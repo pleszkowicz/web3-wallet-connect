@@ -4,39 +4,39 @@
     "next/typescript",
     "plugin:prettier/recommended"
   ],
-//  "rules": {
-//    "react/jsx-key": [
-//      "error",
-//      {
-//        "warnOnDuplicates": true
-//      }
-//    ],
-//    "import/newline-after-import": [
-//      "error",
-//      {
-//        "count": 1
-//      }
-//    ],
-//    "padding-line-between-statements": [
-//      "error",
-//      {
-//        "blankLine": "always",
-//        "prev": "*",
-//        "next": [
-//          "export",
-//          "return"
-//        ]
-//      },
-//      {
-//        "blankLine": "never",
-//        "prev": "*",
-//        "next": "import"
-//      }
-//    ],
-//    "curly": "error",
-//    "eol-last": [
-//      "error",
-//      "always"
-//    ]
-//  }
+  "rules": {
+    "react/jsx-key": [
+      "error",
+      {
+        "warnOnDuplicates": true
+      }
+    ],
+    "import/newline-after-import": [
+      "error",
+      {
+        "count": 1
+      }
+    ],
+    "padding-line-between-statements": [
+      "error",
+      {
+        "blankLine": "always",
+        "prev": "*",
+        "next": [
+          "export",
+          "return"
+        ]
+      },
+      {
+        "blankLine": "never",
+        "prev": "*",
+        "next": "import"
+      }
+    ],
+    "curly": "error",
+    "eol-last": [
+      "error",
+      "always"
+    ]
+  }
 }

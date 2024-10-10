@@ -16,7 +16,7 @@ interface EtherscanResponse {
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const url = new URL(req.url!, 'http://localhost:3000') // dummy base URL
+  const url = new URL(req.url ?? '', 'http://localhost:3000') // dummy base URL to extract params
   const address = url.searchParams.get('address')
   const chainId = url.searchParams.get('chainId')
 
