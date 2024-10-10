@@ -1,14 +1,13 @@
-// pages/api/fetchTransactions.ts
-
 import type { NextApiRequest, NextApiResponse } from 'next';
 import invariant from "tiny-invariant";
-import { mainnet, sepolia } from "wagmi/chains";
 import { EtherscanTransaction } from "@/types/EtherscanTransaction";
+import { config } from "@/config/wagmiConfig";
 
 const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY as string;
 
-invariant(ETHERSCAN_API_KEY, 'ETHERSCAN_API_KEY is not set');
+console.log('ETHERSCAN_API_KEY', ETHERSCAN_API_KEY)
 
+invariant(ETHERSCAN_API_KEY, 'ETHERSCAN_API_KEY is not set');
 
 interface EtherscanResponse {
   status: string;
@@ -17,31 +16,36 @@ interface EtherscanResponse {
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { address, network, page, offset } = req.query;
+  const url = new URL(req.url!, 'http://localhost:3000') // dummy base URL
+  const address = url.searchParams.get('address')
+  const chainId = url.searchParams.get('chainId')
 
+  const currentChain = config.chains.find((chain) => chainId === chain.id.toString())
 
-  if (!address || typeof address !== 'string') {
-    res.status(400).json({ error: 'Address is required and must be a string.' });
+  if (!address) {
+    res.status(400).json({ error: 'Address and chainId is required and must be a string.' });
     return;
   }
 
-  const url = new URL((network === 'sepolia' ? sepolia : mainnet).blockExplorers.default.apiUrl)
+  const apiUrl = currentChain?.blockExplorers?.default.apiUrl
+  invariant(apiUrl, 'Chain API URL is not found');
+
+  const etherscanAPIUrl = new URL(apiUrl)
   const params: Record<string, string> = {
     module: 'account',
     action: 'txlist',
     address,
     startblock: '0',
     endblock: '99999999',
-    page: (page as string) || '1',
-    offset: (offset as string) || '10',
     sort: 'desc',
     apikey: ETHERSCAN_API_KEY,
   };
 
-  Object.keys(params).forEach((key) => url.searchParams.append(key, params[key]));
+  Object.keys(params).forEach((key) => etherscanAPIUrl.searchParams.append(key, params[key]));
+
 
   try {
-    const response = await fetch(url.toString());
+    const response = await fetch(etherscanAPIUrl.toString());
 
     if (!response.ok) {
       throw new Error(`Network response was not ok: ${response.statusText}`);

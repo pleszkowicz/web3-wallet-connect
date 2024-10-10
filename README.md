@@ -1,24 +1,21 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+The main goal is to connect with injected web3 wallet from the browser.
 
 ## Getting Started
 
 First, run the development server:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+pnpm install
 pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/ollama.tsx`. The page auto-updates as you edit the file.
+This project utilizes next.js API routing to connect with Etherscan. THe key is stored locally in the `.env` file.
+See `.env` for more details and how to obtain a key.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Create `.env.local` and add required key(s) to it.
 
 ## Learn More
 

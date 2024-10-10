@@ -13,10 +13,13 @@
 /.next/
 /out/
 
+# .env
+.env*.local
+
 # production
 /build
 
-# misc
+# miscds
 .DS_Store
 *.pem
 .idea
