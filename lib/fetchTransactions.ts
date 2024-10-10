@@ -1,16 +1,9 @@
-import invariant from "tiny-invariant";
-import { EtherscanTransaction } from "@/types/EtherscanTransaction";
-import { Chain } from "wagmi/chains";
+import { EtherscanTransaction } from '@/types/EtherscanTransaction';
+import { Chain } from 'wagmi/chains';
 
-interface EtherscanResponse {
-  status: string;
-  message: string;
-  result: EtherscanTransaction[];
-}
-
-export const fetchTransactions = async (
+export const fetchTransactions = async(
   address: string,
-  chain: Chain
+  chain: Chain,
 ): Promise<EtherscanTransaction[]> => {
   const res = await fetch(`/api/fetch-transactions?address=${address}&chainId=${chain.id}`);
   const data: EtherscanTransaction[] = await res.json();

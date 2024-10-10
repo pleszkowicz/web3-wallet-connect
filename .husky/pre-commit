@@ -1,1 +1,2 @@
-# npm lint
+# pnpm lint-staged
+pnpm lint --fix

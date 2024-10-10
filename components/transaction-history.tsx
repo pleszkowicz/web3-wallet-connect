@@ -9,7 +9,7 @@ import { ChevronDown, ChevronUp } from "lucide-react";
 const TransactionHistory = () => {
   const { address, isConnected, chain: currentChain } = useAccount();
   const [showTransactions, setShowTransactions] = useState<boolean>(false)
-  const [currentChainId, setCurrentChainId] = useState(currentChain?.id)
+  const [chainId, setChainId] = useState(currentChain?.id)
   const queryClient = useQueryClient();
 
   const {
@@ -19,12 +19,12 @@ const TransactionHistory = () => {
   } = useTransactions(address || '', { enabled: showTransactions });
 
   useEffect(() => {
-    if (currentChain?.id !== currentChainId) {
+    if (currentChain?.id !== chainId) {
       queryClient.invalidateQueries({ queryKey: ['transactions', address, currentChain?.id] });
-      setCurrentChainId(currentChain?.id)
+      setChainId(currentChain?.id)
       setShowTransactions(false)
     }
-  }, [currentChain?.id]);
+  }, [address, chainId, currentChain?.id, queryClient]);
 
   const handleFetchTransactions = async() => {
     if (!isConnected || !address) {

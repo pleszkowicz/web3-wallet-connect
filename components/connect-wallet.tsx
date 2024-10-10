@@ -1,5 +1,4 @@
 'use client'
-
 import { useAccount } from "wagmi";
 import { WalletBalance } from "@/components/wallet-balance";
 import { WalletOptions } from "@/components/wallet-options";
@@ -13,7 +12,7 @@ export default function ConnectWallet() {
     isMounted(true);
   }, []);
 
-  if (!mounted) return null;
+  if (!mounted) {return null;}
 
   return isConnected ? <WalletBalance /> : <WalletOptions />;
 }

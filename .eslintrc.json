@@ -2,7 +2,8 @@
   "extends": [
     "next/core-web-vitals",
     "next/typescript",
-    "plugin:prettier/recommended"
+    "eslint-config-next",
+    "prettier"
   ],
   "rules": {
     "react/jsx-key": [
@@ -23,8 +24,7 @@
         "blankLine": "always",
         "prev": "*",
         "next": [
-          "export",
-          "return"
+          "export"
         ]
       },
       {

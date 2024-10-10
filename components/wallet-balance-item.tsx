@@ -1,5 +1,4 @@
 'use client'
-
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Wallet2 } from "lucide-react";
 import { useAccount, useEnsAvatar, useEnsName } from "wagmi";

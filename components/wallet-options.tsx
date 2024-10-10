@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { Connector, useConnect } from 'wagmi'
 import { Button } from "@/components/ui/button"

@@ -58,8 +58,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     res.status(200).json(data.result);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error fetching transactions:', error);
-    res.status(500).json({ error: error.message || 'Internal Server Error' });
+    res.status(500).json({ error: (error as Error).message || 'Internal Server Error' });
   }
 }
