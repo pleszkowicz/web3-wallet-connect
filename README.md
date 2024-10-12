@@ -19,12 +19,11 @@ Create `.env.local` and add required key(s) to it.
 
 Once the application is running, you should see the following login screen:
 
-![login](./https://raw.githubusercontent.com/pleszkowicz/web3-wallet-connect/refs/heads/main/public/images/login.png)
+![login](https://github.com/pleszkowicz/web3-wallet-connect/blob/main/public/images/balance.png?raw=true)
 
 Then, use the injected web3 wallet from the browser and allow read-only access to your account.
 
-![balance](./https://raw.githubusercontent.com/pleszkowicz/web3-wallet-connect/refs/heads/main/public/images/balance.png)
-
+![balance](https://github.com/pleszkowicz/web3-wallet-connect/blob/main/public/images/login.png?raw=true)
 
 ## Learn More
 
