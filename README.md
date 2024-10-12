@@ -3,6 +3,11 @@ The main goal is to connect with injected web3 wallet from the browser.
 
 ## Getting Started
 
+This project utilizes next.js API routing to connect with Etherscan. THe key is stored locally in the `.env` file.
+See `.env` for more details and how to obtain a key.
+
+Create `.env.local` and add required key(s) to it.
+
 First, run the development server:
 
 ```bash
@@ -12,16 +17,13 @@ pnpm dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-This project utilizes next.js API routing to connect with Etherscan. THe key is stored locally in the `.env` file.
-See `.env` for more details and how to obtain a key.
-
-Create `.env.local` and add required key(s) to it.
+## App
 
 Once the application is running, you should see the following login screen:
 
 ![login](https://github.com/pleszkowicz/web3-wallet-connect/blob/main/public/images/login.png?raw=true)
 
-Then, use the injected web3 wallet from the browser and allow read-only access to your account.
+Then, use selected web3 wallet from the browser and allow read-only access to your account.
 
 ![balance](https://github.com/pleszkowicz/web3-wallet-connect/blob/main/public/images/balance.png?raw=true)
 
