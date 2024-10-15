@@ -43,7 +43,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   Object.keys(params).forEach((key) => etherscanAPIUrl.searchParams.append(key, params[key]));
 
-
   try {
     const response = await fetch(etherscanAPIUrl.toString());
 
