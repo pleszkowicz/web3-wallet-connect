@@ -1,6 +1,5 @@
 import { EtherscanTransaction } from "@/types/EtherscanTransaction";
 import { useQuery } from "@tanstack/react-query";
-import { fetchTransactions } from "@/lib/fetchTransactions";
 import invariant from "tiny-invariant";
 import { useAccount } from "wagmi";
 
@@ -11,7 +10,16 @@ export const useTransactions = (address: string, options: { enabled: boolean }) 
 
   return useQuery<EtherscanTransaction[], Error>({
     queryKey: ['transactions', address, currentChain.id],
-    queryFn: () => fetchTransactions(address, currentChain),
+    queryFn: () => {
+      const params = new URLSearchParams({
+        address: address,
+        chainId: currentChain.id.toString(),
+      });
+
+      // Use params in the fetch call
+      return fetch(`/api/fetch-transactions?${params.toString()}`)
+      .then((res) => res.json());
+    },
     enabled: options.enabled,
     staleTime: 1000 * 60 * 5,
     retry: 3,
