@@ -1,5 +1,5 @@
 'use client';
-import { useAccount, useBalance, useChainId, useConnect, useContractRead, useDisconnect, } from 'wagmi'
+import { useAccount, useBalance, useChainId, useConnect, useContractRead, useDisconnect } from 'wagmi'
 import { formatEther } from "viem"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -10,10 +10,12 @@ import { sepolia } from "wagmi/chains";
 import WalletBalanceItem from "@/components/wallet-balance-item";
 import TransactionHistory from "@/components/transaction-history";
 import { Separator } from "@/components/ui/separator";
+import { DisconnectAccount } from './disconnect-account';
+import Link from 'next/link';
+import { ArrowTopRightIcon } from '@radix-ui/react-icons';
 
 export function WalletBalance() {
   const { address, isConnected } = useAccount()
-  const { disconnect } = useDisconnect()
   const { data: balance, isLoading: isBalanceLoading } = useBalance({ address })
   const { connectors, connect } = useConnect()
   const [ready, setReady] = useState<{ [key: string]: boolean }>({})
@@ -44,12 +46,18 @@ export function WalletBalance() {
 
           <Separator />
           <TransactionHistory key={chainId}/>
+          <Button
+            asChild
+            size="sm"
+            variant="outline"
+            className="w-full"
+          >
+            <Link href="/transfer">Send <ArrowTopRightIcon /></Link>
+          </Button>
           <Separator />
         </CardContent>
         <CardFooter>
-          <Button onClick={() => disconnect()} variant="outline" className="w-full">
-            Disconnect
-          </Button>
+          <DisconnectAccount />
         </CardFooter>
       </Card>
     )

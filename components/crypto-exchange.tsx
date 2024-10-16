@@ -15,7 +15,7 @@ const cryptos = [
   { value: "ada", label: "Cardano (ADA)" },
 ]
 
-export function CryptoExchangeComponent() {
+export function CryptoExchange() {
   const [fromCrypto, setFromCrypto] = useState("")
   const [toCrypto, setToCrypto] = useState("")
   const [amount, setAmount] = useState("")
