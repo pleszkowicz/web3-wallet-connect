@@ -1,5 +1,5 @@
 'use client';
-import { useAccount, useBalance, useChainId, useConnect, useContractRead, useDisconnect } from 'wagmi'
+import { useAccount, useBalance, useChainId, useConnect, useContractRead } from 'wagmi'
 import { formatEther } from "viem"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
