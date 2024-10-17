@@ -1,5 +1,8 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
-The main goal is to connect with injected web3 wallet from the browser.
+It connects with injected web3 wallet from the browser and allows to:
+- switch networks (chains)
+- read balance
+- send transaction
 
 ## Getting Started
 
