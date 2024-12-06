@@ -5,23 +5,71 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RefreshCwIcon } from 'lucide-react';
 import { Address, formatEther, isAddress, parseEther } from 'viem';
-import { useAccount, useBalance, useGasPrice, useSendTransaction } from 'wagmi';
-import { ErrorMessage, Field, Form, Formik } from 'formik';
+import {
+  useAccount,
+  useBalance,
+  useContractRead,
+  useGasPrice,
+  useSendTransaction,
+  useWriteContract,
+} from 'wagmi';
+import { ErrorMessage, Field, Form, Formik, useFormikContext } from 'formik';
 import * as Yup from 'yup';
 import { getFormattedBalance } from '@/Utils/getFormattedValue';
 import { ArrowLeftIcon } from '@radix-ui/react-icons';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import { SEPOLIA_LINK_CONTRACT_ADDRESS, SEPOLIA_LINK_TOKEN_ABI } from '@/const/sepolia';
+import { useState } from 'react';
+
+type Crypto = {
+  value: string;
+  label: string;
+};
+
+type CryptoMapKey = 'ETH' | 'LINK';
+
+const CryptoMap: Record<CryptoMapKey, Crypto> = {
+  ETH: {
+    value: 'eth',
+    label: 'Ethereum (ETH)',
+  },
+  LINK: {
+    value: 'link',
+    label: 'Chainlink (LINK)',
+  },
+};
+
+const cryptos = Object.values(CryptoMap);
 
 export function Transfer() {
+  const [selectedUnit, setSelectedUnit] = useState(CryptoMap.ETH);
   const { address } = useAccount();
-  const { data: balance } = useBalance({ address });
+  const { data: ethBalance } = useBalance({ address });
   const { sendTransaction } = useSendTransaction();
   const router = useRouter();
 
+  const { data: linkBalance } = useContractRead({
+    address: SEPOLIA_LINK_CONTRACT_ADDRESS,
+    abi: SEPOLIA_LINK_TOKEN_ABI,
+    functionName: 'balanceOf',
+    args: [address],
+  });
+
+  const { writeContract } = useWriteContract();
   const { data: gasPrice, isFetching: isGasPriceFetching, refetch: refetchGasPrice } = useGasPrice();
 
+  // const { data: symbol } = useContractRead({
+  //   address: SEPOLIA_LINK_CONTRACT_ADDRESS,
+  //   abi: SEPOLIA_LINK_TOKEN_ABI,
+  //   functionName: 'symbol',
+  // });
+
+  const currentBalance = (selectedUnit === CryptoMap.ETH ? ethBalance?.value : (linkBalance as bigint)) ?? 0;
+
   const validationSchema = Yup.object().shape({
+    unit: Yup.string().required('Unit is required'),
     from: Yup.string()
       .matches(/^0x[a-fA-F0-9]{40}$/, 'Invalid wallet address format')
       .required('Sender address is required'),
@@ -35,7 +83,7 @@ export function Transfer() {
       .required('Value is required')
       .test('is-valid-value', 'Insufficient balance', function (value) {
         const { path, createError } = this;
-        const availableBalance = balance ? Number(getFormattedBalance(balance)) : 0;
+        const availableBalance = currentBalance ? Number(getFormattedBalance(currentBalance)) : 0;
         if (parseFloat(value) > availableBalance) {
           return createError({
             path,
@@ -48,10 +96,10 @@ export function Transfer() {
 
   return (
     <Card className="w-full max-w-md mx-auto">
-      <CardHeader className='text-center relative'>
+      <CardHeader className="text-center relative">
         <Button
           asChild
-          className='absolute'
+          className="absolute"
           variant="ghost"
           size="icon"
           onClick={() => router.push('/')}
@@ -61,19 +109,38 @@ export function Transfer() {
             <ArrowLeftIcon className="h-4 w-4" />
           </Link>
         </Button>
-        <CardTitle>
-          Crypto transfer</CardTitle>
+        <CardTitle>Crypto transfer</CardTitle>
         <CardDescription>Transfer crypto to another address</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <Formik
-          initialValues={{ from: address, to: '', value: getFormattedBalance(balance) }}
+          initialValues={{ unit: CryptoMap.ETH.value, from: address, to: '', value: 0 }}
           onSubmit={(values) => {
-            sendTransaction({ to: values.to as Address, value: parseEther(values.value) });
+            if (selectedUnit === CryptoMap.ETH) {
+              sendTransaction({ to: values.to as Address, value: parseEther(String(values.value)) });
+              return;
+            } else {
+              writeContract({
+                address: SEPOLIA_LINK_CONTRACT_ADDRESS,
+                abi: SEPOLIA_LINK_TOKEN_ABI,
+                functionName: 'transfer',
+                args: [
+                  values.to as Address, // Recipient address
+                  parseEther(String(values.value)), // Amount to transfer
+                ],
+              });
+            }
+            // sendTransaction({ to: values.to as Address, value: parseEther(String(values.value)) });
           }}
           validationSchema={validationSchema}
         >
           <Form className="space-y-4">
+            <div className="space-y-2">
+              <CryptoSelect
+                name="unit"
+                onChange={(unitValue) => setSelectedUnit(CryptoMap[unitValue.toUpperCase() as CryptoMapKey])}
+              />
+            </div>
             <div className="space-y-2">
               <Label htmlFor="from">From</Label>
               <Field as={Input} id="from" name="from" type="text" disabled className="bg-muted" />
@@ -85,7 +152,11 @@ export function Transfer() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="value">
-                Value <span className="text-xs">(max {balance?.value ? formatEther(balance.value) : '0.00'} ETH)</span>
+                Value{' '}
+                <span className="text-xs">
+                  (max {currentBalance ? formatEther(currentBalance as bigint) : '0.00'}{' '}
+                  {selectedUnit.value.toUpperCase()})
+                </span>
               </Label>
               <Field as={Input} id="value" name="value" placeholder="0.00" />
               <ErrorMessage name="value" component="div" className="text-red-500" />
@@ -120,3 +191,36 @@ export function Transfer() {
     </Card>
   );
 }
+
+const CryptoSelect = ({ name, onChange }: { name: string; onChange: (value: Crypto['value']) => void }) => {
+  const { setFieldValue, values } = useFormikContext<Record<string, string>>();
+  const selectedValue = values[name];
+
+  return (
+    <div className="space-y-2">
+      <Label htmlFor={name}>Crypto</Label>
+      <Select
+        value={selectedValue}
+        onValueChange={(value) => {
+          setFieldValue(name, value);
+          onChange(value);
+        }}
+      >
+        <SelectTrigger id={name}>
+          <SelectValue placeholder="Select crypto" />
+        </SelectTrigger>
+
+        <SelectContent>
+          {cryptos.map((crypto) => {
+            return (
+              <SelectItem key={crypto.value} value={crypto.value}>
+                {crypto.label}
+              </SelectItem>
+            );
+          })}
+        </SelectContent>
+      </Select>
+      <ErrorMessage name={name} component="div" className="text-red-500" />
+    </div>
+  );
+};

@@ -1,5 +1,5 @@
 'use client';
-import { useAccount, useBalance, useChainId, useConnect, useContractRead } from 'wagmi'
+import { useAccount, useBalance, useChainId, useConnect, useReadContract } from 'wagmi'
 import { formatEther } from "viem"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -12,7 +12,6 @@ import TransactionHistory from "@/components/transaction-history";
 import { Separator } from "@/components/ui/separator";
 import { DisconnectAccount } from './disconnect-account';
 import Link from 'next/link';
-import { ArrowTopRightIcon } from '@radix-ui/react-icons';
 
 export function WalletBalance() {
   const { address, isConnected } = useAccount()
@@ -52,7 +51,7 @@ export function WalletBalance() {
             variant="outline"
             className="w-full"
           >
-            <Link href="/transfer">Send <ArrowTopRightIcon /></Link>
+            <Link href="/transfer">New Transaction</Link>
           </Button>
           <Separator />
         </CardContent>
@@ -89,15 +88,14 @@ export function WalletBalance() {
 export default function SepoliaLinkBalance() {
   const { address, isConnected } = useAccount();
 
-  // Use wagmi's useContractRead to read the token balance and details
-  const { data: balance, isLoading } = useContractRead({
+  const { data: balance, isLoading } = useReadContract({
     address: SEPOLIA_LINK_CONTRACT_ADDRESS,
     abi: SEPOLIA_LINK_TOKEN_ABI,
     functionName: 'balanceOf',
     args: [address],
-  });
+  })
 
-  const { data: symbol } = useContractRead({
+  const { data: symbol } = useReadContract({
     address: SEPOLIA_LINK_CONTRACT_ADDRESS,
     abi: SEPOLIA_LINK_TOKEN_ABI,
     functionName: 'symbol',
