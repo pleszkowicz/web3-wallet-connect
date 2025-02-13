@@ -10,15 +10,15 @@ export const useTransactions = (address: string, options: { enabled: boolean }) 
 
   return useQuery<EtherscanTransaction[], Error>({
     queryKey: ['transactions', address, currentChain.id],
-    queryFn: () => {
+    queryFn: async() => {
       const params = new URLSearchParams({
         address: address,
         chainId: currentChain.id.toString(),
       });
 
       // Use params in the fetch call
-      return fetch(`/api/fetch-transactions?${params.toString()}`)
-      .then((res) => res.json());
+      const response = await fetch(`/api/fetch-transactions?${params.toString()}`);
+      return response.json();
     },
     enabled: options.enabled,
     staleTime: 1000 * 60 * 5,

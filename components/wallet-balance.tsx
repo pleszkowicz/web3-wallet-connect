@@ -1,5 +1,5 @@
 'use client';
-import { useAccount, useBalance, useChainId, useConnect, useReadContract } from 'wagmi'
+import { useAccount, useBalance, useConnect, useReadContract } from 'wagmi'
 import { formatEther } from "viem"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -10,15 +10,17 @@ import { sepolia } from "wagmi/chains";
 import WalletBalanceItem from "@/components/wallet-balance-item";
 import TransactionHistory from "@/components/transaction-history";
 import { Separator } from "@/components/ui/separator";
-import { DisconnectAccount } from './disconnect-account';
+import { DisconnectAccount } from '@/components/disconnect-account';
 import Link from 'next/link';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
+import { NftCollection } from './nft-collection';
+import invariant from 'tiny-invariant';
 
 export function WalletBalance() {
-  const { address, isConnected } = useAccount()
+  const { address, isConnected, chain } = useAccount()
   const { data: balance, isLoading: isBalanceLoading } = useBalance({ address })
   const { connectors, connect } = useConnect()
   const [ready, setReady] = useState<{ [key: string]: boolean }>({})
-  const chainId = useChainId()
 
   useEffect(() => {
     connectors.forEach(async(connector) => {
@@ -30,7 +32,7 @@ export function WalletBalance() {
   if (isConnected) {
     const formattedBalance = balance && `${parseFloat(formatEther(balance.value)).toFixed(4)} ${balance.symbol}`
     return (
-      <Card className="min-w-[500px]">
+      <Card className="min-w-[540px]">
         <CardHeader className="flex-row justify-between items-center">
           <CardTitle>Wallet Balance</CardTitle>
           <NetworkSwitch/>
@@ -41,18 +43,30 @@ export function WalletBalance() {
             balance={formattedBalance}
             isLoading={isBalanceLoading}
           />
-          {chainId === sepolia.id && <SepoliaLinkBalance/>}
+          {chain?.id === sepolia.id && <SepoliaLinkBalance/>}
 
           <Separator />
-          <TransactionHistory key={chainId}/>
-          <Button
-            asChild
-            size="sm"
-            variant="outline"
-            className="w-full"
-          >
-            <Link href="/transfer">New Transaction</Link>
-          </Button>
+
+          <Tabs defaultValue="nfts" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="nfts">NFTs</TabsTrigger>
+              <TabsTrigger value="transactions">Transactions</TabsTrigger>
+            </TabsList>
+            <TabsContent value="nfts">
+              <NftCollection />
+              <Button
+                asChild
+                size="sm"
+                variant="outline"
+                className="w-full mt-5"
+              >
+                <Link href="/nft/create">Create NFT</Link>
+              </Button>
+            </TabsContent>
+            <TabsContent value="transactions">
+              <TransactionHistory key={chain?.id} />
+            </TabsContent>
+          </Tabs>
           <Separator />
         </CardContent>
         <CardFooter>
@@ -87,6 +101,8 @@ export function WalletBalance() {
 
 export default function SepoliaLinkBalance() {
   const { address, isConnected } = useAccount();
+
+  invariant(address, 'Address is required');
 
   const { data: balance, isLoading } = useReadContract({
     address: SEPOLIA_LINK_CONTRACT_ADDRESS,

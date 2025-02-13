@@ -18,6 +18,8 @@ export default function WalletBalanceItem({
   const { data: ensAvatar } = useEnsAvatar({ name: ensName! })
   const { chain: currentChain } = useAccount()
 
+  const formattedAddress = ensName || address?.slice(0, 6) + '...' + address?.slice(-4)
+
   return (
     <div className={`flex items-center space-x-4 ${isLoading ? 'animate-pulse' : ''}`}>
       <Avatar>
@@ -26,24 +28,28 @@ export default function WalletBalanceItem({
           <Wallet2 className="h-6 w-6"/>
         </AvatarFallback>
       </Avatar>
-      <div>
+      <div className="flex flex-row flex-1 items-center justify-between">
         {isLoading ? (
           <p className="text-sm font-medium">Loading...</p>
         ) : (
           <>
-            <p className="text-sm font-medium">
-              <a
-                href={`${currentChain?.blockExplorers?.default.url}/address/${address}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-500 hover:underline"
-              >
-                {ensName || address?.slice(0, 6) + '...' + address?.slice(-4)}
-              </a>
+            <p className="text-sm font-medium" title={address}>
+              {currentChain?.blockExplorers?.default.url ? (
+                <a
+                  href={`${currentChain?.blockExplorers?.default.url}/address/${address}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-500 hover:underline"
+                >
+                  {formattedAddress}
+                </a>
+              ) : (
+                formattedAddress
+              )}
             </p>
-            <p className="text-xs text-muted-foreground">
+            <h4 className="text-lg text-bold text-right">
               {balance}
-            </p>
+            </h4>
           </>
         )}
       </div>

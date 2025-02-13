@@ -8,8 +8,8 @@ import { Address, formatEther, isAddress, parseEther } from 'viem';
 import {
   useAccount,
   useBalance,
-  useContractRead,
   useGasPrice,
+  useReadContract,
   useSendTransaction,
   useWriteContract,
 } from 'wagmi';
@@ -50,7 +50,7 @@ export function Transfer() {
   const { sendTransaction } = useSendTransaction();
   const router = useRouter();
 
-  const { data: linkBalance } = useContractRead({
+  const { data: linkBalance } = useReadContract({
     address: SEPOLIA_LINK_CONTRACT_ADDRESS,
     abi: SEPOLIA_LINK_TOKEN_ABI,
     functionName: 'balanceOf',
@@ -187,7 +187,8 @@ export function Transfer() {
           </Form>
         </Formik>
       </CardContent>
-      <CardFooter></CardFooter>
+      <CardFooter>
+      </CardFooter>
     </Card>
   );
 }
