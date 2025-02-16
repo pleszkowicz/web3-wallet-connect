@@ -6,7 +6,7 @@ export const DisconnectAccount = () => {
   const { disconnect } = useDisconnect();
 
   return (
-    <Button onClick={() => disconnect()} variant="outline" className="w-full">
+    <Button onClick={() => disconnect()} variant="ghost">
       Disconnect
     </Button>
   );

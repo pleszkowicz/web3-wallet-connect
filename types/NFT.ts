@@ -1,5 +1,5 @@
 export type NFT = {
-    tokenId: bigint;
+    tokenId: `${string}-${string}-${string}-${string}-${string}`;
     name: string;
     description: string;
     image: string;

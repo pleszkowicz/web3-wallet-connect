@@ -2,19 +2,17 @@
 import { useAccount, useBalance, useConnect, useReadContract } from 'wagmi'
 import { formatEther } from "viem"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { useEffect, useState } from 'react'
 import { SEPOLIA_LINK_CONTRACT_ADDRESS, SEPOLIA_LINK_TOKEN_ABI } from "@/const/sepolia";
-import NetworkSwitch from "@/components/network-switch";
-import { sepolia } from "wagmi/chains";
 import WalletBalanceItem from "@/components/wallet-balance-item";
 import TransactionHistory from "@/components/transaction-history";
 import { Separator } from "@/components/ui/separator";
-import { DisconnectAccount } from '@/components/disconnect-account';
 import Link from 'next/link';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { NftCollection } from './nft-collection';
 import invariant from 'tiny-invariant';
+import CardLayout from './card-layout';
+import { sepolia } from "wagmi/chains";
 
 export function WalletBalance() {
   const { address, isConnected, chain } = useAccount()
@@ -32,70 +30,64 @@ export function WalletBalance() {
   if (isConnected) {
     const formattedBalance = balance && `${parseFloat(formatEther(balance.value)).toFixed(4)} ${balance.symbol}`
     return (
-      <Card className="min-w-[540px]">
-        <CardHeader className="flex-row justify-between items-center">
-          <CardTitle>Wallet Balance</CardTitle>
-          <NetworkSwitch/>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <WalletBalanceItem
-            address={address}
-            balance={formattedBalance}
-            isLoading={isBalanceLoading}
-          />
-          {chain?.id === sepolia.id && <SepoliaLinkBalance/>}
+      <CardLayout title="Wallet Balance">
+        <WalletBalanceItem
+          address={address}
+          balance={formattedBalance}
+          isLoading={isBalanceLoading}
+        />
+        {chain?.id === sepolia.id && <SepoliaLinkBalance/>}
 
-          <Separator />
+        <Separator />
 
-          <Tabs defaultValue="nfts" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="nfts">NFTs</TabsTrigger>
-              <TabsTrigger value="transactions">Transactions</TabsTrigger>
-            </TabsList>
-            <TabsContent value="nfts">
-              <NftCollection />
-              <Button
-                asChild
-                size="sm"
-                variant="outline"
-                className="w-full mt-5"
-              >
-                <Link href="/nft/create">Create NFT</Link>
-              </Button>
-            </TabsContent>
-            <TabsContent value="transactions">
-              <TransactionHistory key={chain?.id} />
-            </TabsContent>
-          </Tabs>
-          <Separator />
-        </CardContent>
-        <CardFooter>
-          <DisconnectAccount />
-        </CardFooter>
-      </Card>
+        <Tabs defaultValue="nfts" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="nfts">NFTs</TabsTrigger>
+            <TabsTrigger value="transactions">Transactions</TabsTrigger>
+          </TabsList>
+          <TabsContent value="nfts">
+            <NftCollection />
+            <Button
+              asChild
+              size="sm"
+              variant="outline"
+              className="w-full mt-5"
+            >
+              <Link href="/nft/create">Create NFT</Link>
+            </Button>
+          </TabsContent>
+          <TabsContent value="transactions">
+            <TransactionHistory key={chain?.id} />
+            <Button
+              asChild
+              size="sm"
+              variant="outline"
+              className="w-full mt-5"
+            >
+              <Link href="/transaction">Create transaction</Link>
+            </Button>
+          </TabsContent>
+        </Tabs>
+        <Separator />
+      </CardLayout>
     )
   }
 
   return (
-    <Card className="w-[350px]">
-      <CardHeader>
-        <CardTitle>Connect Wallet</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="grid gap-4">
-          {connectors.map((connector) => (
-            <Button
-              key={connector.id}
-              onClick={() => connect({ connector })}
-              disabled={!ready[connector.id]}
-              variant="outline"
-            >
-              {connector.name}
-            </Button>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
+    <CardLayout title="Connect Wallet">
+      <div className="grid gap-4">
+        {connectors.map((connector) => (
+          <Button
+            key={connector.id}
+            onClick={() => connect({ connector })}
+            disabled={!ready[connector.id]}
+            variant="outline"
+          >
+            {connector.name}
+          </Button>
+        ))}
+      </div>
+    </CardLayout>
   )
 }
 

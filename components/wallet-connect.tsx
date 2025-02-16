@@ -2,32 +2,26 @@
 import * as React from 'react';
 import { Connector, useConnect } from 'wagmi';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2 } from 'lucide-react';
 import Image from 'next/image';
+import CardLayout from './card-layout';
 
-export function WalletSelect() {
+export function WalletConnect() {
   const { connectors, connect, isPending } = useConnect();
 
   return (
-    <Card className="w-[350px]">
-      <CardHeader>
-        <CardTitle>Connect Wallet</CardTitle>
-        <CardDescription>Choose a wallet to connect to this app</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="grid gap-4">
-          {connectors.map((connector) => (
-            <WalletOption
-              key={connector.id}
-              connector={connector}
-              onClick={() => connect({ connector })}
-              pending={isPending}
-            />
-          ))}
-        </div>
-      </CardContent>
-    </Card>
+    <CardLayout title="Connect Wallet" description="Choose a wallet to connect to this app">
+      <div className="grid gap-4">
+        {connectors.map((connector) => (
+          <WalletOption
+            key={connector.id}
+            connector={connector}
+            onClick={() => connect({ connector })}
+            pending={isPending}
+          />
+        ))}
+      </div>
+    </CardLayout>
   );
 }
 

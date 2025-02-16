@@ -18,16 +18,16 @@ export async function GET(_req: NextApiRequest, { params }: { params: Promise<{ 
         invariant(typeof id === 'string', 'Invalid token ID');
 
         const tokens = await readTokens();
-        const token = tokens.find((token: NFT) => token.tokenId === BigInt(id));
+        const token = tokens.find((token: NFT) => token.tokenId === id);
 
         if (!token) {
-            return Response.json({ error: 'Token not found' }, {status: 404});
+            return Response.json({ error: 'Token not found' }, { status: 404 });
         }
 
         return Response.json(token);
     } catch (error: unknown) {
         console.error('Error fetching token:', error);
 
-        return Response.json({ error: (error as Error).message || 'Internal Server Error' }, {status: 500});
+        return Response.json({ error: (error as Error).message || 'Internal Server Error' }, { status: 500 });
     }
 }

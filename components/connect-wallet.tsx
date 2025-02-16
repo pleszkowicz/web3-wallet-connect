@@ -1,8 +1,8 @@
 'use client'
 import { useAccount } from "wagmi";
 import { WalletBalance } from "@/components/wallet-balance";
-import { WalletSelect } from "@/components/wallet-select";
 import { useEffect, useState } from "react";
+import { WalletConnect } from "./wallet-connect";
 
 export default function ConnectWallet() {
   const { isConnected } = useAccount();
@@ -14,5 +14,5 @@ export default function ConnectWallet() {
 
   if (!mounted) {return null;}
 
-  return isConnected ? <WalletBalance /> : <WalletSelect />;
+  return isConnected ? <WalletBalance /> : <WalletConnect />;
 }

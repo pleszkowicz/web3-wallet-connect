@@ -1,3 +1,4 @@
+'use client';
 import { NFT_MARKET_CONTRACT_ABI } from '@/const/nft-marketplace-abi';
 import { Address, formatEther } from 'viem';
 import { useReadContract } from 'wagmi';
@@ -24,9 +25,9 @@ export const NftCollection = () => {
       {isLoading ? (
         <p>Loading...</p>
       ) : (
-        <div className="flex flex-column">
+        <div className="flex flex-wrap">
           {nfts?.map((nft) => (
-            <div key={nft.tokenId} className="flex flex-col justify-between p-4 text-center max-w-[180px]">
+            <div key={nft.tokenId} className="flex flex-col justify-between p-4 text-center w-1/3 min-w-[180px]">
               <NftItem tokenId={nft.tokenId.toString()} price={nft.price} />
             </div>
           ))}
@@ -35,6 +36,7 @@ export const NftCollection = () => {
     </>
   );
 };
+
 
 const NftItem = ({ tokenId, price }: { tokenId: string, price: bigint }) => {
   const { data: tokenURI, isLoading } = useReadContract({
@@ -65,10 +67,12 @@ const NftItem = ({ tokenId, price }: { tokenId: string, price: bigint }) => {
     return <p>Loading...</p>;
   }
 
+  console.log('tokenDetails.image', tokenDetails.image);
+
   return (
     <>
       <div className="flex items-center flex-col">
-        <Image src={tokenDetails.image} alt={tokenDetails.name} className="w-12 h-12 rounded-lg" />
+        <Image loading="lazy" src={tokenDetails.image} alt={tokenDetails.name || 'NFT Image'} className="w-12 h-12 rounded-lg" width={50} height={50} />
         <h3 className="text-sm font-semibold">{tokenDetails.name}</h3>
         <p className="text-sm text-muted-foreground">{tokenDetails.description}</p>
         <p className="text-sm text-muted-foreground">Price: {formatEther(price)} ETH</p>

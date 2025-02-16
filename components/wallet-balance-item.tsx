@@ -30,7 +30,7 @@ export default function WalletBalanceItem({
       </Avatar>
       <div className="flex flex-row flex-1 items-center justify-between">
         {isLoading ? (
-          <p className="text-sm font-medium">Loading...</p>
+          <p className="text-sm font-medium">Loading balance...</p>
         ) : (
           <>
             <p className="text-sm font-medium" title={address}>
