@@ -1,13 +1,18 @@
 'use client';
 import { useDisconnect } from 'wagmi';
 import { Button } from '@/components/ui/button';
+import { PowerOff } from 'lucide-react';
 
-export const DisconnectAccount = () => {
+type DisconnectAccountTypes = {
+  className?: string;
+}
+
+export const DisconnectAccount = ({ className }: DisconnectAccountTypes) => {
   const { disconnect } = useDisconnect();
 
   return (
-    <Button onClick={() => disconnect()} variant="ghost">
-      Disconnect
+    <Button className={className} onClick={() => disconnect()} variant="ghost">
+      <PowerOff width={20} />
     </Button>
   );
 };

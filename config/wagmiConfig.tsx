@@ -1,14 +1,14 @@
 import { defineChain } from 'viem';
-import { http, createConfig } from 'wagmi'
+import { http, createConfig, webSocket } from 'wagmi'
 import { mainnet, sepolia } from 'wagmi/chains'
 import { injected } from 'wagmi/connectors'
 
 // I had to provide from scratch since default localhost wagmi/chains didn't work
 export const localhost = defineChain({
   id: 31337,
-  name: 'Hardhat Localhost',
+  name: 'Dev Network',
   nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
-  rpcUrls: { default: { http: ['http://127.0.0.1:8545'] } },
+  rpcUrls: { default: { http: ['http://127.0.0.1:8545'], webSocket: ['ws://127.0.0.1:8545'] }, },
 });
 
 export const config = createConfig({
@@ -18,11 +18,11 @@ export const config = createConfig({
     localhost,
   ],
   connectors: [
-    injected(),
+    // injected(),
   ],
   transports: {
-    [mainnet.id]: http(),
-    [sepolia.id]: http(),
-    [localhost.id]: http(), // Explicit RPC URL
+    [mainnet.id]: webSocket(`wss://mainnet.infura.io/ws/v3/YOUR_INFURA_ID`),
+    [sepolia.id]: webSocket(`wss://sepolia.infura.io/ws/v3/YOUR_INFURA_ID`),
+    [localhost.id]: webSocket(), // Dodanie WebSocket dla localhost
   },
 })

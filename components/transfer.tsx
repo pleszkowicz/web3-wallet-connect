@@ -1,6 +1,5 @@
 'use client';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RefreshCwIcon } from 'lucide-react';
@@ -16,12 +15,11 @@ import {
 import { ErrorMessage, Field, Form, Formik, useFormikContext } from 'formik';
 import * as Yup from 'yup';
 import { getFormattedBalance } from '@/Utils/getFormattedValue';
-import { ArrowLeftIcon } from '@radix-ui/react-icons';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { SEPOLIA_LINK_CONTRACT_ADDRESS, SEPOLIA_LINK_TOKEN_ABI } from '@/const/sepolia';
 import { useState } from 'react';
+import CardLayout from './card-layout';
+import invariant from 'tiny-invariant';
 
 type Crypto = {
   value: string;
@@ -48,7 +46,8 @@ export function Transfer() {
   const { address } = useAccount();
   const { data: ethBalance } = useBalance({ address });
   const { sendTransaction } = useSendTransaction();
-  const router = useRouter();
+
+  invariant(address, 'Account address is required');
 
   const { data: linkBalance } = useReadContract({
     address: SEPOLIA_LINK_CONTRACT_ADDRESS,
@@ -95,24 +94,7 @@ export function Transfer() {
   });
 
   return (
-    <Card className="w-full max-w-md mx-auto">
-      <CardHeader className="text-center relative">
-        <Button
-          asChild
-          className="absolute"
-          variant="ghost"
-          size="icon"
-          onClick={() => router.push('/')}
-          aria-label="Go back"
-        >
-          <Link href="/">
-            <ArrowLeftIcon className="h-4 w-4" />
-          </Link>
-        </Button>
-        <CardTitle>Crypto transfer</CardTitle>
-        <CardDescription>Transfer crypto to another address</CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
+    <CardLayout title="Crypto Transfer" description="Transfer your crypto to another wallet" showBackButton>
         <Formik
           initialValues={{ unit: CryptoMap.ETH.value, from: address, to: '', value: 0 }}
           onSubmit={(values) => {
@@ -186,10 +168,7 @@ export function Transfer() {
             </Button>
           </Form>
         </Formik>
-      </CardContent>
-      <CardFooter>
-      </CardFooter>
-    </Card>
+    </CardLayout>
   );
 }
 
