@@ -1,5 +1,6 @@
 'use client';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+
 export interface WalletBalanceItemProps {
   address?: `0x${string}`;
   balance?: string;

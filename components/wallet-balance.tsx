@@ -1,5 +1,5 @@
 'use client';
-import { useAccount, useBalance, useConnect, useReadContract, useReadContracts } from 'wagmi';
+import { useAccount, useBalance, useConnect, useReadContract } from 'wagmi';
 import { formatEther } from 'viem';
 import { Button } from '@/components/ui/button';
 import { useEffect, useState } from 'react';
@@ -83,11 +83,6 @@ export function WalletBalance() {
     </CardLayout>
   );
 }
-
-const sepoliaLinkContract = {
-  address: SEPOLIA_LINK_CONTRACT_ADDRESS,
-  abi: SEPOLIA_LINK_TOKEN_ABI,
-};
 
 export default function SepoliaLinkBalance() {
   const { address, isConnected } = useAccount();
