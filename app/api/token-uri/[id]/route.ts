@@ -1,9 +1,9 @@
 'use server';
-import { NextApiRequest } from "next";
 import invariant from "tiny-invariant";
 import path from 'path';
 import fs from "fs";
 import { NFT } from "@/types/NFT";
+import { NextRequest } from "next/server";
 
 const filePath = path.join(process.cwd(), 'data', 'tokens.json');
 
@@ -12,7 +12,7 @@ const readTokens = async () => {
     return JSON.parse(data);
 }
 
-export async function GET(_req: NextApiRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     try {
         const { id } = await params;
         invariant(typeof id === 'string', 'Invalid token ID');

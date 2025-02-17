@@ -1,7 +1,7 @@
 'use server';
 import { config } from "@/config/wagmiConfig";
 import { EtherscanTransaction } from "@/types/EtherscanTransaction";
-import { NextApiRequest } from "next";
+import { NextRequest } from "next/server";
 import invariant from "tiny-invariant";
 
 const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY as string;
@@ -14,7 +14,7 @@ type EtherscanResponse = {
   result: EtherscanTransaction[];
 }
 
-export async function GET(req: NextApiRequest) {
+export async function GET(req: NextRequest) {
   const url = new URL(req.url ?? '', 'http://localhost:3000') // dummy base URL to extract params
   const address = url.searchParams.get('address')
   const chainId = url.searchParams.get('chainId')

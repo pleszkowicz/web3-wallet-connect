@@ -1,9 +1,9 @@
 'use server';
-import { NextApiRequest } from "next";
 import path from 'path';
 import fs from "fs";
 import crypto from 'crypto';
 import { NFT } from "@/types/NFT";
+import { NextRequest } from "next/server";
 
 const filePath = path.join(process.cwd(), 'data', 'tokens.json');
 console.log('filePath', filePath)
@@ -13,7 +13,7 @@ const readTokens = async () => {
     return JSON.parse(data);
 }
 
-export async function POST(req: NextApiRequest) {
+export async function POST(req: NextRequest) {
     const { name, description, image }: NFT = await new Response(req.body).json();
 
     if (!name || !description || !image) {
