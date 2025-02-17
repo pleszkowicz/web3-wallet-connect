@@ -9,12 +9,16 @@ import { NFT } from '@/types/NFT';
 import { Button } from './ui/button';
 import { NFT_MARKET_CONTRACT_ABI } from '@/const/nft-marketplace-abi';
 import CardLayout from './card-layout';
+import { useToast } from './ui/hooks/use-toast';
+import { useRouter } from 'next/navigation';
 
 dotenv.config();
 
 type NFTMetadata = Omit<NFT, 'tokenId'>;
 
 export function CreateNFT() {
+  const { toast } = useToast();
+  const router = useRouter();
   const { writeContract } = useWriteContract();
   const validationSchema: Yup.ObjectSchema<NFTMetadata> = Yup.object().shape({
     name: Yup.string().required('Name is required'),
@@ -56,6 +60,9 @@ export function CreateNFT() {
               onSuccess: (tokenId) => {
                 console.log('NFT created successfully');
                 console.log('data', tokenId);
+
+                toast({ title: 'NFT successfully created!' });
+                router.push('/');
               },
               onError: (error) => {
                 console.log('NFT creation failed');

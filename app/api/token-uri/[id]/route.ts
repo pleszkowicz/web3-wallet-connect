@@ -21,13 +21,13 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
         const token = tokens.find((token: NFT) => token.tokenId === id);
 
         if (!token) {
-            return Response.json({ error: 'Token not found' }, { status: 404 });
+            return new Response(JSON.stringify({ error: 'Token not found' }), { status: 404 });
         }
 
-        return Response.json(token);
+        return new Response(JSON.stringify(token));
     } catch (error: unknown) {
         console.error('Error fetching token:', error);
 
-        return Response.json({ error: (error as Error).message || 'Internal Server Error' }, { status: 500 });
+        return new Response(JSON.stringify({ error: (error as Error).message || 'Internal Server Error' }), { status: 500 });
     }
 }

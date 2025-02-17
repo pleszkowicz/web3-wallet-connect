@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
     const { name, description, image }: NFT = await new Response(req.body).json();
 
     if (!name || !description || !image) {
-        return Response.json({ error: "All fields are required." }, { status: 400 });
+        return new Response(JSON.stringify({ error: "All fields are required." }), { status: 400 });
     }
 
     const tokens: NFT[] = await readTokens();
@@ -33,11 +33,11 @@ export async function POST(req: NextRequest) {
     tokens.push(newToken);
     fs.writeFileSync(filePath, JSON.stringify(tokens, null, 2));
 
-    return Response.json(newToken, { status: 201 });
+    return new Response(JSON.stringify(newToken), { status: 201 });
 }
 
 export async function GET() {
     const tokens = await readTokens();
 
-    return Response.json(tokens);
+    return new Response(JSON.stringify(tokens));
 }

@@ -1,4 +1,5 @@
 'use client';
+
 import { NFT_MARKET_CONTRACT_ABI } from '@/const/nft-marketplace-abi';
 import { Address, formatEther } from 'viem';
 import { useReadContract } from 'wagmi';
@@ -14,7 +15,7 @@ export const NftCollection = () => {
     'NEXT_PUBLIC_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS is required'
   );
 
-  const { data: nfts, isLoading } = useReadContract({
+  const { data: nfts, isLoading, isFetchedAfterMount, refetch } = useReadContract({
     address: process.env.NEXT_PUBLIC_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS as Address,
     abi: NFT_MARKET_CONTRACT_ABI,
     functionName: 'getAllNFTs',
@@ -71,10 +72,12 @@ const NftItem = ({ tokenId, price }: { tokenId: string, price: bigint }) => {
 
   return (
     <>
-      <div className="flex items-center flex-col">
+      <div className="flex items-center flex-col gap-2">
         <Image loading="lazy" src={tokenDetails.image} alt={tokenDetails.name || 'NFT Image'} className="w-12 h-12 rounded-lg" width={50} height={50} />
-        <h3 className="text-sm font-semibold">{tokenDetails.name}</h3>
-        <p className="text-sm text-muted-foreground">{tokenDetails.description}</p>
+        <div>
+          <h3 className="text-sm font-semibold">{tokenDetails.name}</h3>
+          <p className="text-sm text-muted-foreground">{tokenDetails.description}</p>
+          </div>
         <p className="text-sm text-muted-foreground">Price: {formatEther(price)} ETH</p>
       </div>
 
