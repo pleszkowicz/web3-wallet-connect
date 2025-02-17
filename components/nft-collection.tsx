@@ -1,5 +1,4 @@
 'use client';
-
 import { NFT_MARKET_CONTRACT_ABI } from '@/const/nft-marketplace-abi';
 import { Address, formatEther } from 'viem';
 import { useReadContract } from 'wagmi';
@@ -15,7 +14,7 @@ export const NftCollection = () => {
     'NEXT_PUBLIC_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS is required'
   );
 
-  const { data: nfts, isLoading, isFetchedAfterMount, refetch } = useReadContract({
+  const { data: nfts, isLoading } = useReadContract({
     address: process.env.NEXT_PUBLIC_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS as Address,
     abi: NFT_MARKET_CONTRACT_ABI,
     functionName: 'getAllNFTs',
@@ -47,8 +46,6 @@ const NftItem = ({ tokenId, price }: { tokenId: string, price: bigint }) => {
     args: [BigInt(tokenId)],
   });
 
-  console.log('tokenURI', tokenURI);
-
   const { data: tokenDetails } = useQuery<NFT, Error>({
     queryKey: ['token-details', tokenId],
     queryFn: async () => {
@@ -67,8 +64,6 @@ const NftItem = ({ tokenId, price }: { tokenId: string, price: bigint }) => {
   if (isLoading || tokenDetails === undefined) {
     return <p>Loading...</p>;
   }
-
-  console.log('tokenDetails.image', tokenDetails.image);
 
   return (
     <>
