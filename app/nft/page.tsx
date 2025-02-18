@@ -1,11 +1,10 @@
 'use client';
-import { Transfer } from "@/components/transfer";
 import CardLayout from "@/components/card-layout";
 
 export default function TransactionPage() {
   return (
-    <CardLayout title="Crypto Transfer" description="Transfer your crypto to another wallet" showBackButton>
-      <Transfer />
+    <CardLayout title="All NFTs" description={<p>List allof the marketplace NFTs</p>} showBackButton>
+      TODO: - list all NFTs from smart-contract.
     </CardLayout>
   );
 }
