@@ -13,6 +13,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Set up environment variables
+        run: |
+          echo "ETHERSCAN_API_KEY=${{ secrets.ETHERSCAN_API_KEY }}" >> $GITHUB_ENV
+          echo "NEXT_PUBLIC_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS=${{ secrets.NEXT_PUBLIC_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS }}" >> $GITHUB_ENV
+
       - name: Print env variables
         run: env
 
