@@ -6,7 +6,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { shrotenAddress } from '@/Utils/shortenAddress';
 
 const TransactionHistory = () => {
-  const { address, isConnected, chain: currentChain } = useAccount();
+  const { address, chain: currentChain } = useAccount();
   const [showTransactions, setShowTransactions] = useState<boolean>(true);
   const [chainId, setChainId] = useState(currentChain?.id);
   const queryClient = useQueryClient();
@@ -20,13 +20,6 @@ const TransactionHistory = () => {
       setShowTransactions(false);
     }
   }, [address, chainId, currentChain?.id, queryClient]);
-
-  const handleFetchTransactions = async () => {
-    if (!isConnected || !address) {
-      return;
-    }
-    setShowTransactions((prevState) => !prevState);
-  };
 
   if (isFetching) {
     return <p>Loading transactions...</p>

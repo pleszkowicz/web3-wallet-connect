@@ -13,6 +13,7 @@ import { NftCollection } from './nft-collection';
 import invariant from 'tiny-invariant';
 import CardLayout from './card-layout';
 import { sepolia } from 'wagmi/chains';
+import { ImagePlusIcon, LucideIcon, SendIcon } from 'lucide-react';
 
 export function WalletBalance() {
   const { address, isConnected, chain } = useAccount();
@@ -31,7 +32,15 @@ export function WalletBalance() {
     const formattedBalance = balance && `${parseFloat(formatEther(balance.value)).toFixed(4)} ${balance.symbol}`;
 
     return (
-      <CardLayout title="Wallet Dashboard">
+      <CardLayout
+        title="Wallet Dashboard"
+        description={
+          <div className="flex flex-row gap-6 justify-center pt-3">
+            <ActionLink href="/transaction" text="Send" Icon={SendIcon} />
+            <ActionLink href="/nft/create" text="Create NFT" Icon={ImagePlusIcon} />
+          </div>
+        }
+      >
         <WalletBalanceItem
           address={address}
           balance={formattedBalance}
@@ -49,16 +58,16 @@ export function WalletBalance() {
             <TabsTrigger value="transactions">Transactions</TabsTrigger>
           </TabsList>
           <TabsContent value="nfts">
-            <NftCollection />
-            <Button asChild size="sm" variant="outline" className="w-full mt-5">
+            <Button asChild size="sm" variant="default" className="w-full mt-5">
               <Link href="/nft/create">Create NFT</Link>
             </Button>
+            <NftCollection />
           </TabsContent>
           <TabsContent value="transactions">
-            <TransactionHistory key={chain?.id} />
-            <Button asChild size="sm" variant="outline" className="w-full mt-5">
-              <Link href="/transaction">Create transaction</Link>
+            <Button asChild size="sm" variant="default" className="w-full mt-5 mb-5">
+              <Link href="/transaction">New transaction</Link>
             </Button>
+            <TransactionHistory key={chain?.id} />
           </TabsContent>
         </Tabs>
         <Separator />
@@ -115,10 +124,32 @@ export default function SepoliaLinkBalance() {
   return (
     <div>
       {isConnected ? (
-        <WalletBalanceItem address={address} balance={`${formattedBalance} ${formattedSymbol}`} isLoading={isLoading} name={name} />
+        <WalletBalanceItem
+          address={address}
+          balance={`${formattedBalance} ${formattedSymbol}`}
+          isLoading={isLoading}
+          name={name}
+        />
       ) : (
         <p>Please connect your wallet to Sepolia</p>
       )}
     </div>
   );
 }
+
+type ActionLinkProps = {
+  href: string;
+  Icon: LucideIcon;
+  text: string;
+};
+
+const ActionLink = ({ href, Icon, text }: ActionLinkProps) => {
+  return (
+    <Link href={href} className="flex flex-col items-center">
+      <span className="inline-block rounded-full p-3 bg-gray-700 dark:hover:bg-gray-100 transition-colors">
+        <Icon size="16" color="white" />
+      </span>
+      <span className="block text-xs text-center mt-1">{text}</span>
+    </Link>
+  );
+};

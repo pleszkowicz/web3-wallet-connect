@@ -1,5 +1,5 @@
 'use client';
-import { ReactNode } from 'react';
+import { ReactElement, ReactNode } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import NetworkSwitch from '@/components/network-switch';
 import { Button } from './ui/button';
@@ -13,7 +13,7 @@ import { DisconnectAccount } from './disconnect-account';
 
 interface CardLayoutProps {
   title: string;
-  description?: string;
+  description?: ReactElement;
   showBackButton?: boolean;
   children: ReactNode;
 }
@@ -54,35 +54,37 @@ export default function CardLayout({ title, description, showBackButton, childre
         </div>
 
         {isConnected && (
-          <div className="text-sm font-medium flex flex-row items-center justify-center">
-            <Button
-              className="text-muted-foreground"
-              variant="ghost"
-              size="sm"
-              title="Copy to clipboard"
-              onClick={() => {
-                navigator.clipboard.writeText(address as string);
-                toast({
-                  title: 'Address copied!',
-                });
-              }}
-            >
-              <span>{formattedAddress}</span>
-              <CopyIcon className="ml-2 w-4 h-4" />
-            </Button>
-
-            {currentChain?.blockExplorers?.default.url ? (
-              <a
-                href={`${currentChain?.blockExplorers?.default.url}/address/${address}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-500 hover:underline"
-                title="Go to Explorer"
+          <>
+            <div className="text-sm font-medium flex flex-row items-center justify-center">
+              <Button
+                className="text-muted-foreground"
+                variant="ghost"
+                size="sm"
+                title="Copy to clipboard"
+                onClick={() => {
+                  navigator.clipboard.writeText(address as string);
+                  toast({
+                    title: 'Address copied!',
+                  });
+                }}
               >
-                <OpenInNewWindowIcon />
-              </a>
-            ) : null}
-          </div>
+                <span>{formattedAddress}</span>
+                <CopyIcon className="ml-2 w-4 h-4" />
+              </Button>
+
+              {currentChain?.blockExplorers?.default.url ? (
+                <a
+                  href={`${currentChain?.blockExplorers?.default.url}/address/${address}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-500 hover:underline"
+                  title="Go to Explorer"
+                >
+                  <OpenInNewWindowIcon />
+                </a>
+              ) : null}
+            </div>
+          </>
         )}
 
         {description && <CardDescription className="mt-12">{description}</CardDescription>}
