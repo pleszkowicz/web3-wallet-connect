@@ -1,11 +1,23 @@
-# Web3 Wallet Connect
+# Web3 Wallet Connect for portfolio purposes
 
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
-It connects with injected web3 wallet from the browser and allows to:
 
-- switch networks (chains)
-- read balance
+This project heavily utilizes [wagmi](https://wagmi.sh/react/getting-started) to interact with the **wallet**, **chains** and **smart-contracts**. The purpose of this project is to develop skills in **EVM** world.
+
+When it comes to functionalities, it allows to:
+
+- read current balance
+- switch network
 - send transaction
+- create NFT on localhost hardhat network (requires [hardhat-smart-contract](https://github.com/pleszkowicz/hardhat-smart-contract) to clone and run locally)
+
+Supported networks:
+
+- mainnet
+- sepolia
+- localhost hardhat network (transaction history not available due to)
+
+
 
 ## Getting Started
 
