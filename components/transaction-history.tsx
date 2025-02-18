@@ -1,50 +1,39 @@
 import { useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
-import { useTransactions } from "@/hooks/useTransactions";
-import { formatEther } from "viem";
-import { Button } from "@/components/ui/button";
-import { useQueryClient } from "@tanstack/react-query";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { useTransactions } from '@/hooks/useTransactions';
+import { formatEther } from 'viem';
+import { useQueryClient } from '@tanstack/react-query';
+import { shrotenAddress } from '@/Utils/shortenAddress';
 
 const TransactionHistory = () => {
   const { address, isConnected, chain: currentChain } = useAccount();
-  const [showTransactions, setShowTransactions] = useState<boolean>(false)
-  const [chainId, setChainId] = useState(currentChain?.id)
+  const [showTransactions, setShowTransactions] = useState<boolean>(true);
+  const [chainId, setChainId] = useState(currentChain?.id);
   const queryClient = useQueryClient();
 
-  const {
-    data: transactions,
-    error,
-    isFetching,
-  } = useTransactions(address || '', { enabled: showTransactions });
+  const { data: transactions, error, isFetching } = useTransactions(address || '', { enabled: showTransactions });
 
   useEffect(() => {
     if (currentChain?.id !== chainId) {
       queryClient.invalidateQueries({ queryKey: ['transactions', address, currentChain?.id] });
-      setChainId(currentChain?.id)
-      setShowTransactions(false)
+      setChainId(currentChain?.id);
+      setShowTransactions(false);
     }
   }, [address, chainId, currentChain?.id, queryClient]);
 
-  const handleFetchTransactions = async() => {
+  const handleFetchTransactions = async () => {
     if (!isConnected || !address) {
       return;
     }
-    setShowTransactions((prevState) => !prevState)
+    setShowTransactions((prevState) => !prevState);
   };
+
+  if (isFetching) {
+    return <p>Loading transactions...</p>
+  }
 
   return (
     <>
-      <Button
-        className="flex justify-between w-full"
-        variant="ghost"
-        disabled={isFetching}
-        onClick={handleFetchTransactions}
-      >
-        <span>{showTransactions ? 'Hide Transactions' : 'Show Transactions '}</span>
-        {showTransactions ? <ChevronUp className="ml-2 h-4 w-4"/> : <ChevronDown className="ml-2 h-4 w-4"/>}
-      </Button>
-
       {error && <p className="text-red-500 mb-4">Error: {error.message}</p>}
 
       <div className="overflow-x-auto animate-in animate-bounce animate-fade-in">
@@ -53,27 +42,36 @@ const TransactionHistory = () => {
             <thead>
               <tr>
                 <th className="py-2 px-4 border-b">Txn Hash</th>
+                <th className="py-2 px-4 border-b">From</th>
+                <th className="py-2 px-4 border-b">To</th>
                 <th className="py-2 px-4 border-b">Time</th>
-                <th className="py-2 px-4 border-b">Value</th>
+                <th className="py-2 px-4 border-b text-right">Value</th>
               </tr>
             </thead>
             <tbody>
               {transactions.map((tx) => (
                 <tr key={tx.hash} className="hover:bg-gray-100">
                   <td className="py-2 px-4 border-b">
-                    <a
-                      href={`${currentChain?.blockExplorers?.default.url}/tx/${tx.hash}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-500 hover:underline"
-                    >
-                      {tx.hash.substring(0, 6)}...{tx.hash.substring(tx.hash.length - 4)}
-                    </a>
+                    {currentChain?.blockExplorers?.default.url ? (
+                      <a
+                        href={`${currentChain?.blockExplorers?.default.url}/tx/${tx.hash}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-500 hover:underline"
+                      >
+                        {shrotenAddress(tx.hash)}
+                      </a>
+                    ) : (
+                      <span>
+                        {shrotenAddress(tx.hash)}
+                      </span>
+                    )}
                   </td>
-                  <td className="py-2 px-4 border-b">
-                    {new Date(parseInt(tx.timeStamp) * 1000).toLocaleString()}
-                  </td>
-                  <td className="py-2 px-4 border-b">
+                  <td className="py-2 px-4 border-b">{shrotenAddress(tx.from)}</td>
+                  <td className="py-2 px-4 border-b">{shrotenAddress(tx.to)}</td>
+                  <td className="py-2 px-4 border-b">{new Date(parseInt(tx.timeStamp) * 1000).toLocaleString()}</td>
+                  <td className="py-2 px-4 border-b text-right">
+                    {tx.to === address ? '+' : '-'}
                     {formatEther(tx.value)} {currentChain?.nativeCurrency.symbol}
                   </td>
                 </tr>
