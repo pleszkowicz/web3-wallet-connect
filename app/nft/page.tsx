@@ -1,3 +1,4 @@
+'use client';
 import { Transfer } from "@/components/transfer";
 import CardLayout from "@/components/card-layout";
 

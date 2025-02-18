@@ -19,7 +19,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { SEPOLIA_LINK_CONTRACT_ADDRESS, SEPOLIA_LINK_TOKEN_ABI } from '@/const/sepolia';
 import { useState } from 'react';
 import CardLayout from './card-layout';
-import invariant from 'tiny-invariant';
+// import invariant from 'tiny-invariant';
 
 type Crypto = {
   value: string;
@@ -47,23 +47,16 @@ export function Transfer() {
   const { data: ethBalance } = useBalance({ address });
   const { sendTransaction } = useSendTransaction();
 
-  invariant(address, 'Account address is required');
 
   const { data: linkBalance } = useReadContract({
     address: SEPOLIA_LINK_CONTRACT_ADDRESS,
     abi: SEPOLIA_LINK_TOKEN_ABI,
     functionName: 'balanceOf',
-    args: [address],
+    args: [address!],
   });
 
   const { writeContract } = useWriteContract();
   const { data: gasPrice, isFetching: isGasPriceFetching, refetch: refetchGasPrice } = useGasPrice();
-
-  // const { data: symbol } = useContractRead({
-  //   address: SEPOLIA_LINK_CONTRACT_ADDRESS,
-  //   abi: SEPOLIA_LINK_TOKEN_ABI,
-  //   functionName: 'symbol',
-  // });
 
   const currentBalance = (selectedUnit === CryptoMap.ETH ? ethBalance?.value : (linkBalance as bigint)) ?? 0;
 
