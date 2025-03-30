@@ -13,12 +13,13 @@ import { DisconnectAccount } from './disconnect-account';
 
 interface CardLayoutProps {
   title: string;
-  description?: ReactElement;
+  description?: ReactElement | string;
+  headerContent?: ReactElement;
   showBackButton?: boolean;
   children: ReactNode;
 }
 
-export default function CardLayout({ title, description, showBackButton, children }: CardLayoutProps) {
+export default function CardLayout({ title, description, headerContent, showBackButton, children }: CardLayoutProps) {
   const router = useRouter();
   const { toast } = useToast();
   const { address, chain: currentChain, isConnected } = useAccount();
@@ -26,7 +27,7 @@ export default function CardLayout({ title, description, showBackButton, childre
   const formattedAddress = ensName || address?.slice(0, 6) + '...' + address?.slice(-4);
 
   return (
-    <Card className="max-w-[960px] w-full">
+    <Card className="max-w-2xl w-full">
       <CardHeader>
         <div className="flex flex-row justify-between items-center relative">
           <div className="flex items-center space-x-2 absolute left-0">
@@ -88,6 +89,7 @@ export default function CardLayout({ title, description, showBackButton, childre
         )}
 
         {description && <CardDescription className="mt-12">{description}</CardDescription>}
+        {headerContent}
       </CardHeader>
       <CardContent className="space-y-4">{children}</CardContent>
       <CardFooter className="flex justify-end">

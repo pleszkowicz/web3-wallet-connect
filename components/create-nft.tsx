@@ -50,7 +50,7 @@ export function CreateNFT() {
 
           await writeContract(
             {
-              address: process.env.NEXT_PUBLIC_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS as Address,
+              address: process.env.NEXT_PUBLIC_CUSTOM_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS as Address,
               abi: NFT_MARKET_CONTRACT_ABI,
               functionName: 'createNFT',
               args: [tokenURI, BigInt(0.025 * 10 ** 18)],

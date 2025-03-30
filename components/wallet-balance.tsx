@@ -18,6 +18,7 @@ import { ImagePlusIcon, LucideIcon, SendIcon } from 'lucide-react';
 export function WalletBalance() {
   const { address, isConnected, chain } = useAccount();
   const { data: balance, isLoading: isBalanceLoading } = useBalance({ address });
+
   const { connectors, connect } = useConnect();
   const [ready, setReady] = useState<{ [key: string]: boolean }>({});
 
@@ -34,11 +35,11 @@ export function WalletBalance() {
     return (
       <CardLayout
         title="Wallet Dashboard"
-        description={
-          <div className="flex flex-row gap-6 justify-center pt-3">
+        headerContent={
+          <p className="flex flex-row gap-6 justify-center pt-3">
             <ActionLink href="/transaction" text="Send" Icon={SendIcon} />
             <ActionLink href="/nft/create" text="Create NFT" Icon={ImagePlusIcon} />
-          </div>
+          </p>
         }
       >
         <WalletBalanceItem

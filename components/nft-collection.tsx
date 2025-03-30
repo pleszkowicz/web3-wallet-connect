@@ -7,40 +7,42 @@ import invariant from 'tiny-invariant';
 import { NFT } from '@/types/NFT';
 import { useQuery } from '@tanstack/react-query';
 import Image from 'next/image';
+import { LoaderIcon } from 'lucide-react';
 
 export const NftCollection = () => {
   invariant(
-    process.env.NEXT_PUBLIC_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS,
-    'NEXT_PUBLIC_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS is required'
+    process.env.NEXT_PUBLIC_CUSTOM_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS,
+    'NEXT_PUBLIC_CUSTOM_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS is required'
   );
 
   const { data: nfts, isLoading } = useReadContract({
-    address: process.env.NEXT_PUBLIC_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS as Address,
+    address: process.env.NEXT_PUBLIC_CUSTOM_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS as Address,
     abi: NFT_MARKET_CONTRACT_ABI,
     functionName: 'getAllNFTs',
   });
 
   return (
     <>
-      {isLoading ? (
-        <p>Loading...</p>
-      ) : (
-        <div className="flex flex-wrap">
-          {nfts?.map((nft) => (
-            <div key={nft.tokenId} className="flex flex-col justify-between p-4 text-center w-1/3 min-w-[180px]">
-              <NftItem tokenId={nft.tokenId.toString()} price={nft.price} />
-            </div>
-          ))}
-        </div>
-      )}
+      <div className="flex flex-wrap">
+        {isLoading ? (
+          <p>Loading...</p>
+        ) : (
+          <>
+            {nfts?.map((nft) => (
+              <div key={nft.tokenId} className="flex flex-col justify-between p-4 text-center w-1/3 min-w-[180px]">
+                <NftItem tokenId={nft.tokenId.toString()} price={nft.price} />
+              </div>
+            ))}
+          </>
+        )}
+      </div>
     </>
   );
 };
 
-
-const NftItem = ({ tokenId, price }: { tokenId: string, price: bigint }) => {
+const NftItem = ({ tokenId, price }: { tokenId: string; price: bigint }) => {
   const { data: tokenURI, isLoading } = useReadContract({
-    address: process.env.NEXT_PUBLIC_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS as Address,
+    address: process.env.NEXT_PUBLIC_CUSTOM_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS as Address,
     abi: NFT_MARKET_CONTRACT_ABI,
     functionName: 'tokenURI',
     args: [BigInt(tokenId)],
@@ -62,22 +64,39 @@ const NftItem = ({ tokenId, price }: { tokenId: string, price: bigint }) => {
   });
 
   if (isLoading || tokenDetails === undefined) {
-    return <p>Loading...</p>;
+    return (
+      <p>
+        <LoaderIcon />
+      </p>
+    );
   }
 
   return (
     <>
       <div className="flex items-center flex-col gap-2">
-        <Image loading="lazy" src={tokenDetails.image} alt={tokenDetails.name || 'NFT Image'} className="w-12 h-12 rounded-lg" width={50} height={50} />
-        <div>
-          <h3 className="text-sm font-semibold">{tokenDetails.name}</h3>
-          <p className="text-sm text-muted-foreground">{tokenDetails.description}</p>
-          </div>
-        <p className="text-sm text-muted-foreground">Price: {formatEther(price)} ETH</p>
+        {isLoading || tokenDetails === undefined ? (
+          <LoaderIcon />
+        ) : (
+          <>
+            <Image
+              loading="lazy"
+              src={tokenDetails.image}
+              alt={tokenDetails.name || 'NFT Image'}
+              className="w-12 h-12 rounded-lg"
+              width={50}
+              height={50}
+            />
+            <div>
+              <h3 className="text-sm font-semibold">{tokenDetails.name}</h3>
+              <p className="text-sm text-muted-foreground">{tokenDetails.description}</p>
+            </div>
+            <p className="text-sm text-muted-foreground">Price: {formatEther(price)} ETH</p>
+          </>
+        )}
       </div>
 
       <Button variant="outline" size="sm" className="mt-3" disabled>
-        Buy (Soon)
+        Buy (coming soon)
       </Button>
     </>
   );

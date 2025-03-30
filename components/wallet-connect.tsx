@@ -10,7 +10,7 @@ export function WalletConnect() {
   const { connectors, connect, isPending } = useConnect();
 
   return (
-    <CardLayout title="Connect Wallet" description={<p>Choose a wallet to connect to this app</p>}>
+    <CardLayout title="Connect Wallet" description="Choose a wallet to connect to this app">
       <div className="grid gap-4">
         {connectors.map((connector) => (
           <WalletOption
