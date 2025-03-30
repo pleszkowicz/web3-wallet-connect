@@ -106,10 +106,10 @@ importers:
         version: 0.9.4(@types/react-dom@19.0.3(@types/react@19.0.8))(@types/react@19.0.8)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       viem:
         specifier: ^2.21.15
-        version: 2.21.15(bufferutil@4.0.8)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.22.4)
+        version: 2.21.15(bufferutil@4.0.8)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.22.4)
       wagmi:
         specifier: ^2.14.11
-        version: 2.14.11(@tanstack/query-core@5.66.0)(@tanstack/react-query@5.66.0(react@19.0.0))(@types/react@19.0.8)(bufferutil@4.0.8)(encoding@0.1.13)(react@19.0.0)(typescript@5.7.3)(utf-8-validate@5.0.10)(viem@2.21.15(bufferutil@4.0.8)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.22.4))(zod@3.22.4)
+        version: 2.14.11(@tanstack/query-core@5.66.0)(@tanstack/react-query@5.66.0(react@19.0.0))(@types/react@19.0.8)(bufferutil@4.0.8)(encoding@0.1.13)(react@19.0.0)(typescript@5.8.2)(utf-8-validate@5.0.10)(viem@2.21.15(bufferutil@4.0.8)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.22.4))(zod@3.22.4)
       yup:
         specifier: ^1.6.1
         version: 1.6.1
@@ -125,10 +125,10 @@ importers:
         version: 19.0.3(@types/react@19.0.8)
       '@typescript-eslint/eslint-plugin':
         specifier: ^8.24.0
-        version: 8.24.0(@typescript-eslint/parser@8.24.0(eslint@9.20.1(jiti@2.0.0))(typescript@5.7.3))(eslint@9.20.1(jiti@2.0.0))(typescript@5.7.3)
+        version: 8.24.0(@typescript-eslint/parser@8.24.0(eslint@9.20.1(jiti@2.0.0))(typescript@5.8.2))(eslint@9.20.1(jiti@2.0.0))(typescript@5.8.2)
       '@typescript-eslint/parser':
         specifier: ^8.24.0
-        version: 8.24.0(eslint@9.20.1(jiti@2.0.0))(typescript@5.7.3)
+        version: 8.24.0(eslint@9.20.1(jiti@2.0.0))(typescript@5.8.2)
       dotenv:
         specifier: ^16.4.7
         version: 16.4.7
@@ -137,7 +137,7 @@ importers:
         version: 9.20.1(jiti@2.0.0)
       eslint-config-next:
         specifier: 15.1.7
-        version: 15.1.7(eslint@9.20.1(jiti@2.0.0))(typescript@5.7.3)
+        version: 15.1.7(eslint@9.20.1(jiti@2.0.0))(typescript@5.8.2)
       eslint-config-prettier:
         specifier: ^10.0.1
         version: 10.0.1(eslint@9.20.1(jiti@2.0.0))
@@ -155,13 +155,13 @@ importers:
         version: 3.5.1
       prettier-plugin-organize-imports:
         specifier: ^4.1.0
-        version: 4.1.0(prettier@3.5.1)(typescript@5.7.3)
+        version: 4.1.0(prettier@3.5.1)(typescript@5.8.2)
       tailwindcss:
         specifier: ^3.4.1
         version: 3.4.13
       typescript:
-        specifier: ^5.7.3
-        version: 5.7.3
+        specifier: ^5.8.2
+        version: 5.8.2
 
 packages:
 
@@ -3983,8 +3983,8 @@ packages:
   typedarray-to-buffer@3.1.5:
     resolution: {integrity: sha512-zdu8XMNEDepKKR+XYOXAVPtWui0ly0NtohUscw+UmaHiAWT8hrV1rr//H6V+0DvJ3OQ19S979M0laLfX8rm82Q==}
 
-  typescript@5.7.3:
-    resolution: {integrity: sha512-84MVSjMEHP+FQRPy3pX9sTVV/INIex71s9TL2Gm5FG/WG1SqXeKyZ0k7/blY/4FdOzI12CBy1vGc4og/eus0fw==}
+  typescript@5.8.2:
+    resolution: {integrity: sha512-aJn6wq13/afZp/jT9QZmwEjDqqvSGp1VT5GVg+f/t6/oVyrgXM6BY1h9BRh/O5p3PlUPAe+WuiEZOmb/49RqoQ==}
     engines: {node: '>=14.17'}
     hasBin: true
 
@@ -5579,9 +5579,9 @@ snapshots:
 
   '@rushstack/eslint-patch@1.10.4': {}
 
-  '@safe-global/safe-apps-provider@0.18.5(bufferutil@4.0.8)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.22.4)':
+  '@safe-global/safe-apps-provider@0.18.5(bufferutil@4.0.8)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.22.4)':
     dependencies:
-      '@safe-global/safe-apps-sdk': 9.1.0(bufferutil@4.0.8)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.22.4)
+      '@safe-global/safe-apps-sdk': 9.1.0(bufferutil@4.0.8)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.22.4)
       events: 3.3.0
     transitivePeerDependencies:
       - bufferutil
@@ -5589,10 +5589,10 @@ snapshots:
       - utf-8-validate
       - zod
 
-  '@safe-global/safe-apps-sdk@9.1.0(bufferutil@4.0.8)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.22.4)':
+  '@safe-global/safe-apps-sdk@9.1.0(bufferutil@4.0.8)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.22.4)':
     dependencies:
       '@safe-global/safe-gateway-typescript-sdk': 3.22.2
-      viem: 2.21.15(bufferutil@4.0.8)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.22.4)
+      viem: 2.21.15(bufferutil@4.0.8)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.22.4)
     transitivePeerDependencies:
       - bufferutil
       - typescript
@@ -5753,32 +5753,32 @@ snapshots:
     dependencies:
       '@types/webidl-conversions': 7.0.3
 
-  '@typescript-eslint/eslint-plugin@8.24.0(@typescript-eslint/parser@8.24.0(eslint@9.20.1(jiti@2.0.0))(typescript@5.7.3))(eslint@9.20.1(jiti@2.0.0))(typescript@5.7.3)':
+  '@typescript-eslint/eslint-plugin@8.24.0(@typescript-eslint/parser@8.24.0(eslint@9.20.1(jiti@2.0.0))(typescript@5.8.2))(eslint@9.20.1(jiti@2.0.0))(typescript@5.8.2)':
     dependencies:
       '@eslint-community/regexpp': 4.12.1
-      '@typescript-eslint/parser': 8.24.0(eslint@9.20.1(jiti@2.0.0))(typescript@5.7.3)
+      '@typescript-eslint/parser': 8.24.0(eslint@9.20.1(jiti@2.0.0))(typescript@5.8.2)
       '@typescript-eslint/scope-manager': 8.24.0
-      '@typescript-eslint/type-utils': 8.24.0(eslint@9.20.1(jiti@2.0.0))(typescript@5.7.3)
-      '@typescript-eslint/utils': 8.24.0(eslint@9.20.1(jiti@2.0.0))(typescript@5.7.3)
+      '@typescript-eslint/type-utils': 8.24.0(eslint@9.20.1(jiti@2.0.0))(typescript@5.8.2)
+      '@typescript-eslint/utils': 8.24.0(eslint@9.20.1(jiti@2.0.0))(typescript@5.8.2)
       '@typescript-eslint/visitor-keys': 8.24.0
       eslint: 9.20.1(jiti@2.0.0)
       graphemer: 1.4.0
       ignore: 5.3.2
       natural-compare: 1.4.0
-      ts-api-utils: 2.0.1(typescript@5.7.3)
-      typescript: 5.7.3
+      ts-api-utils: 2.0.1(typescript@5.8.2)
+      typescript: 5.8.2
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/parser@8.24.0(eslint@9.20.1(jiti@2.0.0))(typescript@5.7.3)':
+  '@typescript-eslint/parser@8.24.0(eslint@9.20.1(jiti@2.0.0))(typescript@5.8.2)':
     dependencies:
       '@typescript-eslint/scope-manager': 8.24.0
       '@typescript-eslint/types': 8.24.0
-      '@typescript-eslint/typescript-estree': 8.24.0(typescript@5.7.3)
+      '@typescript-eslint/typescript-estree': 8.24.0(typescript@5.8.2)
       '@typescript-eslint/visitor-keys': 8.24.0
       debug: 4.3.7
       eslint: 9.20.1(jiti@2.0.0)
-      typescript: 5.7.3
+      typescript: 5.8.2
     transitivePeerDependencies:
       - supports-color
 
@@ -5787,20 +5787,20 @@ snapshots:
       '@typescript-eslint/types': 8.24.0
       '@typescript-eslint/visitor-keys': 8.24.0
 
-  '@typescript-eslint/type-utils@8.24.0(eslint@9.20.1(jiti@2.0.0))(typescript@5.7.3)':
+  '@typescript-eslint/type-utils@8.24.0(eslint@9.20.1(jiti@2.0.0))(typescript@5.8.2)':
     dependencies:
-      '@typescript-eslint/typescript-estree': 8.24.0(typescript@5.7.3)
-      '@typescript-eslint/utils': 8.24.0(eslint@9.20.1(jiti@2.0.0))(typescript@5.7.3)
+      '@typescript-eslint/typescript-estree': 8.24.0(typescript@5.8.2)
+      '@typescript-eslint/utils': 8.24.0(eslint@9.20.1(jiti@2.0.0))(typescript@5.8.2)
       debug: 4.3.7
       eslint: 9.20.1(jiti@2.0.0)
-      ts-api-utils: 2.0.1(typescript@5.7.3)
-      typescript: 5.7.3
+      ts-api-utils: 2.0.1(typescript@5.8.2)
+      typescript: 5.8.2
     transitivePeerDependencies:
       - supports-color
 
   '@typescript-eslint/types@8.24.0': {}
 
-  '@typescript-eslint/typescript-estree@8.24.0(typescript@5.7.3)':
+  '@typescript-eslint/typescript-estree@8.24.0(typescript@5.8.2)':
     dependencies:
       '@typescript-eslint/types': 8.24.0
       '@typescript-eslint/visitor-keys': 8.24.0
@@ -5809,19 +5809,19 @@ snapshots:
       is-glob: 4.0.3
       minimatch: 9.0.5
       semver: 7.6.3
-      ts-api-utils: 2.0.1(typescript@5.7.3)
-      typescript: 5.7.3
+      ts-api-utils: 2.0.1(typescript@5.8.2)
+      typescript: 5.8.2
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/utils@8.24.0(eslint@9.20.1(jiti@2.0.0))(typescript@5.7.3)':
+  '@typescript-eslint/utils@8.24.0(eslint@9.20.1(jiti@2.0.0))(typescript@5.8.2)':
     dependencies:
       '@eslint-community/eslint-utils': 4.4.0(eslint@9.20.1(jiti@2.0.0))
       '@typescript-eslint/scope-manager': 8.24.0
       '@typescript-eslint/types': 8.24.0
-      '@typescript-eslint/typescript-estree': 8.24.0(typescript@5.7.3)
+      '@typescript-eslint/typescript-estree': 8.24.0(typescript@5.8.2)
       eslint: 9.20.1(jiti@2.0.0)
-      typescript: 5.7.3
+      typescript: 5.8.2
     transitivePeerDependencies:
       - supports-color
 
@@ -5830,18 +5830,18 @@ snapshots:
       '@typescript-eslint/types': 8.24.0
       eslint-visitor-keys: 4.2.0
 
-  '@wagmi/connectors@5.7.7(@types/react@19.0.8)(@wagmi/core@2.16.4(@tanstack/query-core@5.66.0)(@types/react@19.0.8)(react@19.0.0)(typescript@5.7.3)(use-sync-external-store@1.4.0(react@19.0.0))(viem@2.21.15(bufferutil@4.0.8)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.22.4)))(bufferutil@4.0.8)(encoding@0.1.13)(react@19.0.0)(typescript@5.7.3)(utf-8-validate@5.0.10)(viem@2.21.15(bufferutil@4.0.8)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.22.4))(zod@3.22.4)':
+  '@wagmi/connectors@5.7.7(@types/react@19.0.8)(@wagmi/core@2.16.4(@tanstack/query-core@5.66.0)(@types/react@19.0.8)(react@19.0.0)(typescript@5.8.2)(use-sync-external-store@1.4.0(react@19.0.0))(viem@2.21.15(bufferutil@4.0.8)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.22.4)))(bufferutil@4.0.8)(encoding@0.1.13)(react@19.0.0)(typescript@5.8.2)(utf-8-validate@5.0.10)(viem@2.21.15(bufferutil@4.0.8)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.22.4))(zod@3.22.4)':
     dependencies:
       '@coinbase/wallet-sdk': 4.3.0
       '@metamask/sdk': 0.32.0(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10)
-      '@safe-global/safe-apps-provider': 0.18.5(bufferutil@4.0.8)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.22.4)
-      '@safe-global/safe-apps-sdk': 9.1.0(bufferutil@4.0.8)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.22.4)
-      '@wagmi/core': 2.16.4(@tanstack/query-core@5.66.0)(@types/react@19.0.8)(react@19.0.0)(typescript@5.7.3)(use-sync-external-store@1.4.0(react@19.0.0))(viem@2.21.15(bufferutil@4.0.8)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.22.4))
+      '@safe-global/safe-apps-provider': 0.18.5(bufferutil@4.0.8)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.22.4)
+      '@safe-global/safe-apps-sdk': 9.1.0(bufferutil@4.0.8)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.22.4)
+      '@wagmi/core': 2.16.4(@tanstack/query-core@5.66.0)(@types/react@19.0.8)(react@19.0.0)(typescript@5.8.2)(use-sync-external-store@1.4.0(react@19.0.0))(viem@2.21.15(bufferutil@4.0.8)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.22.4))
       '@walletconnect/ethereum-provider': 2.17.0(@types/react@19.0.8)(bufferutil@4.0.8)(encoding@0.1.13)(react@19.0.0)(utf-8-validate@5.0.10)
       cbw-sdk: '@coinbase/wallet-sdk@3.9.3'
-      viem: 2.21.15(bufferutil@4.0.8)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.22.4)
+      viem: 2.21.15(bufferutil@4.0.8)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.22.4)
     optionalDependencies:
-      typescript: 5.7.3
+      typescript: 5.8.2
     transitivePeerDependencies:
       - '@azure/app-configuration'
       - '@azure/cosmos'
@@ -5865,15 +5865,15 @@ snapshots:
       - utf-8-validate
       - zod
 
-  '@wagmi/core@2.16.4(@tanstack/query-core@5.66.0)(@types/react@19.0.8)(react@19.0.0)(typescript@5.7.3)(use-sync-external-store@1.4.0(react@19.0.0))(viem@2.21.15(bufferutil@4.0.8)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.22.4))':
+  '@wagmi/core@2.16.4(@tanstack/query-core@5.66.0)(@types/react@19.0.8)(react@19.0.0)(typescript@5.8.2)(use-sync-external-store@1.4.0(react@19.0.0))(viem@2.21.15(bufferutil@4.0.8)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.22.4))':
     dependencies:
       eventemitter3: 5.0.1
-      mipd: 0.0.7(typescript@5.7.3)
-      viem: 2.21.15(bufferutil@4.0.8)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.22.4)
+      mipd: 0.0.7(typescript@5.8.2)
+      viem: 2.21.15(bufferutil@4.0.8)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.22.4)
       zustand: 5.0.0(@types/react@19.0.8)(react@19.0.0)(use-sync-external-store@1.4.0(react@19.0.0))
     optionalDependencies:
       '@tanstack/query-core': 5.66.0
-      typescript: 5.7.3
+      typescript: 5.8.2
     transitivePeerDependencies:
       - '@types/react'
       - immer
@@ -6197,9 +6197,9 @@ snapshots:
       '@walletconnect/window-getters': 1.0.1
       tslib: 1.14.1
 
-  abitype@1.0.5(typescript@5.7.3)(zod@3.22.4):
+  abitype@1.0.5(typescript@5.8.2)(zod@3.22.4):
     optionalDependencies:
-      typescript: 5.7.3
+      typescript: 5.8.2
       zod: 3.22.4
 
   abort-controller@3.0.0:
@@ -7016,21 +7016,21 @@ snapshots:
 
   escape-string-regexp@4.0.0: {}
 
-  eslint-config-next@15.1.7(eslint@9.20.1(jiti@2.0.0))(typescript@5.7.3):
+  eslint-config-next@15.1.7(eslint@9.20.1(jiti@2.0.0))(typescript@5.8.2):
     dependencies:
       '@next/eslint-plugin-next': 15.1.7
       '@rushstack/eslint-patch': 1.10.4
-      '@typescript-eslint/eslint-plugin': 8.24.0(@typescript-eslint/parser@8.24.0(eslint@9.20.1(jiti@2.0.0))(typescript@5.7.3))(eslint@9.20.1(jiti@2.0.0))(typescript@5.7.3)
-      '@typescript-eslint/parser': 8.24.0(eslint@9.20.1(jiti@2.0.0))(typescript@5.7.3)
+      '@typescript-eslint/eslint-plugin': 8.24.0(@typescript-eslint/parser@8.24.0(eslint@9.20.1(jiti@2.0.0))(typescript@5.8.2))(eslint@9.20.1(jiti@2.0.0))(typescript@5.8.2)
+      '@typescript-eslint/parser': 8.24.0(eslint@9.20.1(jiti@2.0.0))(typescript@5.8.2)
       eslint: 9.20.1(jiti@2.0.0)
       eslint-import-resolver-node: 0.3.9
-      eslint-import-resolver-typescript: 3.6.3(@typescript-eslint/parser@8.24.0(eslint@9.20.1(jiti@2.0.0))(typescript@5.7.3))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.31.0)(eslint@9.20.1(jiti@2.0.0))
-      eslint-plugin-import: 2.31.0(@typescript-eslint/parser@8.24.0(eslint@9.20.1(jiti@2.0.0))(typescript@5.7.3))(eslint-import-resolver-typescript@3.6.3)(eslint@9.20.1(jiti@2.0.0))
+      eslint-import-resolver-typescript: 3.6.3(@typescript-eslint/parser@8.24.0(eslint@9.20.1(jiti@2.0.0))(typescript@5.8.2))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.31.0)(eslint@9.20.1(jiti@2.0.0))
+      eslint-plugin-import: 2.31.0(@typescript-eslint/parser@8.24.0(eslint@9.20.1(jiti@2.0.0))(typescript@5.8.2))(eslint-import-resolver-typescript@3.6.3)(eslint@9.20.1(jiti@2.0.0))
       eslint-plugin-jsx-a11y: 6.10.0(eslint@9.20.1(jiti@2.0.0))
       eslint-plugin-react: 7.37.4(eslint@9.20.1(jiti@2.0.0))
       eslint-plugin-react-hooks: 5.1.0(eslint@9.20.1(jiti@2.0.0))
     optionalDependencies:
-      typescript: 5.7.3
+      typescript: 5.8.2
     transitivePeerDependencies:
       - eslint-import-resolver-webpack
       - eslint-plugin-import-x
@@ -7048,48 +7048,48 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-import-resolver-typescript@3.6.3(@typescript-eslint/parser@8.24.0(eslint@9.20.1(jiti@2.0.0))(typescript@5.7.3))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.31.0)(eslint@9.20.1(jiti@2.0.0)):
+  eslint-import-resolver-typescript@3.6.3(@typescript-eslint/parser@8.24.0(eslint@9.20.1(jiti@2.0.0))(typescript@5.8.2))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.31.0)(eslint@9.20.1(jiti@2.0.0)):
     dependencies:
       '@nolyfill/is-core-module': 1.0.39
       debug: 4.3.7
       enhanced-resolve: 5.17.1
       eslint: 9.20.1(jiti@2.0.0)
-      eslint-module-utils: 2.11.1(@typescript-eslint/parser@8.24.0(eslint@9.20.1(jiti@2.0.0))(typescript@5.7.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.3)(eslint@9.20.1(jiti@2.0.0))
+      eslint-module-utils: 2.11.1(@typescript-eslint/parser@8.24.0(eslint@9.20.1(jiti@2.0.0))(typescript@5.8.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.3)(eslint@9.20.1(jiti@2.0.0))
       fast-glob: 3.3.2
       get-tsconfig: 4.8.1
       is-bun-module: 1.2.1
       is-glob: 4.0.3
     optionalDependencies:
-      eslint-plugin-import: 2.31.0(@typescript-eslint/parser@8.24.0(eslint@9.20.1(jiti@2.0.0))(typescript@5.7.3))(eslint-import-resolver-typescript@3.6.3)(eslint@9.20.1(jiti@2.0.0))
+      eslint-plugin-import: 2.31.0(@typescript-eslint/parser@8.24.0(eslint@9.20.1(jiti@2.0.0))(typescript@5.8.2))(eslint-import-resolver-typescript@3.6.3)(eslint@9.20.1(jiti@2.0.0))
     transitivePeerDependencies:
       - '@typescript-eslint/parser'
       - eslint-import-resolver-node
       - eslint-import-resolver-webpack
       - supports-color
 
-  eslint-module-utils@2.11.1(@typescript-eslint/parser@8.24.0(eslint@9.20.1(jiti@2.0.0))(typescript@5.7.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.3)(eslint@9.20.1(jiti@2.0.0)):
+  eslint-module-utils@2.11.1(@typescript-eslint/parser@8.24.0(eslint@9.20.1(jiti@2.0.0))(typescript@5.8.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.3)(eslint@9.20.1(jiti@2.0.0)):
     dependencies:
       debug: 3.2.7
     optionalDependencies:
-      '@typescript-eslint/parser': 8.24.0(eslint@9.20.1(jiti@2.0.0))(typescript@5.7.3)
+      '@typescript-eslint/parser': 8.24.0(eslint@9.20.1(jiti@2.0.0))(typescript@5.8.2)
       eslint: 9.20.1(jiti@2.0.0)
       eslint-import-resolver-node: 0.3.9
-      eslint-import-resolver-typescript: 3.6.3(@typescript-eslint/parser@8.24.0(eslint@9.20.1(jiti@2.0.0))(typescript@5.7.3))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.31.0)(eslint@9.20.1(jiti@2.0.0))
+      eslint-import-resolver-typescript: 3.6.3(@typescript-eslint/parser@8.24.0(eslint@9.20.1(jiti@2.0.0))(typescript@5.8.2))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.31.0)(eslint@9.20.1(jiti@2.0.0))
     transitivePeerDependencies:
       - supports-color
 
-  eslint-module-utils@2.12.0(@typescript-eslint/parser@8.24.0(eslint@9.20.1(jiti@2.0.0))(typescript@5.7.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.3)(eslint@9.20.1(jiti@2.0.0)):
+  eslint-module-utils@2.12.0(@typescript-eslint/parser@8.24.0(eslint@9.20.1(jiti@2.0.0))(typescript@5.8.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.3)(eslint@9.20.1(jiti@2.0.0)):
     dependencies:
       debug: 3.2.7
     optionalDependencies:
-      '@typescript-eslint/parser': 8.24.0(eslint@9.20.1(jiti@2.0.0))(typescript@5.7.3)
+      '@typescript-eslint/parser': 8.24.0(eslint@9.20.1(jiti@2.0.0))(typescript@5.8.2)
       eslint: 9.20.1(jiti@2.0.0)
       eslint-import-resolver-node: 0.3.9
-      eslint-import-resolver-typescript: 3.6.3(@typescript-eslint/parser@8.24.0(eslint@9.20.1(jiti@2.0.0))(typescript@5.7.3))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.31.0)(eslint@9.20.1(jiti@2.0.0))
+      eslint-import-resolver-typescript: 3.6.3(@typescript-eslint/parser@8.24.0(eslint@9.20.1(jiti@2.0.0))(typescript@5.8.2))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.31.0)(eslint@9.20.1(jiti@2.0.0))
     transitivePeerDependencies:
       - supports-color
 
-  eslint-plugin-import@2.31.0(@typescript-eslint/parser@8.24.0(eslint@9.20.1(jiti@2.0.0))(typescript@5.7.3))(eslint-import-resolver-typescript@3.6.3)(eslint@9.20.1(jiti@2.0.0)):
+  eslint-plugin-import@2.31.0(@typescript-eslint/parser@8.24.0(eslint@9.20.1(jiti@2.0.0))(typescript@5.8.2))(eslint-import-resolver-typescript@3.6.3)(eslint@9.20.1(jiti@2.0.0)):
     dependencies:
       '@rtsao/scc': 1.1.0
       array-includes: 3.1.8
@@ -7100,7 +7100,7 @@ snapshots:
       doctrine: 2.1.0
       eslint: 9.20.1(jiti@2.0.0)
       eslint-import-resolver-node: 0.3.9
-      eslint-module-utils: 2.12.0(@typescript-eslint/parser@8.24.0(eslint@9.20.1(jiti@2.0.0))(typescript@5.7.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.3)(eslint@9.20.1(jiti@2.0.0))
+      eslint-module-utils: 2.12.0(@typescript-eslint/parser@8.24.0(eslint@9.20.1(jiti@2.0.0))(typescript@5.8.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.3)(eslint@9.20.1(jiti@2.0.0))
       hasown: 2.0.2
       is-core-module: 2.15.1
       is-glob: 4.0.3
@@ -7112,7 +7112,7 @@ snapshots:
       string.prototype.trimend: 1.0.8
       tsconfig-paths: 3.15.0
     optionalDependencies:
-      '@typescript-eslint/parser': 8.24.0(eslint@9.20.1(jiti@2.0.0))(typescript@5.7.3)
+      '@typescript-eslint/parser': 8.24.0(eslint@9.20.1(jiti@2.0.0))(typescript@5.8.2)
     transitivePeerDependencies:
       - eslint-import-resolver-typescript
       - eslint-import-resolver-webpack
@@ -8060,9 +8060,9 @@ snapshots:
 
   minipass@7.1.2: {}
 
-  mipd@0.0.7(typescript@5.7.3):
+  mipd@0.0.7(typescript@5.8.2):
     optionalDependencies:
-      typescript: 5.7.3
+      typescript: 5.8.2
 
   mlly@1.7.1:
     dependencies:
@@ -8448,10 +8448,10 @@ snapshots:
 
   prelude-ls@1.2.1: {}
 
-  prettier-plugin-organize-imports@4.1.0(prettier@3.5.1)(typescript@5.7.3):
+  prettier-plugin-organize-imports@4.1.0(prettier@3.5.1)(typescript@5.8.2):
     dependencies:
       prettier: 3.5.1
-      typescript: 5.7.3
+      typescript: 5.8.2
 
   prettier@3.5.1: {}
 
@@ -9054,9 +9054,9 @@ snapshots:
     dependencies:
       punycode: 2.3.1
 
-  ts-api-utils@2.0.1(typescript@5.7.3):
+  ts-api-utils@2.0.1(typescript@5.8.2):
     dependencies:
-      typescript: 5.7.3
+      typescript: 5.8.2
 
   ts-interface-checker@0.1.13: {}
 
@@ -9152,7 +9152,7 @@ snapshots:
     dependencies:
       is-typedarray: 1.0.0
 
-  typescript@5.7.3: {}
+  typescript@5.8.2: {}
 
   ufo@1.5.4: {}
 
@@ -9273,34 +9273,34 @@ snapshots:
       - '@types/react'
       - '@types/react-dom'
 
-  viem@2.21.15(bufferutil@4.0.8)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.22.4):
+  viem@2.21.15(bufferutil@4.0.8)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.22.4):
     dependencies:
       '@adraffy/ens-normalize': 1.10.0
       '@noble/curves': 1.4.0
       '@noble/hashes': 1.4.0
       '@scure/bip32': 1.4.0
       '@scure/bip39': 1.4.0
-      abitype: 1.0.5(typescript@5.7.3)(zod@3.22.4)
+      abitype: 1.0.5(typescript@5.8.2)(zod@3.22.4)
       isows: 1.0.4(ws@8.17.1(bufferutil@4.0.8)(utf-8-validate@5.0.10))
       webauthn-p256: 0.0.5
       ws: 8.17.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)
     optionalDependencies:
-      typescript: 5.7.3
+      typescript: 5.8.2
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
       - zod
 
-  wagmi@2.14.11(@tanstack/query-core@5.66.0)(@tanstack/react-query@5.66.0(react@19.0.0))(@types/react@19.0.8)(bufferutil@4.0.8)(encoding@0.1.13)(react@19.0.0)(typescript@5.7.3)(utf-8-validate@5.0.10)(viem@2.21.15(bufferutil@4.0.8)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.22.4))(zod@3.22.4):
+  wagmi@2.14.11(@tanstack/query-core@5.66.0)(@tanstack/react-query@5.66.0(react@19.0.0))(@types/react@19.0.8)(bufferutil@4.0.8)(encoding@0.1.13)(react@19.0.0)(typescript@5.8.2)(utf-8-validate@5.0.10)(viem@2.21.15(bufferutil@4.0.8)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.22.4))(zod@3.22.4):
     dependencies:
       '@tanstack/react-query': 5.66.0(react@19.0.0)
-      '@wagmi/connectors': 5.7.7(@types/react@19.0.8)(@wagmi/core@2.16.4(@tanstack/query-core@5.66.0)(@types/react@19.0.8)(react@19.0.0)(typescript@5.7.3)(use-sync-external-store@1.4.0(react@19.0.0))(viem@2.21.15(bufferutil@4.0.8)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.22.4)))(bufferutil@4.0.8)(encoding@0.1.13)(react@19.0.0)(typescript@5.7.3)(utf-8-validate@5.0.10)(viem@2.21.15(bufferutil@4.0.8)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.22.4))(zod@3.22.4)
-      '@wagmi/core': 2.16.4(@tanstack/query-core@5.66.0)(@types/react@19.0.8)(react@19.0.0)(typescript@5.7.3)(use-sync-external-store@1.4.0(react@19.0.0))(viem@2.21.15(bufferutil@4.0.8)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.22.4))
+      '@wagmi/connectors': 5.7.7(@types/react@19.0.8)(@wagmi/core@2.16.4(@tanstack/query-core@5.66.0)(@types/react@19.0.8)(react@19.0.0)(typescript@5.8.2)(use-sync-external-store@1.4.0(react@19.0.0))(viem@2.21.15(bufferutil@4.0.8)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.22.4)))(bufferutil@4.0.8)(encoding@0.1.13)(react@19.0.0)(typescript@5.8.2)(utf-8-validate@5.0.10)(viem@2.21.15(bufferutil@4.0.8)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.22.4))(zod@3.22.4)
+      '@wagmi/core': 2.16.4(@tanstack/query-core@5.66.0)(@types/react@19.0.8)(react@19.0.0)(typescript@5.8.2)(use-sync-external-store@1.4.0(react@19.0.0))(viem@2.21.15(bufferutil@4.0.8)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.22.4))
       react: 19.0.0
       use-sync-external-store: 1.4.0(react@19.0.0)
-      viem: 2.21.15(bufferutil@4.0.8)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.22.4)
+      viem: 2.21.15(bufferutil@4.0.8)(typescript@5.8.2)(utf-8-validate@5.0.10)(zod@3.22.4)
     optionalDependencies:
-      typescript: 5.7.3
+      typescript: 5.8.2
     transitivePeerDependencies:
       - '@azure/app-configuration'
       - '@azure/cosmos'
