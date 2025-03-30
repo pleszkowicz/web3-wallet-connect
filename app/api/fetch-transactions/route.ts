@@ -8,7 +8,10 @@ import { hardhat } from "viem/chains";
 
 const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY as string;
 
+console.log('ETHERSCAN_API_KEY BEFORE')
 invariant(ETHERSCAN_API_KEY, 'ETHERSCAN_API_KEY is not found');
+
+console.log('ETHERSCAN_API_KEY AFTER')
 
 type EtherscanResponse = {
   status: string;
