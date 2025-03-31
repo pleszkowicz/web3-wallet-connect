@@ -63,14 +63,6 @@ const NftItem = ({ tokenId, price }: { tokenId: string; price: bigint }) => {
     retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 30000), // Exponential backoff
   });
 
-  if (isLoading || tokenDetails === undefined) {
-    return (
-      <p>
-        <LoaderIcon />
-      </p>
-    );
-  }
-
   return (
     <>
       <div className="flex items-center flex-col gap-2">
@@ -91,13 +83,13 @@ const NftItem = ({ tokenId, price }: { tokenId: string; price: bigint }) => {
               <p className="text-sm text-muted-foreground">{tokenDetails.description}</p>
             </div>
             <p className="text-sm text-muted-foreground">Price: {formatEther(price)} ETH</p>
+
+            <Button variant="outline" size="sm" className="mt-3" disabled>
+              Buy (coming soon)
+            </Button>
           </>
         )}
       </div>
-
-      <Button variant="outline" size="sm" className="mt-3" disabled>
-        Buy (coming soon)
-      </Button>
     </>
   );
 };

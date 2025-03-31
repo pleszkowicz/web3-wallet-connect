@@ -30,8 +30,8 @@ export default function CardLayout({ title, description, headerContent, showBack
     <Card className="max-w-2xl w-full">
       <CardHeader>
         <div className="flex flex-row justify-between items-center relative">
-          <div className="flex items-center space-x-2 absolute left-0">
-            {showBackButton && (
+          {showBackButton ? (
+            <div className="flex items-center space-x-2 absolute left-0">
               <Button
                 asChild
                 variant="ghost"
@@ -44,18 +44,23 @@ export default function CardLayout({ title, description, headerContent, showBack
                   <ArrowLeftIcon className="h-4 w-4" />
                 </Link>
               </Button>
-            )}
-          </div>
-          <CardTitle className="flex-grow text-center text-lg">{title}</CardTitle>
-          {isConnected && (
-            <div className="absolute right-0">
-              <NetworkSwitch />
             </div>
+          ) : (
+            isConnected && (
+              <div className="absolute left-0">
+                <NetworkSwitch />
+              </div>
+            )
           )}
+          
+          <CardTitle className="flex-grow text-center text-lg">{title}</CardTitle>
+
+          <div className="absolute right-0">
+            <DisconnectAccount />
+          </div>
         </div>
 
         {isConnected && (
-          <>
             <div className="text-sm font-medium flex flex-row items-center justify-center">
               <Button
                 className="text-muted-foreground"
@@ -85,16 +90,13 @@ export default function CardLayout({ title, description, headerContent, showBack
                 </a>
               ) : null}
             </div>
-          </>
         )}
 
         {description && <CardDescription className="mt-12">{description}</CardDescription>}
         {headerContent}
       </CardHeader>
       <CardContent className="space-y-4">{children}</CardContent>
-      <CardFooter className="flex justify-end">
-        <DisconnectAccount className="" />
-      </CardFooter>
+      <CardFooter className="flex justify-end"></CardFooter>
     </Card>
   );
 }

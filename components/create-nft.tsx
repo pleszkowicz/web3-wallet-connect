@@ -31,62 +31,69 @@ export function CreateNFT() {
       <Formik<NFTMetadata>
         initialValues={{ name: '', description: '', image: '' }}
         onSubmit={async (values) => {
-          const tokenURIResponse = await fetch('/api/token-uri', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(values),
-          });
-
-          if (!tokenURIResponse.ok) {
-            console.error('Failed to create NFT');
-            return;
-          }
-          // get id from response
-          const { tokenId } = await tokenURIResponse.json();
-          const currentDomain = window.location.origin;
-          const tokenURI = `${currentDomain}/api/token-uri/${tokenId}`;
-
-          await writeContract(
-            {
-              address: process.env.NEXT_PUBLIC_CUSTOM_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS as Address,
-              abi: NFT_MARKET_CONTRACT_ABI,
-              functionName: 'createNFT',
-              args: [tokenURI, BigInt(0.025 * 10 ** 18)],
-              value: BigInt(0.025 * 10 ** 18),
-            },
-            {
-              onSuccess: (tokenId) => {
-                console.log('NFT created successfully');
-                console.log('data', tokenId);
-
-                toast({ title: 'NFT successfully created!' });
-                router.push('/');
+          try {
+            const tokenURIResponse = await fetch('/api/token-uri', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
               },
-              onError: (error) => {
-                console.log('NFT creation failed');
-                console.log('error', error);
-              },
+              body: JSON.stringify(values),
+            });
+
+            if (!tokenURIResponse.ok) {
+              console.error('Failed to create NFT');
+              return;
             }
-          );
+            // get id from response
+            const { tokenId } = await tokenURIResponse.json();
+            const currentDomain = window.location.origin;
+            const tokenURI = `${currentDomain}/api/token-uri/${tokenId}`;
+
+            await writeContract(
+              {
+                address: process.env.NEXT_PUBLIC_CUSTOM_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS as Address,
+                abi: NFT_MARKET_CONTRACT_ABI,
+                functionName: 'createNFT',
+                args: [tokenURI, BigInt(0.025 * 10 ** 18)],
+                value: BigInt(0.025 * 10 ** 18),
+              },
+              {
+                onSuccess: (tokenId) => {
+                  console.log('NFT created successfully');
+                  console.log('data', tokenId);
+
+                  toast({ title: 'NFT successfully created!' });
+                  router.push('/');
+                },
+                onError: (error) => {
+                  console.log('NFT creation failed');
+                  console.log('error', error);
+                },
+              }
+            );
+          } catch (error) {
+            console.error('Error creating NFT:', error);
+            toast({ title: 'Error creating NFT', description: 'Please try again later.', variant: 'destructive' });
+          }
         }}
         validationSchema={validationSchema}
       >
-        <Form className="space-y-4">
-          <Field as={Input} id="name" name="name" placeholder="Name" />
-          <ErrorMessage name="name" component="div" className="text-red-500" />
+        {({ isSubmitting }) => (
+          <Form className="space-y-4" aria-disabled={isSubmitting}>
+            <Field as={Input} id="name" name="name" placeholder="Name" />
+            <ErrorMessage name="name" component="div" className="text-red-500" />
 
-          <Field as={Input} id="description" name="description" placeholder="Description" />
-          <ErrorMessage name="description" component="div" className="text-red-500" />
+            <Field as={Input} id="description" name="description" placeholder="Description" />
+            <ErrorMessage name="description" component="div" className="text-red-500" />
 
-          <Field as={Input} id="image" name="image" placeholder="Image URL" />
-          <ErrorMessage name="image" component="div" className="text-red-500" />
+            <Field as={Input} id="image" name="image" placeholder="Image URL" />
+            <ErrorMessage name="image" component="div" className="text-red-500" />
 
-          <Button variant="default" className="w-full" type="submit">
-            Create
-          </Button>
-        </Form>
+            <Button variant="default" className="w-full" type="submit" disabled={isSubmitting}>
+              Create
+            </Button>
+          </Form>
+        )}
       </Formik>
     </CardLayout>
   );

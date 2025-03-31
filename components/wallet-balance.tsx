@@ -59,16 +59,16 @@ export function WalletBalance() {
             <TabsTrigger value="transactions">Transactions</TabsTrigger>
           </TabsList>
           <TabsContent value="nfts">
+            <NftCollection />
             <Button asChild size="sm" variant="default" className="w-full mt-5">
               <Link href="/nft/create">Create NFT</Link>
             </Button>
-            <NftCollection />
           </TabsContent>
           <TabsContent value="transactions">
+            <TransactionHistory key={chain?.id} />
             <Button asChild size="sm" variant="default" className="w-full mt-5 mb-5">
               <Link href="/transaction">New transaction</Link>
             </Button>
-            <TransactionHistory key={chain?.id} />
           </TabsContent>
         </Tabs>
         <Separator />
