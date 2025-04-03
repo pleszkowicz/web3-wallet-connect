@@ -60,4 +60,3 @@ export const NftItem = ({ tokenId, price }: { tokenId: string; price: bigint }) 
       </>
     );
   };
-  

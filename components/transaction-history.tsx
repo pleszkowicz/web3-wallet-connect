@@ -30,10 +30,10 @@ const TransactionHistory = () => {
     <>
       {error && <p className="text-red-500 mb-4">Error: {error.message}</p>}
 
-      <div className="overflow-x-auto animate-in animate-bounce animate-fade-in">
+      <div className="overflow-x-auto animate-in animate-bounce animate-fade-in max-h-[400px]">
         {showTransactions && transactions && transactions.length > 0 ? (
           <table className="text-sm min-w-full bg-white border border-gray-200">
-            <thead>
+            <thead className="sticky top-[0] z-10 bg-gray-100 shadow-md">
               <tr>
                 <th className="py-2 px-4 border-b">Txn Hash</th>
                 <th className="py-2 px-4 border-b">From</th>
