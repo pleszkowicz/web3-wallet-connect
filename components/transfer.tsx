@@ -18,8 +18,7 @@ import { getFormattedBalance } from '@/Utils/getFormattedValue';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { SEPOLIA_LINK_CONTRACT_ADDRESS, SEPOLIA_LINK_TOKEN_ABI } from '@/const/sepolia';
 import { useState } from 'react';
-import CardLayout from './card-layout';
-// import invariant from 'tiny-invariant';
+import { CardLayout } from './card-layout';
 
 type Crypto = {
   value: string;
@@ -105,7 +104,6 @@ export function Transfer() {
                 ],
               });
             }
-            // sendTransaction({ to: values.to as Address, value: parseEther(String(values.value)) });
           }}
           validationSchema={validationSchema}
         >
@@ -165,7 +163,12 @@ export function Transfer() {
   );
 }
 
-const CryptoSelect = ({ name, onChange }: { name: string; onChange: (value: Crypto['value']) => void }) => {
+type CryptoSelectProps = {
+  name: string;
+  onChange: (value: Crypto['value']) => void;
+};
+
+const CryptoSelect = ({ name, onChange }: CryptoSelectProps) => {
   const { setFieldValue, values } = useFormikContext<Record<string, string>>();
   const selectedValue = values[name];
 

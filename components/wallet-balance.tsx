@@ -11,7 +11,7 @@ import Link from 'next/link';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { NftCollection } from './nft-collection';
 import invariant from 'tiny-invariant';
-import CardLayout from './card-layout';
+import { CardLayout } from './card-layout';
 import { sepolia } from 'wagmi/chains';
 import { ImagePlusIcon, LucideIcon, SendIcon } from 'lucide-react';
 

@@ -19,7 +19,7 @@ interface CardLayoutProps {
   children: ReactNode;
 }
 
-export default function CardLayout({ title, description, headerContent, showBackButton, children }: CardLayoutProps) {
+export const CardLayout = ({ title, description, headerContent, showBackButton, children }: CardLayoutProps) => {
   const router = useRouter();
   const { toast } = useToast();
   const { address, chain: currentChain, isConnected } = useAccount();
@@ -52,7 +52,7 @@ export default function CardLayout({ title, description, headerContent, showBack
               </div>
             )
           )}
-          
+
           <CardTitle className="flex-grow text-center text-lg">{title}</CardTitle>
 
           <div className="absolute right-0">

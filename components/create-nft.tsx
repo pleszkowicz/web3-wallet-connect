@@ -1,26 +1,24 @@
 'use client';
 import { ErrorMessage, Field, Form, Formik } from 'formik';
-import { Address } from 'viem';
 import { useWriteContract } from 'wagmi';
 import * as Yup from 'yup';
 import { Input } from './ui/input';
 import * as dotenv from 'dotenv';
-import { NFT } from '@/types/NFT';
 import { Button } from './ui/button';
 import { NFT_MARKET_CONTRACT_ABI } from '@/const/nft-marketplace-abi';
-import CardLayout from './card-layout';
+import { CardLayout } from './card-layout';
 import { useToast } from './ui/hooks/use-toast';
 import { useRouter } from 'next/navigation';
+import { NftMeta } from '@/types/NFT';
+import { NFT_MARKETPLACE_ADDRESS } from '@/const/nft-marketplace-address';
 
 dotenv.config();
-
-type NFTMetadata = Omit<NFT, 'tokenId'>;
 
 export function CreateNFT() {
   const { toast } = useToast();
   const router = useRouter();
   const { writeContract } = useWriteContract();
-  const validationSchema: Yup.ObjectSchema<NFTMetadata> = Yup.object().shape({
+  const validationSchema: Yup.ObjectSchema<Pick<NftMeta, 'name' | 'description' | 'image'>> = Yup.object().shape({
     name: Yup.string().required('Name is required'),
     description: Yup.string().required('Description is required'),
     image: Yup.string().url('Must be a valid URL').required('Image URL is required'),
@@ -28,11 +26,12 @@ export function CreateNFT() {
 
   return (
     <CardLayout title="Create NFT" showBackButton>
-      <Formik<NFTMetadata>
+      <Formik<Omit<NftMeta, 'tokenId'>>
         initialValues={{ name: '', description: '', image: '' }}
         onSubmit={async (values) => {
           try {
-            const tokenURIResponse = await fetch('/api/token-uri', {
+            const currentDomain = window.location.origin;
+            const tokenURIResponse = await fetch(`${currentDomain}/api/token-uri`, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
@@ -44,31 +43,29 @@ export function CreateNFT() {
               console.error('Failed to create NFT');
               return;
             }
-            // get id from response
+            
             const { tokenId } = await tokenURIResponse.json();
-            const currentDomain = window.location.origin;
             const tokenURI = `${currentDomain}/api/token-uri/${tokenId}`;
 
             await writeContract(
               {
-                address: process.env.NEXT_PUBLIC_CUSTOM_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS as Address,
+                address: NFT_MARKETPLACE_ADDRESS,
                 abi: NFT_MARKET_CONTRACT_ABI,
                 functionName: 'createNFT',
                 args: [tokenURI, BigInt(0.025 * 10 ** 18)],
                 value: BigInt(0.025 * 10 ** 18),
               },
               {
-                onSuccess: (tokenId) => {
+                onSuccess: (data) => {
                   console.log('NFT created successfully');
-                  console.log('data', tokenId);
+                  console.log('data', data);
 
                   toast({ title: 'NFT successfully created!' });
                   router.push('/');
                 },
                 onError: (error) => {
                   console.log('NFT creation failed');
-                  console.log('error', error);
-                },
+                  console.log('error', error);                },
               }
             );
           } catch (error) {

@@ -2,7 +2,7 @@
 import path from 'path';
 import fs from "fs";
 import crypto from 'crypto';
-import { NFT } from "@/types/NFT";
+import { NftMeta } from "@/types/NFT";
 import { NextRequest } from "next/server";
 
 const filePath = path.join(process.cwd(), 'data', 'tokens.json');
@@ -14,13 +14,13 @@ const readTokens = async () => {
 }
 
 export async function POST(req: NextRequest) {
-    const { name, description, image }: NFT = await new Response(req.body).json();
+    const { name, description, image }: NftMeta = await new Response(req.body).json();
 
     if (!name || !description || !image) {
         return new Response(JSON.stringify({ error: "All fields are required." }), { status: 400 });
     }
 
-    const tokens: NFT[] = await readTokens();
+    const tokens: NftMeta[] = await readTokens();
     const tokenId = crypto.randomUUID();
 
     const newToken = {

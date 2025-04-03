@@ -1,5 +1,5 @@
 'use client';
-import CardLayout from "@/components/card-layout";
+import { CardLayout } from "@/components/card-layout";
 
 export default function TransactionPage() {
   return (

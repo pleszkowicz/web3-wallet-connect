@@ -56,12 +56,13 @@ export async function GET(req: NextRequest) {
       const data: EtherscanResponse = await response.json();
 
       return Response.json(data.result);
-    } catch (error: unknown) {
+    } catch (error) {
       console.error('Error fetching transactions:', error);
       return Response.json({ error: (error as Error).message || 'Internal Server Error' }, { status: 500 });
     }
   } else if (currentChain?.id === hardhat.id) {
-    // custom solutiom for hardhad local node since Etherscan doesn't work with local nodes
+    // custom solution for hardhat local node since there is no explorer
+    // and we need to fetch transactions from the local node
     const client = createPublicClient({
       chain: hardhat,
       transport: http()

@@ -4,7 +4,7 @@ import { Connector, useConnect } from 'wagmi';
 import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
 import Image from 'next/image';
-import CardLayout from './card-layout';
+import { CardLayout } from './card-layout';
 
 export function WalletConnect() {
   const { connectors, connect, isPending } = useConnect();
