@@ -8,6 +8,7 @@ import { NFT } from '@/types/NFT';
 import { useQuery } from '@tanstack/react-query';
 import Image from 'next/image';
 import { LoaderIcon } from 'lucide-react';
+import { Loader } from './ui/loader';
 
 export const NftCollection = () => {
   invariant(
@@ -25,16 +26,16 @@ export const NftCollection = () => {
     <>
       <div className="flex flex-wrap">
         {isLoading ? (
-          <p>Loading...</p>
+          <Loader>Loading...</Loader>
+        ) : nfts && nfts.length > 0 ? (
+          nfts.map((nft) => (
+            <div key={nft.tokenId} className="flex flex-col justify-between p-4 text-center w-1/3 min-w-[180px]">
+              <NftItem tokenId={nft.tokenId.toString()} price={nft.price} />
+            </div>
+          ))
         ) : (
-          <>
-            {nfts?.map((nft) => (
-              <div key={nft.tokenId} className="flex flex-col justify-between p-4 text-center w-1/3 min-w-[180px]">
-                <NftItem tokenId={nft.tokenId.toString()} price={nft.price} />
-              </div>
-            ))}
-          </>
-        )}
+          <p className="w-full text-sm text-muted-foreground mt-4">No NFTs yet</p>
+        )}{' '}
       </div>
     </>
   );

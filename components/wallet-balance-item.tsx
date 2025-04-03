@@ -1,5 +1,6 @@
 'use client';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Loader } from './ui/loader';
 
 export interface WalletBalanceItemProps {
   address?: `0x${string}`;
@@ -20,7 +21,7 @@ export default function WalletBalanceItem({ balance, isLoading = false, name }: 
         <span className="ml-4">{name}</span>
         </div>
         {isLoading ? (
-          <p className="text-sm font-medium">Loading balance...</p>
+          <Loader>Loading balance...</Loader>
         ) : (
           <>
             <h4 className="text-lg text-bold text-right">{balance}</h4>

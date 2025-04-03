@@ -4,6 +4,7 @@ import { useTransactions } from '@/hooks/useTransactions';
 import { formatEther } from 'viem';
 import { useQueryClient } from '@tanstack/react-query';
 import { shrotenAddress } from '@/Utils/shortenAddress';
+import { Loader } from '@/components/ui/loader';
 
 const TransactionHistory = () => {
   const { address, chain: currentChain } = useAccount();
@@ -22,7 +23,7 @@ const TransactionHistory = () => {
   }, [address, chainId, currentChain?.id, queryClient]);
 
   if (isFetching) {
-    return <p>Loading transactions...</p>
+    return <Loader>Loading transactions...</Loader>;
   }
 
   return (
@@ -55,16 +56,14 @@ const TransactionHistory = () => {
                         {shrotenAddress(tx.hash)}
                       </a>
                     ) : (
-                      <span>
-                        {shrotenAddress(tx.hash)}
-                      </span>
+                      <span>{shrotenAddress(tx.hash)}</span>
                     )}
                   </td>
                   <td className="py-2 px-4 border-b">{shrotenAddress(tx.from)}</td>
                   <td className="py-2 px-4 border-b">{shrotenAddress(tx.to)}</td>
                   <td className="py-2 px-4 border-b">{new Date(parseInt(tx.timeStamp) * 1000).toLocaleString()}</td>
                   <td className="py-2 px-4 border-b text-right">
-                    {tx.to === address ? '+' : '-'}
+                    {tx.to && (tx.to === address ? '+' : '-')}
                     {formatEther(tx.value)} {currentChain?.nativeCurrency.symbol}
                   </td>
                 </tr>
