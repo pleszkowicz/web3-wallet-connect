@@ -55,7 +55,11 @@ export const CardLayout = ({ title, description, headerContent, showBackButton, 
 
           <CardTitle className="flex-grow text-center text-lg">{title}</CardTitle>
 
-          <div className="absolute right-0">{isConnected && <DisconnectAccount />}</div>
+          {isConnected && (
+            <div className="absolute right-0">
+              <DisconnectAccount />
+            </div>
+          )}
         </div>
 
         {isConnected && (
