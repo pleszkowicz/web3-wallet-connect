@@ -40,3 +40,6 @@ next-env.d.ts
 
 # repomix
 .repomix
+
+# other
+/data/tokens.json
