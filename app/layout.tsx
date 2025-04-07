@@ -27,7 +27,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} !opacity-100 transition-opacity duration-300 v0-c`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} !opacity-100 transition-opacity duration-300 v0-c bg-slate-100`}>
         <WagmiProviderWrapper>
           {children}
         </WagmiProviderWrapper>
