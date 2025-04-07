@@ -51,7 +51,7 @@ function WalletOption({
       onClick={onClick}
     >
       {connector.icon && (
-        <Image src={connector.icon} alt="connector" width={20} height={20} className="w-[20px] h-[20px] mr-2" />
+        <Image src={connector.icon.trimStart().trimEnd()} alt="connector" width={20} height={20} className="w-[20px] h-[20px] mr-2" />
       )}
       <span>{connector.name}</span>
       {!ready && <span className="ml-auto">Unavailable</span>}
