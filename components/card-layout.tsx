@@ -27,7 +27,7 @@ export const CardLayout = ({ title, description, headerContent, showBackButton, 
   const formattedAddress = ensName || address?.slice(0, 6) + '...' + address?.slice(-4);
 
   return (
-    <Card className="max-w-2xl w-full">
+    <Card className="max-w-2xl w-full min-h-[80vh]">
       <CardHeader>
         <div className="flex flex-row justify-between items-center relative">
           {showBackButton ? (

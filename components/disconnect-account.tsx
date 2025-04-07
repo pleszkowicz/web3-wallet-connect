@@ -11,7 +11,7 @@ export const DisconnectAccount = ({ className }: DisconnectAccountTypes) => {
   const { disconnect } = useDisconnect();
 
   return (
-    <Button className={className} onClick={() => disconnect()} variant="ghost">
+    <Button className={className} onClick={() => disconnect()} variant="ghost" title="Disconnect account">
       <PowerOff width={20} />
     </Button>
   );

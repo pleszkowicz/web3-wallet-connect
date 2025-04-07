@@ -15,17 +15,15 @@ export default function WalletBalanceItem({ balance, isLoading = false, name }: 
     <div className={`flex items-center space-x-4 ${isLoading ? 'animate-pulse' : ''}`}>
       <div className="flex flex-row flex-1 items-center justify-between">
         <div className="flex flex-row items-center">
-        <Avatar>
-          <AvatarFallback>{name?.charAt(0)}</AvatarFallback>
-        </Avatar>
-        <span className="ml-4">{name}</span>
+          <Avatar>
+            <AvatarFallback>{name?.charAt(0)}</AvatarFallback>
+          </Avatar>
+          <span className="ml-4">{name}</span>
         </div>
         {isLoading ? (
           <Loader>Loading balance...</Loader>
         ) : (
-          <>
-            <h4 className="text-lg text-bold text-right">{balance}</h4>
-          </>
+          <h4 className="text-right text-muted-foreground">{balance}</h4>
         )}
       </div>
     </div>

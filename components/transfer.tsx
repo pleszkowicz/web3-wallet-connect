@@ -86,7 +86,7 @@ export function Transfer() {
   });
 
   return (
-    <CardLayout title="Crypto Transfer" description="Transfer your crypto to another wallet" showBackButton>
+    <CardLayout title="Crypto Transfer" description="Transfer your crypto to another another" showBackButton>
         <Formik
           initialValues={{ unit: CryptoMap.ETH.value, from: address, to: '', value: 0 }}
           onSubmit={(values) => {
@@ -120,7 +120,7 @@ export function Transfer() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="to">To</Label>
-              <Field as={Input} id="to" name="to" placeholder="0x" />
+              <Field as={Input} id="to" name="to" placeholder="0x..." />
               <ErrorMessage name="to" component="div" className="text-red-500" />
             </div>
             <div className="space-y-2">
