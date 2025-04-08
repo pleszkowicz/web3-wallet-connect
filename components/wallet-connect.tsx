@@ -30,13 +30,19 @@ export function WalletConnect() {
           Additional note:
         </h2>
         <h3 className="mt-4">Welcome to the NFT Marketplace!</h3>
-        <p>
+        <p className="mt-4">
           In order to test the functionality, you have to configure{' '}
           <Link href="https://github.com/pleszkowicz/hardhat-smart-contract" className="text-blue-800" target="_blank">
             pleszkowicz/hardhat-smart-contract
-          </Link>.
+          </Link>
+          .
         </p>
-        <p>Once you have working hardhat node and deployed smart-contract, follow <Link href="https://github.com/pleszkowicz/web3-wallet-connect/blob/main/README.md" target="_blank">README.MD</Link></p>
+        <p className="mt-4">
+          Once you have running hardhat node and deployed smart-contract, follow{' '}
+          <Link href="https://github.com/pleszkowicz/web3-wallet-connect/blob/main/README.md" target="_blank">
+            README.MD
+          </Link>
+        </p>
       </div>
     </CardLayout>
   );
