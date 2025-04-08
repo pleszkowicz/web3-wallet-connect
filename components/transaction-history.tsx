@@ -74,7 +74,7 @@ const TransactionHistory = () => {
           </tbody>
         </table>
       ) : (
-        !isFetching && showTransactions && <p className="text-muted-foreground mt-4">No transactions found.</p>
+        !isFetching && showTransactions && <p className="text-muted-foreground">No transactions found.</p>
       )}
     </div>
   );

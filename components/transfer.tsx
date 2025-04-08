@@ -4,14 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RefreshCwIcon } from 'lucide-react';
 import { Address, formatEther, isAddress, parseEther } from 'viem';
-import {
-  useAccount,
-  useBalance,
-  useGasPrice,
-  useReadContract,
-  useSendTransaction,
-  useWriteContract,
-} from 'wagmi';
+import { useAccount, useBalance, useGasPrice, useReadContract, useSendTransaction, useWriteContract } from 'wagmi';
 import { ErrorMessage, Field, Form, Formik, useFormikContext } from 'formik';
 import * as Yup from 'yup';
 import { getFormattedBalance } from '@/Utils/getFormattedValue';
@@ -45,7 +38,6 @@ export function Transfer() {
   const { address } = useAccount();
   const { data: ethBalance } = useBalance({ address });
   const { sendTransaction } = useSendTransaction();
-
 
   const { data: linkBalance } = useReadContract({
     address: SEPOLIA_LINK_CONTRACT_ADDRESS,
@@ -87,78 +79,78 @@ export function Transfer() {
 
   return (
     <CardLayout title="Crypto Transfer" description="Transfer your crypto to another address" showBackButton>
-        <Formik
-          initialValues={{ unit: CryptoMap.ETH.value, from: address, to: '', value: 0 }}
-          onSubmit={(values) => {
-            if (selectedUnit === CryptoMap.ETH) {
-              sendTransaction({ to: values.to as Address, value: parseEther(String(values.value)) });
-              return;
-            } else {
-              writeContract({
-                address: SEPOLIA_LINK_CONTRACT_ADDRESS,
-                abi: SEPOLIA_LINK_TOKEN_ABI,
-                functionName: 'transfer',
-                args: [
-                  values.to as Address, // Recipient address
-                  parseEther(String(values.value)), // Amount to transfer
-                ],
-              });
-            }
-          }}
-          validationSchema={validationSchema}
-        >
-          <Form className="space-y-4">
-            <div className="space-y-2">
-              <CryptoSelect
-                name="unit"
-                onChange={(unitValue) => setSelectedUnit(CryptoMap[unitValue.toUpperCase() as CryptoMapKey])}
-              />
+      <Formik
+        initialValues={{ unit: CryptoMap.ETH.value, from: address, to: '', value: 0 }}
+        onSubmit={(values) => {
+          if (selectedUnit === CryptoMap.ETH) {
+            sendTransaction({ to: values.to as Address, value: parseEther(String(values.value)) });
+            return;
+          } else {
+            writeContract({
+              address: SEPOLIA_LINK_CONTRACT_ADDRESS,
+              abi: SEPOLIA_LINK_TOKEN_ABI,
+              functionName: 'transfer',
+              args: [
+                values.to as Address, // Recipient address
+                parseEther(String(values.value)), // Amount to transfer
+              ],
+            });
+          }
+        }}
+        validationSchema={validationSchema}
+      >
+        <Form className="space-y-4">
+          <div className="space-y-2">
+            <CryptoSelect
+              name="unit"
+              onChange={(unitValue) => setSelectedUnit(CryptoMap[unitValue.toUpperCase() as CryptoMapKey])}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="from">From</Label>
+            <Field as={Input} id="from" name="from" type="text" disabled className="bg-muted" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="to">To</Label>
+            <Field as={Input} id="to" name="to" placeholder="0x...abc" />
+            <ErrorMessage name="to" component="div" className="text-red-500" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="value">
+              Value{' '}
+              <span className="text-xs">
+                (max {currentBalance ? formatEther(currentBalance as bigint) : '0.00'}{' '}
+                {selectedUnit.value.toUpperCase()})
+              </span>
+            </Label>
+            <Field as={Input} id="value" name="value" placeholder="0.00" />
+            <ErrorMessage name="value" component="div" className="text-red-500" />
+          </div>
+          <div className={`space-y-2 ${isGasPriceFetching ? 'animate-pulse disabled' : ''}`}>
+            <Label>Estimated Gas Fee</Label>
+            <div className="flex items-center justify-start gap-2 bg-muted p-2 rounded-md">
+              <span className="text-sm">{gasPrice ? `${formatEther(gasPrice, 'gwei')} Gwei` : 'Loading...'}</span>{' '}
+              {gasPrice ? <span className="text-xs">({formatEther(gasPrice, 'wei')} ETH)</span> : null}
+              <Button
+                variant="link"
+                size="sm"
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (!isGasPriceFetching) {
+                    refetchGasPrice();
+                  }
+                }}
+              >
+                <RefreshCwIcon className="w-4 h-4 mr-2" />
+                Refresh
+              </Button>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="from">From</Label>
-              <Field as={Input} id="from" name="from" type="text" disabled className="bg-muted" />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="to">To</Label>
-              <Field as={Input} id="to" name="to" placeholder="0x..." />
-              <ErrorMessage name="to" component="div" className="text-red-500" />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="value">
-                Value{' '}
-                <span className="text-xs">
-                  (max {currentBalance ? formatEther(currentBalance as bigint) : '0.00'}{' '}
-                  {selectedUnit.value.toUpperCase()})
-                </span>
-              </Label>
-              <Field as={Input} id="value" name="value" placeholder="0.00" />
-              <ErrorMessage name="value" component="div" className="text-red-500" />
-            </div>
-            <div className={`space-y-2 ${isGasPriceFetching ? 'animate-pulse disabled' : ''}`}>
-              <Label>Estimated Gas Fee</Label>
-              <div className="flex items-center justify-between bg-muted p-2 rounded-md">
-                <span className="text-sm">{gasPrice ? `${formatEther(gasPrice, 'gwei')} Gwei` : 'Loading...'}</span>{' '}
-                {gasPrice ? <span className="text-xs">({formatEther(gasPrice, 'wei')} ETH)</span> : null}
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    if (!isGasPriceFetching) {
-                      refetchGasPrice();
-                    }
-                  }}
-                >
-                  <RefreshCwIcon className="w-4 h-4 mr-2" />
-                  Refresh
-                </Button>
-              </div>
-            </div>
-            <Button variant="default" className="w-full" type="submit">
-              Transfer
-            </Button>
-          </Form>
-        </Formik>
+          </div>
+          <Button variant="default" className="w-full" type="submit">
+            Transfer
+          </Button>
+        </Form>
+      </Formik>
     </CardLayout>
   );
 }

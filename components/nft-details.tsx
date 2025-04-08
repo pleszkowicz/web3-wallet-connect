@@ -164,7 +164,7 @@ const NftItem = ({ tokenId, owner, price }: NftItemProps) => {
           <>
             <div className="relative w-full h-full">
               <Image
-                loading="lazy"
+                priority={true}
                 src={tokenDetails.image}
                 alt={tokenDetails.name || 'NFT Image'}
                 className="pointer w-full aspect-square object-cover transform transition-transform duration-1000 group-hover:scale-110"
@@ -185,7 +185,7 @@ const NftItem = ({ tokenId, owner, price }: NftItemProps) => {
               <div className="">
                 <h2 className="font-bold text-slate-100">{tokenDetails.name}</h2>
                 <p className="text-sm text-slate-200">{tokenDetails.description}</p>
-                <p className="text-sm mt-2 mb-2 text-slate-300">
+                <div className="text-sm mt-2 mb-2 text-slate-300">
                   {isOwned ? (
                     <Badge variant="secondary" className="bg-green-100 text-green-800 hover:normal-case">
                       <ShieldCheck className="h-3 w-3 mr-1" />
@@ -194,7 +194,7 @@ const NftItem = ({ tokenId, owner, price }: NftItemProps) => {
                   ) : (
                     <span>Owner: {owner}</span>
                   )}
-                  </p>
+                  </div>
                 <NftPrice tokenId={tokenId} price={price} isOwned={isOwned} />
               </div>
             </div>

@@ -6,13 +6,14 @@ import { InfoIcon, Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import { CardLayout } from './card-layout';
 import Link from 'next/link';
+import { OpenInNewWindowIcon } from '@radix-ui/react-icons';
 
 export function WalletConnect() {
   const { connectors, connect, isPending } = useConnect();
 
   return (
-    <CardLayout title="Connect Wallet" description="Choose a wallet to connect to this app">
-      <div className="grid gap-4">
+    <CardLayout title="Connect Wallet" description="Welcome to the NFT Marketplace! Choose a wallet to connect to this app">
+      <div className="grid gap-2">
         {connectors.map((connector) => (
           <WalletOption
             key={connector.id}
@@ -22,25 +23,29 @@ export function WalletConnect() {
           />
         ))}
       </div>
-      <div className="mt-6 border rounded p-4 text-slate-600">
-        <h2 className="flex items-center">
-          <span className="inline-block h-6 w-6 mr-2">
+
+      <div className="border rounded p-4 text-slate-500 shadow-sm">
+        <p className="flex items-center text-sm">
+          <span className="inline-block text-lg mr-2">
             <InfoIcon display="inline" />
           </span>
-          Additional note:
-        </h2>
-        <h3 className="mt-4">Welcome to the NFT Marketplace!</h3>
-        <p className="mt-4">
-          In order to test the functionality, you have to configure{' '}
-          <Link href="https://github.com/pleszkowicz/hardhat-smart-contract" className="text-blue-800" target="_blank">
-            pleszkowicz/hardhat-smart-contract
-          </Link>
-          .
+          Setup instruction
         </p>
-        <p className="mt-4">
-          Once you have running hardhat node and deployed smart-contract, follow{' '}
-          <Link href="https://github.com/pleszkowicz/web3-wallet-connect/blob/main/README.md" target="_blank">
-            README.MD
+        <p className="mt-4 text-sm">
+          In order to test all functionalities locally, you have to clone and configure{' '}
+          <Link href="https://github.com/pleszkowicz/hardhat-smart-contract" className="text-blue-600" target="_blank">
+            pleszkowicz/hardhat-smart-contract <OpenInNewWindowIcon className="inline" />
+          </Link>{' '}
+          and set up your environment variables as described in the repository documentation.
+        </p>
+        <p className="mt-4 text-sm">
+          Once you have running hardhat node locally, deploy smart-contract as described in {' '}
+          <Link
+            href="https://github.com/pleszkowicz/web3-wallet-connect/blob/main/README.md"
+            className="text-blue-600 inline-block"
+            target="_blank"
+          >
+            readme <OpenInNewWindowIcon className="inline" />.
           </Link>
         </p>
       </div>
@@ -69,6 +74,7 @@ function WalletOption({
   return (
     <Button
       variant="outline"
+      size="lg"
       className="w-full justify-start flex content-between"
       disabled={!ready || pending}
       onClick={onClick}
@@ -79,7 +85,7 @@ function WalletOption({
           alt="connector"
           width={20}
           height={20}
-          className="w-[20px] h-[20px] mr-2"
+          className="w-[20px] h-[20px] mr-2 rounded-sm"
         />
       )}
       <span>{connector.name}</span>

@@ -1,6 +1,6 @@
 'use client';
 import { ErrorMessage, Field, Form, Formik } from 'formik';
-import { useWriteContract } from 'wagmi';
+import { useReadContract, useWriteContract } from 'wagmi';
 import * as Yup from 'yup';
 import { Input } from './ui/input';
 import * as dotenv from 'dotenv';
@@ -11,13 +11,20 @@ import { useToast } from './ui/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import { NftMeta } from '@/types/NFT';
 import { NFT_MARKETPLACE_ADDRESS } from '@/const/nft-marketplace-address';
+import { formatEther } from 'viem';
+import invariant from 'tiny-invariant';
 
 dotenv.config();
 
 export function CreateNFT() {
   const { toast } = useToast();
   const router = useRouter();
-  const { writeContract } = useWriteContract();
+  const { data: listingPrice } = useReadContract({
+    address: NFT_MARKETPLACE_ADDRESS,
+    abi: NFT_MARKET_CONTRACT_ABI,
+    functionName: 'listingPrice',
+  });
+  const { writeContract, isPending: isTransactionPending } = useWriteContract();
   const validationSchema: Yup.ObjectSchema<Pick<NftMeta, 'name' | 'description' | 'image'>> = Yup.object().shape({
     name: Yup.string().required('Name is required'),
     description: Yup.string().required('Description is required'),
@@ -43,17 +50,19 @@ export function CreateNFT() {
               console.error('Failed to create NFT');
               return;
             }
-            
+
             const { tokenId } = await tokenURIResponse.json();
             const tokenURI = `${currentDomain}/api/token-uri/${tokenId}`;
+
+            invariant(listingPrice, 'listingPrice is not defined');
 
             await writeContract(
               {
                 address: NFT_MARKETPLACE_ADDRESS,
                 abi: NFT_MARKET_CONTRACT_ABI,
                 functionName: 'createNft',
-                args: [tokenURI, BigInt(0.025 * 10 ** 18)],
-                value: BigInt(0.025 * 10 ** 18),
+                args: [tokenURI, listingPrice],
+                value: listingPrice,
               },
               {
                 onSuccess: (data) => {
@@ -65,7 +74,8 @@ export function CreateNFT() {
                 },
                 onError: (error) => {
                   console.log('NFT creation failed');
-                  console.log('error', error);                },
+                  console.log('error', error);
+                },
               }
             );
           } catch (error) {
@@ -76,17 +86,19 @@ export function CreateNFT() {
         validationSchema={validationSchema}
       >
         {({ isSubmitting }) => (
-          <Form className="space-y-4" aria-disabled={isSubmitting}>
+          <Form className="space-y-4" aria-disabled={isSubmitting || isTransactionPending}>
             <Field as={Input} id="name" name="name" placeholder="Name" />
             <ErrorMessage name="name" component="div" className="text-red-500" />
-
             <Field as={Input} id="description" name="description" placeholder="Description" />
             <ErrorMessage name="description" component="div" className="text-red-500" />
-
             <Field as={Input} id="image" name="image" placeholder="Image URL" />
             <ErrorMessage name="image" component="div" className="text-red-500" />
-
-            <Button variant="default" className="w-full" type="submit" disabled={isSubmitting}>
+            <div className="flex items-center justify-start gap-2 bg-muted p-2 rounded-md">
+              <span className="text-sm">
+                NFT creation price: <b>{listingPrice && formatEther(listingPrice)} ETH</b>
+              </span>
+            </div>
+            <Button variant="default" className="w-full" type="submit" disabled={isSubmitting || isTransactionPending}>
               Create
             </Button>
           </Form>

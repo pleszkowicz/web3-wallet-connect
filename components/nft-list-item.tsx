@@ -9,7 +9,7 @@ import { Badge } from './ui/badge';
 import { NFT_MARKETPLACE_ADDRESS } from '@/const/nft-marketplace-address';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-
+import { formatEther } from 'viem';
 
 export const NftListItem = ({ tokenId, price, owner }: Nft) => {
   const { data: tokenURI, isLoading } = useReadContract({
@@ -45,7 +45,7 @@ export const NftListItem = ({ tokenId, price, owner }: Nft) => {
 
   const [isSaleApproved, setIsSaleApproved] = useState(false);
   const isOwned = owner === address;
-  const formattedPrice = (parseFloat(price.toString()) / 1e18).toFixed(5);
+  const formattedPrice = formatEther(price);
 
   useEffect(() => {
     setIsSaleApproved(approvedAddress?.toLowerCase() === NFT_MARKETPLACE_ADDRESS.toLowerCase());
@@ -90,7 +90,7 @@ export const NftListItem = ({ tokenId, price, owner }: Nft) => {
                   <h3 className="text-sm font-semibold">{tokenDetails.name}</h3>
                   <p className="text-sm text-white flex flex-row">{tokenDetails.description}</p>
 
-                  <span className="text-sm text-white display-inline">{formattedPrice} ETH</span>
+                  <span className="text-sm text-white display-inline"><b>{formattedPrice} ETH</b></span>
                 </div>
               </div>
             </>
