@@ -1,7 +1,6 @@
 import invariant from 'tiny-invariant';
 import { http, createConfig } from 'wagmi';
 import { mainnet, sepolia, hardhat } from 'wagmi/chains';
-import { injected } from 'wagmi/connectors';
 
 const ALCHEMY_API_KEY = process.env.NEXT_PUBLIC_ALCHEMY_API_KEY as string;
 
@@ -13,7 +12,7 @@ export const config = createConfig({
     sepolia, // testnet
     hardhat,
   ],
-  connectors: [injected()],
+  connectors: [],
   transports: {
     [mainnet.id]: http(`https://eth-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`),
     [sepolia.id]: http(`https://eth-sepolia.g.alchemy.com/v2/${ALCHEMY_API_KEY}`),
