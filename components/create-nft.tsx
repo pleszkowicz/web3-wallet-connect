@@ -51,7 +51,7 @@ export function CreateNFT() {
               {
                 address: NFT_MARKETPLACE_ADDRESS,
                 abi: NFT_MARKET_CONTRACT_ABI,
-                functionName: 'createNFT',
+                functionName: 'createNft',
                 args: [tokenURI, BigInt(0.025 * 10 ** 18)],
                 value: BigInt(0.025 * 10 ** 18),
               },

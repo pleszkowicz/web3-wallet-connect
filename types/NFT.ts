@@ -4,7 +4,6 @@ export type Nft = {
     tokenId: bigint;
     price: bigint;
     owner: Address,
-    isForSale: boolean;
 }
 
 export type NftMeta = {

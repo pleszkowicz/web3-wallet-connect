@@ -86,7 +86,7 @@ export function Transfer() {
   });
 
   return (
-    <CardLayout title="Crypto Transfer" description="Transfer your crypto to another another" showBackButton>
+    <CardLayout title="Crypto Transfer" description="Transfer your crypto to another address" showBackButton>
         <Formik
           initialValues={{ unit: CryptoMap.ETH.value, from: address, to: '', value: 0 }}
           onSubmit={(values) => {

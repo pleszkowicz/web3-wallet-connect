@@ -9,11 +9,11 @@ import TransactionHistory from '@/components/transaction-history';
 import { Separator } from '@/components/ui/separator';
 import Link from 'next/link';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
-import { NftCollection } from './nft-collection';
 import invariant from 'tiny-invariant';
 import { CardLayout } from './card-layout';
 import { sepolia } from 'wagmi/chains';
 import { ImagePlusIcon, LucideIcon, SendIcon } from 'lucide-react';
+import { NftList } from './nft-list';
 
 export function WalletBalance() {
   const { address, isConnected, chain } = useAccount();
@@ -54,12 +54,12 @@ export function WalletBalance() {
         <Separator />
 
         <Tabs defaultValue="nfts" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-2 mb-4">
             <TabsTrigger value="nfts">NFTs</TabsTrigger>
             <TabsTrigger value="transactions">Transactions</TabsTrigger>
           </TabsList>
           <TabsContent value="nfts">
-            <NftCollection />
+            <NftList />
             <Button asChild variant="default" className="w-full mt-5">
               <Link href="/nft/create">Create NFT</Link>
             </Button>
