@@ -35,11 +35,15 @@ pnpm dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the results.
 
+## Configure API keys
+
+Once everthing is installed, create `.env.local` and copy and fill required keys from [.env](https://github.com/pleszkowicz/web3-wallet-connect/blob/main/.env) file:
+
 ## App Features
 
-### Login Screen
+### Welcome Screen
 
-Once the application is running, you should see the following login screen:
+Once the application is running, depending on available web3 wallets, you should see a screen similar to:
 
 ![login](https://github.com/pleszkowicz/web3-wallet-connect/blob/main/public/images/login.png?raw=true)
 
@@ -53,9 +57,15 @@ After connecting your wallet, you can view your wallet balance, NFT collections,
 
 Easily create NFTs on the Sepolia or localhost Hardhat network using the built-in NFT creation form.
 
-### Cross-Chain Crypto Exchange
+### NFT price updates
 
-Swap cryptocurrencies across different blockchains (mocked functionality for demonstration purposes).
+NFT owners are eligible to update the price in ETH tokens.
+
+### NFT Sell and Buy
+
+In order to sell NFT, smart-contract requires to set `approval`, which is grnting permission for smart contract address to manage or transfer NFT on behalf of the owner. Once this operation is performed, other community members are allowed to buy NFT at specific price.
+
+Owner can withdraw `approval` at any point of time, allowing other users only to view.
 
 ## Contributing
 
