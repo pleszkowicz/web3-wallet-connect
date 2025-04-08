@@ -94,7 +94,7 @@ export const CardLayout = ({ title, description, headerContent, showBackButton, 
           </div>
         )}
 
-        {description && <CardDescription className="mt-12">{description}</CardDescription>}
+        {description && <CardDescription className="mt-12 text-muted-foreground">{description}</CardDescription>}
         {headerContent}
       </CardHeader>
       <CardContent className="space-y-4">{children}</CardContent>
