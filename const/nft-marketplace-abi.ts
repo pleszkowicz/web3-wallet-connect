@@ -1,4 +1,4 @@
-export const NFT_MARKET_CONTRACT_ABI =[
+export const NFT_MARKET_CONTRACT_ABI = [
   {
     "inputs": [],
     "stateMutability": "nonpayable",
@@ -217,7 +217,7 @@ export const NFT_MARKET_CONTRACT_ABI =[
         "type": "string"
       }
     ],
-    "name": "NFTCreated",
+    "name": "NftCreated",
     "type": "event"
   },
   {
@@ -236,7 +236,7 @@ export const NFT_MARKET_CONTRACT_ABI =[
         "type": "uint256"
       }
     ],
-    "name": "NFTListingChanged",
+    "name": "NftListingChanged",
     "type": "event"
   },
   {
@@ -267,7 +267,7 @@ export const NFT_MARKET_CONTRACT_ABI =[
         "type": "uint256"
       }
     ],
-    "name": "NFTSold",
+    "name": "NftSold",
     "type": "event"
   },
   {
@@ -345,7 +345,7 @@ export const NFT_MARKET_CONTRACT_ABI =[
         "type": "uint256"
       }
     ],
-    "name": "createNFT",
+    "name": "createNft",
     "outputs": [
       {
         "internalType": "uint256",
@@ -371,7 +371,7 @@ export const NFT_MARKET_CONTRACT_ABI =[
   },
   {
     "inputs": [],
-    "name": "getAllNFTs",
+    "name": "getAllNfts",
     "outputs": [
       {
         "components": [
@@ -391,7 +391,7 @@ export const NFT_MARKET_CONTRACT_ABI =[
             "type": "uint256"
           }
         ],
-        "internalType": "struct NFTMarketplace.ListedNFT[]",
+        "internalType": "struct NftMarketplace.ListedNft[]",
         "name": "",
         "type": "tuple[]"
       }
@@ -421,12 +421,12 @@ export const NFT_MARKET_CONTRACT_ABI =[
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "_owner",
-        "type": "address"
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
       }
     ],
-    "name": "getNFTsByOwner",
+    "name": "getNftById",
     "outputs": [
       {
         "components": [
@@ -446,7 +446,43 @@ export const NFT_MARKET_CONTRACT_ABI =[
             "type": "uint256"
           }
         ],
-        "internalType": "struct NFTMarketplace.ListedNFT[]",
+        "internalType": "struct NftMarketplace.ListedNft",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_owner",
+        "type": "address"
+      }
+    ],
+    "name": "getNftsByOwner",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "tokenId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "owner",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "price",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct NftMarketplace.ListedNft[]",
         "name": "",
         "type": "tuple[]"
       }
@@ -462,7 +498,7 @@ export const NFT_MARKET_CONTRACT_ABI =[
         "type": "uint256"
       }
     ],
-    "name": "idToListedNFT",
+    "name": "idToListedNft",
     "outputs": [
       {
         "internalType": "uint256",
