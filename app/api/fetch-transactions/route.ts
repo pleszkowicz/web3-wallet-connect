@@ -76,23 +76,19 @@ export async function GET(req: NextRequest) {
     console.log('latestBlock', latestBlock)
 
     for (let i = startBlock; i <= latestBlock; i++) {
-      console.log('i', i)
       const block = await client.getBlock({ blockNumber: i });
-      console.log('block', block)
       const blockTransactions = await Promise.all(
         block.transactions.map((hash) => client.getTransaction({ hash }))
       );
 
-      console.log('blockTransactions', blockTransactions)
-
       blockTransactions.forEach((tx) => {
-        console.log('tx:', tx)
         if (tx.from.toLowerCase() === address.toLowerCase() || tx.to?.toLowerCase() === address.toLowerCase()) {
           // enhance tx by block `timestamp`
           transactions.push({ timeStamp: block.timestamp, ...tx });
         }
       });
     }
+
     return new Response(JSON.stringify(transactions, replacer))
   }
 }
