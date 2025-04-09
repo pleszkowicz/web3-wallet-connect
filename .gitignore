@@ -13,8 +13,12 @@
 /.next/
 /out/
 
-# .env
+# env
+.env
 .env*.local
+.env*.development
+.env*.production
+
 
 # production
 /build
@@ -41,4 +45,6 @@ next-env.d.ts
 # repomix
 .repomix
 
-# other
+# prisma
+/lib/generated
+/prisma/.data/dev.db
