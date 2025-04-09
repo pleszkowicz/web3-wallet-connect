@@ -13,6 +13,7 @@ import { NftMeta } from '@/types/NFT';
 import { NFT_MARKETPLACE_ADDRESS } from '@/const/nft-marketplace-address';
 import { formatEther } from 'viem';
 import invariant from 'tiny-invariant';
+import { Nft } from '@/lib/generated/prisma';
 
 dotenv.config();
 
@@ -51,8 +52,8 @@ export function CreateNFT() {
               return;
             }
 
-            const { tokenId } = await tokenURIResponse.json();
-            const tokenURI = `${currentDomain}/api/token-uri/${tokenId}`;
+            const { id } = await tokenURIResponse.json() as Nft;
+            const tokenURI = `${currentDomain}/api/token-uri/${id}`;
 
             invariant(listingPrice, 'listingPrice is not defined');
 

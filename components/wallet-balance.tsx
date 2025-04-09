@@ -12,7 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import invariant from 'tiny-invariant';
 import { CardLayout } from './card-layout';
 import { sepolia } from 'wagmi/chains';
-import { ImagePlusIcon, LucideIcon, SendIcon } from 'lucide-react';
+import { ImagePlusIcon, LucideIcon, Plus, SendIcon } from 'lucide-react';
 import { NftList } from './nft-list';
 
 export function WalletBalance() {
@@ -61,13 +61,13 @@ export function WalletBalance() {
           <TabsContent value="nfts">
             <NftList />
             <Button asChild variant="default" className="w-full mt-5">
-              <Link href="/nft/create">Create NFT</Link>
+              <Link href="/nft/create"><Plus /> Mint New NFT</Link>
             </Button>
           </TabsContent>
           <TabsContent value="transactions">
             <TransactionHistory key={chain?.id} />
             <Button asChild variant="default" className="w-full mt-5 mb-5">
-              <Link href="/transaction">New transaction</Link>
+              <Link href="/transaction"><Plus /> New transaction</Link>
             </Button>
           </TabsContent>
         </Tabs>
@@ -119,7 +119,7 @@ export default function SepoliaLinkBalance() {
   });
 
   // Convert balance from token decimals
-  const formattedBalance = balance ? formatEther(balance as bigint) : 'N/A';
+  const formattedBalance = balance ? formatEther(balance) : 'N/A';
   const formattedSymbol = String(symbol);
 
   return (

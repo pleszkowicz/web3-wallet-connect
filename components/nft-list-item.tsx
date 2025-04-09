@@ -78,7 +78,7 @@ export const NftListItem = ({ tokenId, price, owner }: Nft) => {
                   </Badge>
                 )}
                 {isSaleApproved && (
-                  <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+                  <Badge variant="secondary" className="bg-blue-100 text-blue-700 border-blue-300">
                     <Tag className="h-3 w-3 mr-1" />
                     For Sale
                   </Badge>
@@ -87,10 +87,10 @@ export const NftListItem = ({ tokenId, price, owner }: Nft) => {
 
               <div className="absolute bottom-0 left-0 p-2 w-full flex flex-row items-end gap-1 z-10 text-white text-left bg-gradient-to-b from-transparent to-black bg-opacity-100">
                 <div>
-                  <h3 className="text-sm font-semibold">{tokenDetails.name}</h3>
+                  <h3 className="text-sm font-semibold"><b>{tokenDetails.name}</b></h3>
                   <p className="text-sm text-white flex flex-row">{tokenDetails.description}</p>
 
-                  <span className="text-sm text-white display-inline"><b>{formattedPrice} ETH</b></span>
+                  <span className="text-sm text-green-300 font-semibold display-inline"><b>{formattedPrice} ETH</b></span>
                 </div>
               </div>
             </>

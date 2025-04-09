@@ -1,7 +1,7 @@
 'use client';
 import { NFT_MARKET_CONTRACT_ABI } from '@/const/nft-marketplace-abi';
 import { useQuery } from '@tanstack/react-query';
-import { EditIcon, LoaderIcon, ShieldCheck, Tag } from 'lucide-react';
+import { Check, EditIcon, LoaderIcon, ShieldCheck, ShoppingCart, Tag, Undo2 } from 'lucide-react';
 import Image from 'next/image';
 import { useAccount, useReadContract, useTransactionCount, useWriteContract } from 'wagmi';
 import { Button } from './ui/button';
@@ -174,7 +174,7 @@ const NftItem = ({ tokenId, owner, price }: NftItemProps) => {
             </div>
             <div className="absolute top-0 left-0 p-4 flex flex-col gap-1 z-10 cursor-default">
               {isSaleApproved && (
-                <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+                <Badge variant="secondary" className="bg-blue-100 text-blue-700 border-blue-300">
                   <Tag className="h-3 w-3 mr-1" />
                   For Sale
                 </Badge>
@@ -204,19 +204,20 @@ const NftItem = ({ tokenId, owner, price }: NftItemProps) => {
       <div className="w-full mt-6">
         {isOwned && (
           <Button
-            variant="default"
+            variant={isSaleApproved ? 'destructive' : 'default'}
             className="w-full"
             type="button"
             onClick={toggleApprove}
             disabled={isPending}
           >
-            {isSaleApproved ? 'Revoke Sale Approval' : 'Approve to Sell'}
+            {isSaleApproved ? <Undo2 className='mr-2' /> : <Check className='mr-2' />}
+            {isSaleApproved ? 'Revoke from Sale' : 'Approve to Sell'}
           </Button>
         )}
 
         {!isOwned && isSaleApproved && (
           <Button variant="default" className="w-full" type="button" disabled={isPending} onClick={handleBuyNft}>
-            Buy
+            <ShoppingCart className='mr-2' />  Buy
           </Button>
         )}
       </div>
@@ -249,7 +250,7 @@ const NftPrice = ({ tokenId, price, isOwned }: NftPriceProps) => {
   });
 
   return (
-    <div className="flex flex-row text-green-200 align-middle">
+    <div className="flex flex-row text-green-300 font-semibold align-middle">
       <h3 className="display-inline text-lg">{priceValue} ETH</h3>
       {isOwned && (
         <Formik

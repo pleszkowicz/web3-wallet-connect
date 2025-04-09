@@ -112,7 +112,7 @@ export function Transfer() {
           </div>
           <div className="space-y-2">
             <Label htmlFor="to">To</Label>
-            <Field as={Input} id="to" name="to" placeholder="0x...abc" />
+            <Field as={Input} id="to" name="to" placeholder="0x..." />
             <ErrorMessage name="to" component="div" className="text-red-500" />
           </div>
           <div className="space-y-2">
@@ -141,8 +141,7 @@ export function Transfer() {
                   }
                 }}
               >
-                <RefreshCwIcon className="w-4 h-4 mr-2" />
-                Refresh
+                <RefreshCwIcon className="w-4 h-4 mr-2 spin-in-180 hover:animate-spin" />
               </Button>
             </div>
           </div>
