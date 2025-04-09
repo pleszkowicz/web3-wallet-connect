@@ -1,43 +1,30 @@
 'use server';
-import path from 'path';
-import fs from "fs";
-import crypto from 'crypto';
 import { NftMeta } from "@/types/NFT";
 import { NextRequest } from "next/server";
+import { PrismaClient } from '@/lib/generated/prisma';
 
-const filePath = path.join(process.cwd(), 'data', 'tokens.json');
-console.log('filePath', filePath)
-
-const readTokens = async () => {
-    const data = fs.readFileSync(filePath, 'utf8');
-    return JSON.parse(data);
-}
+const prisma = new PrismaClient();
 
 export async function POST(req: NextRequest) {
     const { name, description, image }: NftMeta = await new Response(req.body).json();
 
     if (!name || !description || !image) {
-        return new Response(JSON.stringify({ error: "All fields are required." }), { status: 400 });
+        return new Response(JSON.stringify({ error: "All fields are required." }), { status: 400, });
     }
 
-    const tokens: NftMeta[] = await readTokens();
-    const tokenId = crypto.randomUUID();
+    const newToken = await prisma.nft.create({ data: { name, description, image } });
 
-    const newToken = {
-        tokenId,
-        name,
-        description,
-        image,
-    };
-
-    tokens.push(newToken);
-    fs.writeFileSync(filePath, JSON.stringify(tokens, null, 2));
-
-    return new Response(JSON.stringify(newToken), { status: 201 });
+    return new Response(JSON.stringify(newToken), {
+        status: 201
+    });
 }
 
 export async function GET() {
-    const tokens = await readTokens();
+    const tokens = await prisma.nft.findMany();
 
-    return new Response(JSON.stringify(tokens));
+    return new Response(JSON.stringify(tokens), {
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    });
 }

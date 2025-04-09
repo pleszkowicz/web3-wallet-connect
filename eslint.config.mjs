@@ -13,7 +13,7 @@ const eslintConfig = [
       'eslint-config-next',
       'prettier',
     ],
-    ignorePatterns: ['.next/**'], // Ignore the .next directory
+    ignorePatterns: ['.next/**', 'lib/generated/prisma/**'],
     settings: {
       next: {
         rootDir: '/',
@@ -53,6 +53,7 @@ const eslintConfig = [
       'eol-last': ['error', 'always'],
       '@next/next/no-html-link-for-pages': 'off',
       '@next/next/no-assign-module-variable': 'off',
+      '@typescript-eslint/no-require-imports': 'warn'
     },
   }),
 ];
