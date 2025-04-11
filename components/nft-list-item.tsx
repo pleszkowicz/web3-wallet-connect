@@ -1,15 +1,14 @@
 'use client';
 import { NFT_MARKET_CONTRACT_ABI } from '@/const/nft-marketplace-abi';
-import { useQuery } from '@tanstack/react-query';
-import { LoaderIcon, ShieldCheck, Tag } from 'lucide-react';
-import Image from 'next/image';
-import { useAccount, useReadContract } from 'wagmi';
-import { Nft, NftMeta } from '@/types/NFT';
 import { NFT_MARKETPLACE_ADDRESS } from '@/const/nft-marketplace-address';
-import { useEffect, useState } from 'react';
+import { Nft, NftMeta } from '@/types/NFT';
+import { useQuery } from '@tanstack/react-query';
+import { LoaderIcon } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 import { formatEther } from 'viem';
-import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
+import { useAccount, useReadContract } from 'wagmi';
 import { NftStatusHelper } from './nft-status-helper';
 
 export const NftListItem = ({ tokenId, price, owner }: Nft) => {
@@ -56,8 +55,10 @@ export const NftListItem = ({ tokenId, price, owner }: Nft) => {
     <div className="flex flex-col w-full">
       <Link href={`/nft/${tokenId}`} className="">
         <div className="flex items-center rounded-lg overflow-hidden flex-col gap-2 relative group">
-          {isLoading || tokenDetails === undefined ? (
+          {isLoading ? (
             <LoaderIcon />
+          ) : !tokenDetails ? (
+            <span>Loading failed</span>
           ) : (
             <>
               <div className="relative w-full h-full">

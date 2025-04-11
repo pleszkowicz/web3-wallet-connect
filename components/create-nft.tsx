@@ -1,19 +1,20 @@
 'use client';
+import { NFT_MARKET_CONTRACT_ABI } from '@/const/nft-marketplace-abi';
+import { NFT_MARKETPLACE_ADDRESS } from '@/const/nft-marketplace-address';
+import { useMounted } from '@/hooks/useMounted';
+import { Nft } from '@/lib/generated/prisma';
+import { NftMeta } from '@/types/NFT';
+import * as dotenv from 'dotenv';
 import { ErrorMessage, Field, Form, Formik } from 'formik';
+import { useRouter } from 'next/navigation';
+import invariant from 'tiny-invariant';
+import { formatEther } from 'viem';
 import { useReadContract, useWriteContract } from 'wagmi';
 import * as Yup from 'yup';
-import { Input } from './ui/input';
-import * as dotenv from 'dotenv';
-import { Button } from './ui/button';
-import { NFT_MARKET_CONTRACT_ABI } from '@/const/nft-marketplace-abi';
 import { CardLayout } from './card-layout';
+import { Button } from './ui/button';
 import { useToast } from './ui/hooks/use-toast';
-import { useRouter } from 'next/navigation';
-import { NftMeta } from '@/types/NFT';
-import { NFT_MARKETPLACE_ADDRESS } from '@/const/nft-marketplace-address';
-import { formatEther } from 'viem';
-import invariant from 'tiny-invariant';
-import { Nft } from '@/lib/generated/prisma';
+import { Input } from './ui/input';
 
 dotenv.config();
 
@@ -31,6 +32,11 @@ export function CreateNFT() {
     description: Yup.string().required('Description is required'),
     image: Yup.string().url('Must be a valid URL').required('Image URL is required'),
   });
+  const mounted = useMounted();
+
+  if (!mounted) {
+    return null;
+  }
 
   return (
     <CardLayout title="Create NFT" showBackButton>
@@ -38,7 +44,7 @@ export function CreateNFT() {
         initialValues={{ name: '', description: '', image: '' }}
         onSubmit={async (values) => {
           try {
-            const currentDomain = window.location.origin;
+            const currentDomain = typeof window !== 'undefined' ? window.location.origin : '';
             const tokenURIResponse = await fetch(`${currentDomain}/api/token-uri`, {
               method: 'POST',
               headers: {
@@ -52,7 +58,7 @@ export function CreateNFT() {
               return;
             }
 
-            const { id } = await tokenURIResponse.json() as Nft;
+            const { id } = (await tokenURIResponse.json()) as Nft;
             const tokenURI = `${currentDomain}/api/token-uri/${id}`;
 
             invariant(listingPrice, 'listingPrice is not defined');

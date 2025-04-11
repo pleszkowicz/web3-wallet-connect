@@ -1,18 +1,20 @@
-'use client'
-import { useAccount } from "wagmi";
-import { WalletBalance } from "@/components/wallet-balance";
-import { useEffect, useState } from "react";
-import { WalletConnect } from "./wallet-connect";
+'use client';
+import { WalletBalance } from '@/components/wallet-balance';
+import { useMounted } from '@/hooks/useMounted';
+import { useAccount } from 'wagmi';
+import { WalletConnect } from './wallet-connect';
 
 export default function ConnectWallet() {
   const { isConnected } = useAccount();
-  const [mounted, isMounted] = useState(false);
+  const mounted = useMounted();
 
-  useEffect(() => {
-    isMounted(true);
-  }, []);
+  if (!mounted) {
+    return null;
+  }
 
-  if (!mounted) {return null;}
+  if (!mounted) {
+    return null;
+  }
 
   return isConnected ? <WalletBalance /> : <WalletConnect />;
 }

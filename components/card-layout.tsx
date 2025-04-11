@@ -1,6 +1,7 @@
 'use client';
 import NetworkSwitch from '@/components/network-switch';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { useMounted } from '@/hooks/useMounted';
 import { OpenInNewWindowIcon } from '@radix-ui/react-icons';
 import { ArrowLeftIcon, CopyIcon } from 'lucide-react';
 import Link from 'next/link';
@@ -26,6 +27,11 @@ export const CardLayout = ({ title, description, headerContent, showBackButton, 
   const { address, chain: currentChain, isConnected } = useAccount();
   const { data: ensName } = useEnsName({ address });
   const formattedAddress = ensName || address?.slice(0, 6) + '...' + address?.slice(-4);
+  const mounted = useMounted();
+
+  if (!mounted) {
+    return null;
+  }
 
   return (
     <Card className="max-w-3xl w-full min-h-screen sm:min-h-[80vh]">
