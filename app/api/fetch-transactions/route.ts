@@ -23,18 +23,6 @@ export async function GET(req: NextRequest) {
     return Response.json({ error: 'Address is required' }, { status: 400 });
   }
 
-  let network: string;
-
-  switch (currentChain?.id) {
-    case mainnet.id:
-      network = 'eth-mainnet';
-      break;
-    case sepolia.id:
-      network = 'eth-sepolia';
-      break;
-    default:
-  }
-
   const apiUrl = chainTransportsURLMap[Number(chainId) as keyof typeof chainTransportsURLMap];
 
   if (apiUrl) {
