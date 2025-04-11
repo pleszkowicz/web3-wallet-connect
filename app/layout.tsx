@@ -1,9 +1,9 @@
+import { Toaster } from '@/components/ui/toaster';
+import { TooltipProvider } from '@/components/ui/tooltip';
+import WagmiProviderWrapper from '@/context/WagmiProviderWrapper';
 import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 import './globals.css';
-import WagmiProviderWrapper from '@/context/WagmiProviderWrapper';
-import { Toaster } from '@/components/ui/toaster';
-import { TooltipProvider } from '@/components/ui/tooltip';
 
 const geistSans = localFont({
   src: './fonts/GeistVF.woff',
@@ -29,7 +29,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} !opacity-100 transition-opacity duration-300 v0-c bg-slate-100`}
+        className={`${geistSans.variable} ${geistMono.variable} v0-c bg-gradient-to-br from-gray-900 via-indigo-950 to-purple-900 !opacity-100 transition-opacity duration-300`}
       >
         <WagmiProviderWrapper>
           <TooltipProvider>{children}</TooltipProvider>

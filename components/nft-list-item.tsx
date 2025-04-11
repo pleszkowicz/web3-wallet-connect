@@ -10,6 +10,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { formatEther } from 'viem';
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
+import { NftStatusHelper } from './nft-status-helper';
 
 export const NftListItem = ({ tokenId, price, owner }: Nft) => {
   const { data: tokenURI, isLoading } = useReadContract({
@@ -71,30 +72,8 @@ export const NftListItem = ({ tokenId, price, owner }: Nft) => {
                 />
               </div>
               <div className="absolute top-2 right-2 flex flex-row gap-1 z-10 cursor-default">
-                {isOwned && (
-                  <Tooltip>
-                    <TooltipTrigger>
-                      <div className="bg-green-100 text-green-800 p-1 rounded-full aspect-square object-cover">
-                        <ShieldCheck width={24} height={24} />
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>You are the owner</p>
-                    </TooltipContent>
-                  </Tooltip>
-                )}
-                {isSaleApproved && (
-                  <Tooltip>
-                    <TooltipTrigger>
-                      <div className="bg-blue-100 text-blue-700 p-1 rounded-full">
-                        <Tag width={24} height={24} />
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>For sale</p>
-                    </TooltipContent>
-                  </Tooltip>
-                )}
+                {isOwned && <NftStatusHelper variant="owner" />}
+                {isSaleApproved && <NftStatusHelper variant="for-sale" />}
               </div>
 
               <div className="absolute bottom-0 left-0 p-2 w-full flex flex-row items-end gap-1 z-10 text-white text-left bg-gradient-to-b from-transparent to-black bg-opacity-100">

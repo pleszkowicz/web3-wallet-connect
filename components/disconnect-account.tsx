@@ -13,7 +13,7 @@ export const DisconnectAccount = ({ className }: DisconnectAccountTypes) => {
 
   return (
     <Tooltip>
-      <TooltipTrigger>
+      <TooltipTrigger asChild>
         <Button className={className} onClick={() => disconnect()} variant="ghost">
           <PowerOff width={20} />
         </Button>

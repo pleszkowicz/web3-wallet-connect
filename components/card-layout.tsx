@@ -28,7 +28,7 @@ export const CardLayout = ({ title, description, headerContent, showBackButton, 
   const formattedAddress = ensName || address?.slice(0, 6) + '...' + address?.slice(-4);
 
   return (
-    <Card className="max-w-2xl w-full min-h-[80vh]">
+    <Card className="max-w-3xl w-full min-h-screen sm:min-h-[80vh]">
       <CardHeader>
         <div className="flex flex-row justify-between items-center relative">
           {showBackButton ? (
@@ -66,7 +66,7 @@ export const CardLayout = ({ title, description, headerContent, showBackButton, 
         {isConnected && (
           <div className="text-sm font-medium flex flex-row items-center justify-center">
             <Tooltip>
-              <TooltipTrigger>
+              <TooltipTrigger asChild>
                 <Button
                   className="text-muted-foreground"
                   variant="ghost"

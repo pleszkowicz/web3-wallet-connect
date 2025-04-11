@@ -146,8 +146,8 @@ type ActionLinkProps = {
 
 const ActionLink = ({ href, Icon, text }: ActionLinkProps) => {
   return (
-    <Link href={href} className="flex flex-col items-center">
-      <span className="inline-block rounded-full p-3 bg-gray-700 dark:hover:bg-gray-100 transition-colors">
+    <Link href={href} className="flex flex-col group items-center ">
+      <span className="inline-block rounded-full p-3 bg-gray-800 dark:hover:bg-gray-100 transform transition-transform duration-300 group-hover:scale-110">
         <Icon size="16" color="white" />
       </span>
       <span className="block text-xs text-center mt-1">{text}</span>

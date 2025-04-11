@@ -1,19 +1,18 @@
-'use client';
-import { NFT_MARKET_CONTRACT_ABI } from '@/const/nft-marketplace-abi';
-import { useQuery } from '@tanstack/react-query';
-import { Check, EditIcon, LoaderIcon, ShieldCheck, ShoppingCart, Tag, Undo2 } from 'lucide-react';
-import Image from 'next/image';
-import { useAccount, useReadContract, useTransactionCount, useWriteContract } from 'wagmi';
-import { Button } from './ui/button';
-import { formatEther, parseEther } from 'viem';
-import { Nft, NftMeta } from '@/types/NFT';
-import { Badge } from './ui/badge';
-import { useToast } from './ui/hooks/use-toast';
-import { NFT_MARKETPLACE_ADDRESS } from '@/const/nft-marketplace-address';
-import { useEffect, useState } from 'react';
-import { ErrorMessage, Field, Form, Formik } from 'formik';
-import * as Yup from 'yup';
-import { Input } from './ui/input';
+"use client";
+import { NFT_MARKET_CONTRACT_ABI } from "@/const/nft-marketplace-abi";
+import { useQuery } from "@tanstack/react-query";
+import { Check, EditIcon, LoaderIcon, ShoppingCart, Undo2 } from "lucide-react";
+import Image from "next/image";
+import { useAccount, useReadContract, useTransactionCount, useWriteContract } from "wagmi";
+import { Button } from "./ui/button";
+import { formatEther, parseEther } from "viem";
+import { Nft, NftMeta } from "@/types/NFT";
+import { useToast } from "./ui/hooks/use-toast";
+import { NFT_MARKETPLACE_ADDRESS } from "@/const/nft-marketplace-address";
+import { useEffect, useState } from "react";
+import { ErrorMessage, Field, Form, Formik } from "formik";
+import * as Yup from "yup";
+import { Input } from "./ui/input";
 import {
   Dialog,
   DialogContent,
@@ -22,14 +21,14 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from './ui/dialog';
-import { Label } from './ui/label';
-import { Loader } from './ui/loader';
-import { useRouter } from 'next/navigation';
-import invariant from 'tiny-invariant';
-import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
+} from "./ui/dialog";
+import { Label } from "./ui/label";
+import { Loader } from "./ui/loader";
+import { useRouter } from "next/navigation";
+import invariant from "tiny-invariant";
+import { NftStatusHelper } from "./nft-status-helper";
 
-type NftDetailsProps = Pick<Nft, 'tokenId'>;
+type NftDetailsProps = Pick<Nft, "tokenId">;
 
 export const NftDetails = ({ tokenId }: NftDetailsProps) => {
   const {
@@ -39,7 +38,7 @@ export const NftDetails = ({ tokenId }: NftDetailsProps) => {
   } = useReadContract({
     address: NFT_MARKETPLACE_ADDRESS,
     abi: NFT_MARKET_CONTRACT_ABI,
-    functionName: 'getNftById',
+    functionName: "getNftById",
     args: [BigInt(tokenId)],
   });
 
@@ -49,30 +48,30 @@ export const NftDetails = ({ tokenId }: NftDetailsProps) => {
 
   if (error) {
     return (
-      <p className="text-red-500 text-sm">
+      <p className="text-sm text-red-500">
         An unexpected error occurred. Please check your connection or try again later.
       </p>
     );
   }
 
-  invariant(nft, 'NFT data is undefined');
+  invariant(nft, "NFT data is undefined");
 
   return <NftItem tokenId={nft.tokenId} owner={nft.owner} price={nft.price} />;
 };
 
-const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
+const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 
-type NftItemProps = Pick<Nft, 'tokenId' | 'owner' | 'price'>;
+type NftItemProps = Pick<Nft, "tokenId" | "owner" | "price">;
 const NftItem = ({ tokenId, owner, price }: NftItemProps) => {
   const { data: tokenURI, isLoading } = useReadContract({
     address: NFT_MARKETPLACE_ADDRESS,
     abi: NFT_MARKET_CONTRACT_ABI,
-    functionName: 'tokenURI',
+    functionName: "tokenURI",
     args: [BigInt(tokenId)],
   });
 
   const { data: tokenDetails } = useQuery<NftMeta, Error>({
-    queryKey: ['token-details', tokenId.toString()],
+    queryKey: ["token-details", tokenId.toString()],
     queryFn: async () => {
       if (!tokenURI) {
         return;
@@ -86,7 +85,7 @@ const NftItem = ({ tokenId, owner, price }: NftItemProps) => {
   const { data: approvedAddress, refetch: refetchGetApproved } = useReadContract({
     address: NFT_MARKETPLACE_ADDRESS,
     abi: NFT_MARKET_CONTRACT_ABI,
-    functionName: 'getApproved',
+    functionName: "getApproved",
     args: [BigInt(tokenId)],
   });
 
@@ -110,20 +109,20 @@ const NftItem = ({ tokenId, owner, price }: NftItemProps) => {
       {
         address: NFT_MARKETPLACE_ADDRESS,
         abi: NFT_MARKET_CONTRACT_ABI,
-        functionName: 'approve',
+        functionName: "approve",
         args: [addressToApprove, BigInt(tokenId)],
         nonce: transactionCount, // fix for passing the correct nonce in hardhat network
       },
       {
         onSuccess: () => {
-          toast({ title: isSaleApproved ? 'NFT sell approval withdrawn!' : 'NFT approved to sell!' });
+          toast({ title: isSaleApproved ? "NFT sell approval withdrawn!" : "NFT approved to sell!" });
           setIsSaleApproved(!isSaleApproved);
         },
         onError: (error: unknown) => {
-          console.log('error', error);
+          console.log("error", error);
           toast({
-            title: 'Approval change failed',
-            description: 'Please try again later.',
+            title: "Approval change failed",
+            description: "Please try again later.",
           });
         },
       }
@@ -135,21 +134,21 @@ const NftItem = ({ tokenId, owner, price }: NftItemProps) => {
       {
         address: NFT_MARKETPLACE_ADDRESS,
         abi: NFT_MARKET_CONTRACT_ABI,
-        functionName: 'executeSale',
+        functionName: "executeSale",
         args: [BigInt(tokenId)],
         value: BigInt(price),
       },
       {
         onSuccess: () => {
           refetchGetApproved();
-          toast({ title: 'NFT purchased successfully!' });
-          router.push('/');
+          toast({ title: "NFT purchased successfully!" });
+          router.push("/");
         },
         onError: (error) => {
-          console.error('Purchase error:', error);
+          console.error("Purchase error:", error);
           toast({
-            title: 'Purchase failed',
-            description: 'Please try again later.',
+            title: "Purchase failed",
+            description: "Please try again later.",
           });
         },
       }
@@ -157,44 +156,32 @@ const NftItem = ({ tokenId, owner, price }: NftItemProps) => {
   };
 
   return (
-    <div className="flex flex-col w-full">
-      <div className="flex items-center rounded-lg overflow-hidden flex-col gap-2 relative group">
+    <div className="flex w-full flex-col">
+      <div className="group relative flex flex-col items-center gap-2 overflow-hidden rounded-lg">
         {isLoading || tokenDetails === undefined ? (
           <LoaderIcon />
         ) : (
           <>
-            <div className="relative w-full h-full">
+            <div className="relative h-full w-full">
               <Image
                 priority={true}
                 src={tokenDetails.image}
-                alt={tokenDetails.name || 'NFT Image'}
-                className="pointer w-full aspect-square object-cover transform transition-transform duration-1000 group-hover:scale-110"
+                alt={tokenDetails.name || "NFT Image"}
+                className="pointer aspect-square w-full transform object-cover transition-transform duration-1000 group-hover:scale-110"
                 width={622}
                 height={622}
               />
             </div>
-            <div className="absolute top-0 left-0 p-4 flex flex-col gap-1 z-10 cursor-default">
-              {isSaleApproved && (
-                <Badge variant="secondary" className="bg-blue-100 text-blue-700 border-blue-300">
-                  <Tag className="h-3 w-3 mr-1" />
-                  For Sale
-                </Badge>
-              )}
+            <div className="absolute left-0 top-0 z-10 flex cursor-default flex-col gap-1 p-4">
+              {isSaleApproved && <NftStatusHelper variant="for-sale" />}
             </div>
 
-            <div className="absolute bottom-0 left-0 p-4 w-full flex flex-row items-end gap-1 z-10 text-white text-left bg-gradient-to-b from-transparent to-black bg-opacity-100">
+            <div className="absolute bottom-0 left-0 z-10 flex w-full flex-row items-end gap-1 bg-opacity-100 bg-gradient-to-b from-transparent to-black p-4 text-left text-white">
               <div className="">
                 <h2 className="font-bold text-slate-100">{tokenDetails.name}</h2>
                 <p className="text-sm text-slate-200">{tokenDetails.description}</p>
-                <div className="text-sm mt-2 mb-2 text-slate-300">
-                  {isOwned ? (
-                    <Badge variant="secondary" className="bg-green-100 text-green-800 hover:normal-case">
-                      <ShieldCheck className="h-3 w-3 mr-1" />
-                      Owned
-                    </Badge>
-                  ) : (
-                    <span>Owner: {owner}</span>
-                  )}
+                <div className="mb-2 mt-2 flex items-center justify-start text-sm text-slate-300">
+                  {isOwned ? <NftStatusHelper className="" variant="owner" /> : <span>Owner: {owner}</span>}
                 </div>
                 <NftPrice tokenId={tokenId} price={price} isOwned={isOwned} />
               </div>
@@ -202,17 +189,17 @@ const NftItem = ({ tokenId, owner, price }: NftItemProps) => {
           </>
         )}
       </div>
-      <div className="w-full mt-6">
+      <div className="mt-6 w-full">
         {isOwned && (
           <Button
-            variant={isSaleApproved ? 'destructive' : 'default'}
+            variant={isSaleApproved ? "destructive" : "default"}
             className="w-full"
             type="button"
             onClick={toggleApprove}
             disabled={isPending}
           >
             {isSaleApproved ? <Undo2 className="mr-2" /> : <Check className="mr-2" />}
-            {isSaleApproved ? 'Revoke from Sale' : 'Approve to Sell'}
+            {isSaleApproved ? "Revoke from Sale" : "Approve to Sell"}
           </Button>
         )}
 
@@ -226,7 +213,7 @@ const NftItem = ({ tokenId, owner, price }: NftItemProps) => {
   );
 };
 
-type NftPriceProps = Pick<Nft, 'tokenId' | 'price'> & {
+type NftPriceProps = Pick<Nft, "tokenId" | "price"> & {
   isOwned: boolean;
 };
 
@@ -240,10 +227,10 @@ const NftPrice = ({ tokenId, price, isOwned }: NftPriceProps) => {
 
   const validationSchema: Yup.ObjectSchema<{ price: string }> = Yup.object().shape({
     price: Yup.string()
-      .required('Price is required')
-      .test('max-decimal', 'Price must have at most 18 decimal places', (value) => {
+      .required("Price is required")
+      .test("max-decimal", "Price must have at most 18 decimal places", (value) => {
         if (value) {
-          const decimalPlaces = value.toString().split('.')[1]?.length || 0;
+          const decimalPlaces = value.toString().split(".")[1]?.length || 0;
           return decimalPlaces <= 18;
         }
         return true;
@@ -251,7 +238,7 @@ const NftPrice = ({ tokenId, price, isOwned }: NftPriceProps) => {
   });
 
   return (
-    <div className="flex flex-row text-green-300 font-semibold align-middle">
+    <div className="flex flex-row align-middle font-semibold text-green-300">
       <h3 className="display-inline text-lg">{priceValue} ETH</h3>
       {isOwned && (
         <Formik
@@ -262,21 +249,21 @@ const NftPrice = ({ tokenId, price, isOwned }: NftPriceProps) => {
               {
                 address: NFT_MARKETPLACE_ADDRESS,
                 abi: NFT_MARKET_CONTRACT_ABI,
-                functionName: 'updatePrice',
+                functionName: "updatePrice",
                 args: [BigInt(tokenId), priceInWei],
                 nonce: transactionCount, // fix for passing the correct nonce in hardhat network
               },
               {
                 onSuccess: () => {
                   setPriceValue(formatEther(priceInWei)); // Update the displayed price
-                  toast({ title: 'NFT listing price updated!' });
+                  toast({ title: "NFT listing price updated!" });
                   setIsEditing(false);
                 },
                 onError: (error: unknown) => {
-                  console.log('error', error);
+                  console.log("error", error);
                   toast({
-                    title: 'Price update failed',
-                    description: 'Please try again later.',
+                    title: "Price update failed",
+                    description: "Please try again later.",
                   });
                 },
               }
@@ -288,16 +275,9 @@ const NftPrice = ({ tokenId, price, isOwned }: NftPriceProps) => {
           {({ isSubmitting, submitForm }) => (
             <Dialog open={isEditing} onOpenChange={setIsEditing}>
               <DialogTrigger asChild>
-                <Tooltip>
-                  <TooltipTrigger>
-                    <span className="flex flex-row items-center" title="Edit NFT price">
-                      <EditIcon className="h-5 w-5 ml-1 cursor-pointer" />
-                    </span>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Edit price</p>
-                  </TooltipContent>
-                </Tooltip>
+                <span className="flex flex-row items-center" title="Edit NFT price">
+                  <EditIcon className="ml-1 h-5 w-5 cursor-pointer" />
+                </span>
               </DialogTrigger>
               <Form aria-disabled={isSubmitting || isWriteContractPending}>
                 <DialogContent className="sm:max-w-[425px]">

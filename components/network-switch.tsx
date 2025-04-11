@@ -10,7 +10,7 @@ export default function NetworkSwitch() {
 
   return (
     <Tooltip>
-      <TooltipTrigger>
+      <TooltipTrigger asChild>
         <select
           className={isPending ? 'animate-pulse' : ''}
           onChange={(event) => event.target.value && switchChain({ chainId: parseInt(event.target.value) })}

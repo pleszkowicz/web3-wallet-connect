@@ -1,6 +1,6 @@
 import invariant from 'tiny-invariant';
-import { http, createConfig } from 'wagmi';
-import { mainnet, sepolia, hardhat } from 'wagmi/chains';
+import { createConfig, http } from 'wagmi';
+import { hardhat, mainnet, sepolia } from 'wagmi/chains';
 
 const ALCHEMY_API_KEY = process.env.NEXT_PUBLIC_ALCHEMY_API_KEY as string;
 

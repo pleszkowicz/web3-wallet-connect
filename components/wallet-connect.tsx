@@ -1,92 +1,117 @@
 'use client';
-import { Connector, useConnect } from 'wagmi';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+import { Dialog } from '@radix-ui/react-dialog';
+import { OpenInNewWindowIcon } from '@radix-ui/react-icons';
 import { Loader2, Wallet2 } from 'lucide-react';
 import Image from 'next/image';
-import { CardLayout } from './card-layout';
 import Link from 'next/link';
-import { OpenInNewWindowIcon } from '@radix-ui/react-icons';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { Connector, useConnect } from 'wagmi';
+import { CardLayout } from './card-layout';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './ui/accordion';
-import { cn } from '@/lib/utils';
+import { DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
 
 export function WalletConnect() {
   const { connectors, connect, isPending } = useConnect();
 
+  // prevent re-render during wallet connect action
+  const nftPlaceholders = useMemo(() => {
+    return [300, 700, 500].map((nftPlaceholderDelay) => (
+      <NftPlaceholder delay={nftPlaceholderDelay} key={nftPlaceholderDelay} />
+    ));
+  }, []);
+
   return (
     <CardLayout>
       <div>
-        <h1 className="text-3xl md:text-4xl font-bold text-center">Welcome to the NFT Marketplace!</h1>
-        <p className="text-gray-600 text-center text-lg">
-          Welcome to the NFT Hub – Mint, Sell &amp; Discover Unique Digital Assets.
-        </p>
-
-        <div className="mb-10 p-4 bg-gray-50 rounded-xl mt-8">
-          <h2 className="text-2xl font-bold text-center mb-6">Explore & Trade NFTs</h2>{' '}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <NftPlaceholder delay={300} />
-            <NftPlaceholder delay={500} />
-            <NftPlaceholder delay={700} />
-          </div>
+        <h1 className="text-center text-3xl font-bold md:text-4xl">Welcome to the NFT Marketplace!</h1>
+        <p className="text-center text-lg text-gray-600">NFT Hub – Mint, Trade &amp; Discover Unique Digital Assets.</p>
+        <div className="mb-10 mt-8 rounded-xl bg-gray-50 p-2 sm:p-4">
+          <h2 className="mb-6 mt-2 text-center text-2xl font-bold">Explore & Trade NFTs</h2>{' '}
+          <div className="grid grid-cols-3 gap-4">{nftPlaceholders}</div>
         </div>
-      </div>
+        <h2 className="mb-6 mt-2 text-center text-2xl font-bold">Let's dive, first</h2>{' '}
+        <div className="mx-auto flex w-full flex-col items-center self-center md:max-w-[80%]">
+          <div className="mb-4 flex items-center pb-2">
+            <Dialog>
+              <DialogTrigger asChild>
+                <div className=" flex items-center pb-2 text-purple-800">
+                  <Button variant="default" size="lg">
+                    <Wallet2 className="mr-2 h-6 w-6" />
+                    Connect your wallet
+                  </Button>
+                </div>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle>Please connect your wallet</DialogTitle>
+                </DialogHeader>
+                <div className="mt-6 grid w-full gap-2">
+                  {connectors.length ? (
+                    connectors.map((connector) => (
+                      <WalletOption
+                        key={connector.id}
+                        connector={connector}
+                        onClick={() => connect({ connector })}
+                        pending={isPending}
+                      />
+                    ))
+                  ) : (
+                    <div className="text-slate-700">
+                      <p>
+                        Unfortunately, I <b>coud not find any crypto wallet</b> enabled in your browser. Once you
+                        install, please try again.
+                      </p>
+                      <p></p>
+                    </div>
+                  )}
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
 
-      <div className="flex items-center mb-4 pb-2">
-        <Wallet2 className="mr-2 h-6 w-6 " />
-
-        <h2 className="text-xl font-semibold text-slate-700">Choose a wallet to connect to this app:</h2>
-      </div>
-      <div className="grid gap-2">
-        {connectors.map((connector) => (
-          <WalletOption
-            key={connector.id}
-            connector={connector}
-            onClick={() => connect({ connector })}
-            pending={isPending}
-          />
-        ))}
-      </div>
-
-      {/* <div className="border rounded p-4 text-slate-500 shadow-sm"> */}
-      <Accordion type="single" collapsible className="border rounded-lg px-4">
-        <AccordionItem value="item-1">
-          <AccordionTrigger>
-            {' '}
-            <span className="text-slate-500">🔧 Developer Setup Instructions</span>
-          </AccordionTrigger>
-          <AccordionContent>
-            <div className="text-slate-500">
-              <p className="mt-4 text-sm">
-                In order to test all functionalities locally, you have to:
-                <ol className="list-decimal pl-6 space-y-2 my-2">
-                  <li>
-                    Clone and configure{' '}
+          {/* <div className="border rounded p-4 text-slate-500 shadow-sm"> */}
+          <Accordion type="single" collapsible className="mt-8 w-full rounded-lg border px-4">
+            <AccordionItem value="item-1">
+              <AccordionTrigger>
+                {' '}
+                <span className="text-slate-500">🔧 Developer Setup Instructions</span>
+              </AccordionTrigger>
+              <AccordionContent>
+                <div className="text-slate-500">
+                  <p className="mt-4 text-sm">
+                    In order to test all functionalities locally, you have to:
+                    <ol className="my-2 list-decimal space-y-2 pl-6">
+                      <li>
+                        Clone and configure{' '}
+                        <Link
+                          href="https://github.com/pleszkowicz/hardhat-smart-contract"
+                          className="text-blue-600"
+                          target="_blank"
+                        >
+                          pleszkowicz/hardhat-smart-contract <OpenInNewWindowIcon className="inline" />
+                        </Link>{' '}
+                      </li>
+                      <li>Setup your environment variables as described in the repository documentation.</li>
+                    </ol>
+                  </p>
+                  <p className="mt-4 text-sm">
+                    Once you have running hardhat node locally, deploy smart-contract as described in{' '}
                     <Link
-                      href="https://github.com/pleszkowicz/hardhat-smart-contract"
-                      className="text-blue-600"
+                      href="https://github.com/pleszkowicz/web3-wallet-connect/blob/main/README.md"
+                      className="inline-block text-blue-600"
                       target="_blank"
                     >
-                      pleszkowicz/hardhat-smart-contract <OpenInNewWindowIcon className="inline" />
-                    </Link>{' '}
-                  </li>
-                  <li>Setup your environment variables as described in the repository documentation.</li>
-                </ol>
-              </p>
-              <p className="mt-4 text-sm">
-                Once you have running hardhat node locally, deploy smart-contract as described in{' '}
-                <Link
-                  href="https://github.com/pleszkowicz/web3-wallet-connect/blob/main/README.md"
-                  className="text-blue-600 inline-block"
-                  target="_blank"
-                >
-                  readme <OpenInNewWindowIcon className="inline" />.
-                </Link>
-              </p>
-            </div>
-          </AccordionContent>
-        </AccordionItem>
-      </Accordion>
-      {/* </div> */}
+                      readme <OpenInNewWindowIcon className="inline" />.
+                    </Link>
+                  </p>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        </div>
+      </div>
     </CardLayout>
   );
 }
@@ -113,7 +138,7 @@ function WalletOption({
     <Button
       variant="outline"
       size="lg"
-      className="w-full justify-start flex content-between text-lg transform transition-transform duration-500 hover:scale-105 hover:bg-accent"
+      className="flex w-full transform content-between justify-start text-lg transition-transform duration-500 hover:scale-105 hover:bg-accent"
       disabled={!ready || pending}
       onClick={onClick}
     >
@@ -123,7 +148,7 @@ function WalletOption({
           alt="connector"
           width={20}
           height={20}
-          className="w-[20px] h-[20px] mr-2 rounded-sm"
+          className="mr-2 h-[20px] w-[20px] rounded-sm"
         />
       )}
       <span>{connector.name}</span>
@@ -146,7 +171,7 @@ const delayMap: Record<number, string> = {
 const getRandomTokenData = () => {
   const names = ['Sky Ape', 'Pixel Cat', 'Cyber Punk', 'Mystic Fox'];
   const descriptions = ['Cool NFT', 'Limited Edition', 'Rare drop', 'Exclusive art'];
-  const prices = [0.01, 0.05, 0.1, 0.25, 0.5];
+  const prices = [0.016, 0.05, 0.1, 0.25, 0.5];
   const gradients = [
     ['from-purple-900', 'via-pink-700', 'to-amber-500'],
     ['from-blue-900', 'via-indigo-700', 'to-sky-500'],
@@ -194,20 +219,20 @@ const NftPlaceholder = ({ delay }: { delay: number }) => {
         gradient,
         delayClass,
 
-        'relative rounded-xl overflow-hidden bg-gradient-to-br aspect-square opacity-0 animate-fade-in'
+        'relative aspect-square animate-fade-in overflow-hidden rounded-xl bg-gradient-to-br opacity-0'
       )}
     >
       <div className="absolute inset-0 opacity-20">
         {/* SVG animation or canvas-based animation */}
-        <svg className="w-full h-full" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-          {generateRandomCircles(7)}
+        <svg className="h-full w-full" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          {generateRandomCircles(delay / 100)}
           {/* Additional animated elements */}
         </svg>
       </div>
-      <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black to-transparent">
-        <h3 className="text-white font-bold">{name}</h3>
-        <p className="text-gray-300 text-sm">{description}</p>
-        <p className="text-green-400 font-bold mt-1">{price} ETH</p>
+      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-2">
+        <h3 className="font-bold text-white">{name}</h3>
+        <p className="text-sm text-gray-300">{description}</p>
+        <p className="mt-1 font-bold text-green-400">{price} ETH</p>
       </div>
     </div>
   );
