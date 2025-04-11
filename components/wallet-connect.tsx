@@ -26,7 +26,7 @@ export function WalletConnect() {
     <CardLayout>
       <div>
         <h1 className="text-center text-3xl font-bold md:text-4xl">Welcome to the NFT Marketplace!</h1>
-        <p className="text-center text-lg text-gray-600">NFT Hub – Mint, Trade &amp; Discover Unique Digital Assets.</p>
+        <p className="text-center text-lg text-gray-600">Mint. Trade. Discover. All in one place.</p>
         <div className="mb-10 mt-8 rounded-xl bg-gray-50 p-2 sm:p-4">
           <h2 className="mb-6 mt-2 text-center text-2xl font-bold">Explore & Trade NFTs</h2>{' '}
           <div className="grid grid-cols-3 gap-4">{nftPlaceholders}</div>
