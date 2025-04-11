@@ -1,4 +1,4 @@
-import { EtherscanTransaction } from "@/types/EtherscanTransaction";
+import { AlchemyAssetTransaction } from "@/types/AlchemyAssetTransaction";
 import { useQuery } from "@tanstack/react-query";
 import invariant from "tiny-invariant";
 import { useAccount } from "wagmi";
@@ -8,9 +8,9 @@ export const useTransactions = (address: string, options: { enabled: boolean }) 
 
   invariant(currentChain, 'Network not found')
 
-  return useQuery<EtherscanTransaction[], Error>({
+  return useQuery<AlchemyAssetTransaction[], Error>({
     queryKey: ['transactions', address, currentChain.id],
-    queryFn: async() => {
+    queryFn: async () => {
       const params = new URLSearchParams({
         address: address,
         chainId: currentChain.id.toString(),

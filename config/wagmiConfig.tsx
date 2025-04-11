@@ -6,6 +6,11 @@ const ALCHEMY_API_KEY = process.env.NEXT_PUBLIC_ALCHEMY_API_KEY as string;
 
 invariant(ALCHEMY_API_KEY, 'ALCHEMY_API_KEY is not found');
 
+export const chainTransportsURLMap = {
+  [mainnet.id]: `https://eth-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`,
+  [sepolia.id]: `https://eth-sepolia.g.alchemy.com/v2/${ALCHEMY_API_KEY}`,
+};
+
 export const config = createConfig({
   chains: [
     mainnet,
@@ -14,8 +19,8 @@ export const config = createConfig({
   ],
   connectors: [],
   transports: {
-    [mainnet.id]: http(`https://eth-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`),
-    [sepolia.id]: http(`https://eth-sepolia.g.alchemy.com/v2/${ALCHEMY_API_KEY}`),
-    [hardhat.id]: http(),
+    [mainnet.id]: http(chainTransportsURLMap[mainnet.id]),
+    [sepolia.id]: http(chainTransportsURLMap[sepolia.id]),
+    [hardhat.id]: http(), // created custom transaction history handler
   },
 });
