@@ -4,7 +4,6 @@ import { NFT_MARKETPLACE_ADDRESS } from '@/const/nft-marketplace-address';
 import { useMounted } from '@/hooks/useMounted';
 import { Nft } from '@/lib/generated/prisma';
 import { NftMeta } from '@/types/NFT';
-import * as dotenv from 'dotenv';
 import { ErrorMessage, Field, Form, Formik } from 'formik';
 import { useRouter } from 'next/navigation';
 import invariant from 'tiny-invariant';
@@ -15,8 +14,6 @@ import { CardLayout } from './card-layout';
 import { Button } from './ui/button';
 import { useToast } from './ui/hooks/use-toast';
 import { Input } from './ui/input';
-
-dotenv.config();
 
 export function CreateNFT() {
   const { toast } = useToast();

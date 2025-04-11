@@ -1,5 +1,6 @@
 'use client';
 import { Button } from '@/components/ui/button';
+import { useMounted } from '@/hooks/useMounted';
 import { cn } from '@/lib/utils';
 import { Dialog } from '@radix-ui/react-dialog';
 import { OpenInNewWindowIcon } from '@radix-ui/react-icons';
@@ -21,6 +22,12 @@ export function WalletConnect() {
       <NftPlaceholder delay={nftPlaceholderDelay} key={nftPlaceholderDelay} />
     ));
   }, []);
+
+  const mounted = useMounted();
+
+  if (!mounted) {
+    return null;
+  }
 
   return (
     <CardLayout>
