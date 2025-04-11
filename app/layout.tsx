@@ -3,6 +3,7 @@ import localFont from 'next/font/local';
 import './globals.css';
 import WagmiProviderWrapper from '@/context/WagmiProviderWrapper';
 import { Toaster } from '@/components/ui/toaster';
+import { TooltipProvider } from '@/components/ui/tooltip';
 
 const geistSans = localFont({
   src: './fonts/GeistVF.woff',
@@ -16,7 +17,7 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: 'Wallet balance',
+  title: 'NFT Hub',
   description: '',
 };
 
@@ -27,9 +28,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} !opacity-100 transition-opacity duration-300 v0-c bg-slate-100`}>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} !opacity-100 transition-opacity duration-300 v0-c bg-slate-100`}
+      >
         <WagmiProviderWrapper>
-          {children}
+          <TooltipProvider>{children}</TooltipProvider>
         </WagmiProviderWrapper>
         <Toaster />
       </body>

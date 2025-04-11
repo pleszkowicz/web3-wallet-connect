@@ -27,6 +27,7 @@ import { Label } from './ui/label';
 import { Loader } from './ui/loader';
 import { useRouter } from 'next/navigation';
 import invariant from 'tiny-invariant';
+import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 
 type NftDetailsProps = Pick<Nft, 'tokenId'>;
 
@@ -194,7 +195,7 @@ const NftItem = ({ tokenId, owner, price }: NftItemProps) => {
                   ) : (
                     <span>Owner: {owner}</span>
                   )}
-                  </div>
+                </div>
                 <NftPrice tokenId={tokenId} price={price} isOwned={isOwned} />
               </div>
             </div>
@@ -210,14 +211,14 @@ const NftItem = ({ tokenId, owner, price }: NftItemProps) => {
             onClick={toggleApprove}
             disabled={isPending}
           >
-            {isSaleApproved ? <Undo2 className='mr-2' /> : <Check className='mr-2' />}
+            {isSaleApproved ? <Undo2 className="mr-2" /> : <Check className="mr-2" />}
             {isSaleApproved ? 'Revoke from Sale' : 'Approve to Sell'}
           </Button>
         )}
 
         {!isOwned && isSaleApproved && (
           <Button variant="default" className="w-full" type="button" disabled={isPending} onClick={handleBuyNft}>
-            <ShoppingCart className='mr-2' />  Buy
+            <ShoppingCart className="mr-2" /> Buy
           </Button>
         )}
       </div>
@@ -287,9 +288,16 @@ const NftPrice = ({ tokenId, price, isOwned }: NftPriceProps) => {
           {({ isSubmitting, submitForm }) => (
             <Dialog open={isEditing} onOpenChange={setIsEditing}>
               <DialogTrigger asChild>
-                <span className="flex flex-row items-center" title="Edit NFT price">
-                  <EditIcon className="h-5 w-5 ml-1 cursor-pointer" />
-                </span>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <span className="flex flex-row items-center" title="Edit NFT price">
+                      <EditIcon className="h-5 w-5 ml-1 cursor-pointer" />
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Edit price</p>
+                  </TooltipContent>
+                </Tooltip>
               </DialogTrigger>
               <Form aria-disabled={isSubmitting || isWriteContractPending}>
                 <DialogContent className="sm:max-w-[425px]">

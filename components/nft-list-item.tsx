@@ -5,11 +5,11 @@ import { LoaderIcon, ShieldCheck, Tag } from 'lucide-react';
 import Image from 'next/image';
 import { useAccount, useReadContract } from 'wagmi';
 import { Nft, NftMeta } from '@/types/NFT';
-import { Badge } from './ui/badge';
 import { NFT_MARKETPLACE_ADDRESS } from '@/const/nft-marketplace-address';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { formatEther } from 'viem';
+import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 
 export const NftListItem = ({ tokenId, price, owner }: Nft) => {
   const { data: tokenURI, isLoading } = useReadContract({
@@ -70,27 +70,43 @@ export const NftListItem = ({ tokenId, price, owner }: Nft) => {
                   height={192}
                 />
               </div>
-              <div className="absolute top-2 right-2 flex flex-col gap-1 z-10 cursor-default">
+              <div className="absolute top-2 right-2 flex flex-row gap-1 z-10 cursor-default">
                 {isOwned && (
-                  <Badge variant="secondary" className="bg-green-100 text-green-800 hover:normal-case">
-                    <ShieldCheck className="h-3 w-3 mr-1" />
-                    Owned
-                  </Badge>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <div className="bg-green-100 text-green-800 p-1 rounded-full aspect-square object-cover">
+                        <ShieldCheck width={24} height={24} />
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>You are the owner</p>
+                    </TooltipContent>
+                  </Tooltip>
                 )}
                 {isSaleApproved && (
-                  <Badge variant="secondary" className="bg-blue-100 text-blue-700 border-blue-300">
-                    <Tag className="h-3 w-3 mr-1" />
-                    For Sale
-                  </Badge>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <div className="bg-blue-100 text-blue-700 p-1 rounded-full">
+                        <Tag width={24} height={24} />
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>For sale</p>
+                    </TooltipContent>
+                  </Tooltip>
                 )}
               </div>
 
               <div className="absolute bottom-0 left-0 p-2 w-full flex flex-row items-end gap-1 z-10 text-white text-left bg-gradient-to-b from-transparent to-black bg-opacity-100">
                 <div>
-                  <h3 className="text-sm font-semibold"><b>{tokenDetails.name}</b></h3>
+                  <h3 className="text-sm font-semibold">
+                    <b>{tokenDetails.name}</b>
+                  </h3>
                   <p className="text-sm text-white flex flex-row">{tokenDetails.description}</p>
 
-                  <span className="text-sm text-green-300 font-semibold display-inline"><b>{formattedPrice} ETH</b></span>
+                  <p className="mt-1 text-lg text-green-300 font-semibold display-inline">
+                    <b>{formattedPrice} ETH</b>
+                  </p>
                 </div>
               </div>
             </>

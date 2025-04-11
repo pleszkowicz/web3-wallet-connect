@@ -10,9 +10,10 @@ import { useAccount, useEnsName } from 'wagmi';
 import { OpenInNewWindowIcon } from '@radix-ui/react-icons';
 import { useToast } from './ui/hooks/use-toast';
 import { DisconnectAccount } from './disconnect-account';
+import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 
 interface CardLayoutProps {
-  title: string;
+  title?: string;
   description?: ReactElement | string;
   headerContent?: ReactElement;
   showBackButton?: boolean;
@@ -64,21 +65,27 @@ export const CardLayout = ({ title, description, headerContent, showBackButton, 
 
         {isConnected && (
           <div className="text-sm font-medium flex flex-row items-center justify-center">
-            <Button
-              className="text-muted-foreground"
-              variant="ghost"
-              size="sm"
-              title="Copy to clipboard"
-              onClick={() => {
-                navigator.clipboard.writeText(address as string);
-                toast({
-                  title: 'Address copied!',
-                });
-              }}
-            >
-              <span>{formattedAddress}</span>
-              <CopyIcon className="ml-2 w-4 h-4" />
-            </Button>
+            <Tooltip>
+              <TooltipTrigger>
+                <Button
+                  className="text-muted-foreground"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    navigator.clipboard.writeText(address as string);
+                    toast({
+                      title: 'Address copied!',
+                    });
+                  }}
+                >
+                  <span>{formattedAddress}</span>
+                  <CopyIcon className="ml-2 w-4 h-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Copy address to clipboard</p>
+              </TooltipContent>
+            </Tooltip>
 
             {currentChain?.blockExplorers?.default.url ? (
               <a
