@@ -66,9 +66,10 @@ const TransactionHistory = () => {
                 </td>
                 <td className="py-2 px-4 border-b">
                   {tx.category === 'erc721' && tx.from === zeroAddress ? (
-                    <Badge className="bg-blue-500/80 backdrop-blur-sm text-white px-2.5 py-1">Mint NFT</Badge>
-                  ) : null}
-                  {shrotenAddress(tx.from)}
+                    <Badge className="bg-blue-500/80 backdrop-blur-sm text-white px-2.5 py-1">NFT Minting</Badge>
+                  ) : (
+                    shrotenAddress(tx.from)
+                  )}
                 </td>
                 <td className="py-2 px-4 border-b">
                   {tx.to === null ? <span className="text-xs">Smart contract deployment</span> : null}
