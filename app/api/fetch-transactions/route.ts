@@ -1,19 +1,13 @@
 'use server';
-import { config } from "@/config/wagmiConfig";
-import { EtherscanTransaction } from "@/types/EtherscanTransaction";
+import { chainTransportsURLMap, config } from "@/config/wagmiConfig";
+import { AlchemyAssetTransaction } from "@/types/AlchemyAssetTransaction";
 import { NextRequest } from "next/server";
 import invariant from "tiny-invariant";
-import { createPublicClient, http } from "viem";
-import { hardhat } from "viem/chains";
+import { createPublicClient, formatEther, http } from "viem";
+import { hardhat, mainnet, sepolia } from "viem/chains";
 
-const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY as string;
-
-invariant(ETHERSCAN_API_KEY, 'ETHERSCAN_API_KEY is not found');
-
-type EtherscanResponse = {
-  status: string;
-  message: string;
-  result: EtherscanTransaction[];
+type AlchemyResponse = {
+  transfers: AlchemyAssetTransaction[];
 }
 
 export async function GET(req: NextRequest) {
@@ -21,46 +15,53 @@ export async function GET(req: NextRequest) {
   const address = url.searchParams.get('address')
   const chainId = url.searchParams.get('chainId')
 
+  invariant(chainId, 'Chain ID is required to be passed');
+
   const currentChain = config.chains.find((chain) => chainId === chain.id.toString())
 
   if (!address) {
     return Response.json({ error: 'Address is required' }, { status: 400 });
   }
 
-  // Get Etherscan API URL
-  const apiUrl = currentChain?.blockExplorers?.default.apiUrl
+  let network: string;
 
-  console.log('apiUrl', apiUrl)
+  switch (currentChain?.id) {
+    case mainnet.id:
+      network = 'eth-mainnet';
+      break;
+    case sepolia.id:
+      network = 'eth-sepolia';
+      break;
+    default:
+  }
+
+  const apiUrl = chainTransportsURLMap[Number(chainId) as keyof typeof chainTransportsURLMap];
 
   if (apiUrl) {
-    const etherscanAPIUrl = new URL(apiUrl)
-    const params: Record<string, string> = {
-      module: 'account',
-      action: 'txlist',
-      address,
-      startblock: '0',
-      endblock: '99999999',
-      sort: 'desc',
-      apikey: ETHERSCAN_API_KEY,
+    const body = {
+      jsonrpc: "2.0",
+      id: 1,
+      method: "alchemy_getAssetTransfers",
+      params: [
+        {
+          fromBlock: "0x0",
+          toBlock: "latest",
+          toAddress: address,
+          category: ["external", "erc20", "erc721", "erc1155"],
+          withMetadata: true,
+        },
+      ],
     };
 
-    Object.keys(params).forEach((key) => etherscanAPIUrl.searchParams.append(key, params[key]));
+    const response = await fetch(apiUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    const { result }: { result: AlchemyResponse } = await response.json();
 
-    try {
-      const response = await fetch(etherscanAPIUrl.toString());
-
-      if (!response.ok) {
-        throw new Error(`Network response was not ok: ${response.statusText}`);
-      }
-
-      const data: EtherscanResponse = await response.json();
-
-      return Response.json(data.result);
-    } catch (error) {
-      console.error('Error fetching transactions:', error);
-      return Response.json({ error: (error as Error).message || 'Internal Server Error' }, { status: 500 });
-    }
-  } else if (currentChain?.id === hardhat.id) {
+    return Response.json(result.transfers);
+  } else if (currentChain?.id === Number(hardhat.id)) {
     // custom solution for hardhat local node since there is no explorer
     // and we need to fetch transactions from the local node
     const client = createPublicClient({
@@ -68,9 +69,8 @@ export async function GET(req: NextRequest) {
       transport: http()
     })
     const latestBlock = await client.getBlockNumber()
-    console.log('latestBlock', latestBlock)
     const startBlock = latestBlock >= BigInt(10) ? latestBlock - BigInt(10) : BigInt(0); // Ensure non-negative
-    const transactions: Record<string, unknown>[] = [];
+    const transactions: AlchemyAssetTransaction[] = [];
 
     console.log('startBlock', startBlock)
     console.log('latestBlock', latestBlock)
@@ -83,8 +83,23 @@ export async function GET(req: NextRequest) {
 
       blockTransactions.forEach((tx) => {
         if (tx.from.toLowerCase() === address.toLowerCase() || tx.to?.toLowerCase() === address.toLowerCase()) {
-          // enhance tx by block `timestamp`
-          transactions.push({ timeStamp: block.timestamp, ...tx });
+          transactions.push({
+            blockNum: tx.blockHash,
+            hash: tx.hash,
+            from: tx.from,
+            to: tx.to as string,
+            value: Number(formatEther(tx.value)), // match with the format returned by Alchemy
+            asset: 'ETH', // not possible to map it at this moment
+            category: 'erc20', // not possible to map it at this moment
+            rawContract: {
+              value: tx.value as unknown as string,
+              address: tx.to as unknown as string,
+              decimal: undefined,
+            },
+            metadata: {
+              blockTimestamp: new Date(Number(block.timestamp) * 1000).toString(), // e.g. "2023-11-15T12:34:56.000Z"
+            }
+          });
         }
       });
     }

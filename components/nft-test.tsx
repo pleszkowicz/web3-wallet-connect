@@ -1,9 +1,9 @@
-"use client"
-import Image from "next/image"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
-import { ArrowLeft, RefreshCw, Copy, ExternalLink, Shield, Tag } from "lucide-react"
+'use client';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+import { ArrowLeft, Copy, ExternalLink, RefreshCw, Shield, Tag } from 'lucide-react';
+import Image from 'next/image';
 
 export default function NFTDetailsPage() {
   return (
@@ -127,5 +127,5 @@ export default function NFTDetailsPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

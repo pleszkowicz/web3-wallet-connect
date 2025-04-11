@@ -1,10 +1,12 @@
-import { useEffect, useState } from 'react';
-import { useAccount } from 'wagmi';
-import { useTransactions } from '@/hooks/useTransactions';
-import { formatEther } from 'viem';
-import { useQueryClient } from '@tanstack/react-query';
+'use client';
 import { shrotenAddress } from '@/Utils/shortenAddress';
 import { Loader } from '@/components/ui/loader';
+import { useTransactions } from '@/hooks/useTransactions';
+import { useQueryClient } from '@tanstack/react-query';
+import { useEffect, useState } from 'react';
+import { formatEther, parseEther, zeroAddress } from 'viem';
+import { useAccount } from 'wagmi';
+import { Badge } from './ui/badge';
 
 const TransactionHistory = () => {
   const { address, chain: currentChain } = useAccount();
@@ -33,7 +35,7 @@ const TransactionHistory = () => {
   }
 
   return (
-    <div className="overflow-x-auto animate-in animate-bounce animate-fade-in max-h-[400px]">
+    <div className="overflow-x-auto max-h-[400px]">
       {showTransactions && transactions && transactions.length > 0 ? (
         <table className="text-sm min-w-full bg-white border border-gray-200">
           <thead className="sticky top-[0] z-10 bg-gray-100 shadow-md">
@@ -62,12 +64,33 @@ const TransactionHistory = () => {
                     <span>{shrotenAddress(tx.hash)}</span>
                   )}
                 </td>
-                <td className="py-2 px-4 border-b">{shrotenAddress(tx.from)}</td>
-                <td className="py-2 px-4 border-b">{shrotenAddress(tx.to)}</td>
-                <td className="py-2 px-4 border-b">{new Date(parseInt(tx.timeStamp) * 1000).toLocaleString()}</td>
+                <td className="py-2 px-4 border-b">
+                  {tx.category === 'erc721' && tx.from === zeroAddress ? (
+                    <Badge className="bg-blue-500/80 backdrop-blur-sm text-white px-2.5 py-1">Mint NFT</Badge>
+                  ) : null}
+                  {shrotenAddress(tx.from)}
+                </td>
+                <td className="py-2 px-4 border-b">
+                  {tx.to === null ? <span className="text-xs">Smart contract deployment</span> : null}
+                  {shrotenAddress(tx.to)}
+                </td>
+                <td className="py-2 px-4 border-b">{new Date(tx.metadata.blockTimestamp).toLocaleString()}</td>
                 <td className="py-2 px-4 border-b text-right whitespace-nowrap">
-                    {tx.to && !!(tx.value > 0) && (tx.to === address ? '+' : '-')}
-                    {formatEther(tx.value)} {currentChain?.nativeCurrency.symbol}
+                  {tx.to && !!(Number(tx.value) > 0) && (tx.to === address ? '+' : '-')}
+                  {tx.asset?.toLocaleLowerCase() === 'eth'
+                    ? tx.value &&
+                      formatEther(
+                        parseEther(
+                          String(
+                            tx.value.toLocaleString('en-US', {
+                              useGrouping: true,
+                              maximumSignificantDigits: 18,
+                            })
+                          )
+                        )
+                      )
+                    : tx.value}{' '}
+                  <span>{tx.asset}</span>
                 </td>
               </tr>
             ))}

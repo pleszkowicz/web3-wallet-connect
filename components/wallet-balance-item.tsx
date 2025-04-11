@@ -18,7 +18,7 @@ export default function WalletBalanceItem({ balance, isLoading = false, name }: 
           <Avatar>
             <AvatarFallback>{name?.charAt(0)}</AvatarFallback>
           </Avatar>
-          <span className="ml-4">{name}</span>
+          <span className="ml-2">{name}</span>
         </div>
         {isLoading ? (
           <Loader>Loading balance...</Loader>

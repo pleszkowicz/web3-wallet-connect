@@ -20,42 +20,42 @@ Supported networks:
 - Sepolia
 - Localhost Hardhat network (transaction history not available due to limitations)
 
+## Configure API keys
+
+For development purposes, create `.env.local` file in the root project directory. Then copy and fill required keys from [.env](https://github.com/pleszkowicz/web3-wallet-connect/blob/main/.env.example) file. Also, `.env.example` contains instructions how to obtain API keys.
+
 ## Getting Started
 
-This project utilizes Next.js API routing to connect with Etherscan. The `ETHERSCAN_API_KEY` should be stored locally in the `.env` file. See `.env` for more details and how to obtain a key.
+This project utilizes Next.js API routing and connects with blockchain by Alchemy provider.
 
-For local development purposes, create `.env.local` and add the required key(s) to it.
+To run smoothly in production mode, I decided to utilize prisma with PostgreSQL hosted on Neon.
 
-First, run the development server:
+### Next step
+
+Install and run the development server:
 
 ```bash
 pnpm install
 pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the results.
-
-## Configure API keys
-
-Once everthing is installed, create `.env.local` and copy and fill required keys from [.env](https://github.com/pleszkowicz/web3-wallet-connect/blob/main/.env) file:
+Open [http://localhost:3000](http://localhost:3000) in your browser to see the results.
 
 ## App Features
 
 ### Welcome Screen
 
-Once the application is running, depending on available web3 wallets, you should see a screen similar to:
-
-![login](https://github.com/pleszkowicz/web3-wallet-connect/blob/main/public/images/login.png?raw=true)
+Once the application is running, depending on available web3 wallets, you should see a Welcome screen.
 
 ### Wallet Dashboard
 
-After connecting your wallet, you can view your wallet balance, NFT collections, and transaction history. You can also perform actions like sending transactions or creating NFTs.
+After connecting your web wallet, you can view your balance, mint, trade NFTs, check transaction history, and more...
 
 ![balance](https://github.com/pleszkowicz/web3-wallet-connect/blob/main/public/images/balance.png?raw=true)
 
-### NFT Creation
+### NFT Minting
 
-Easily create NFTs on the Sepolia or localhost Hardhat network using the built-in NFT creation form.
+Create NFTs on Sepolia or localhost Hardhat network using the built-in NFT creation form.
 
 ### NFT price updates
 
@@ -63,9 +63,9 @@ NFT owners are eligible to update the price in ETH tokens.
 
 ### NFT Sell and Buy
 
-In order to sell NFT, smart-contract requires to set `approval`, which is grnting permission for smart contract address to manage or transfer NFT on behalf of the owner. Once this operation is performed, other community members are allowed to buy NFT at specific price.
+In order to sell NFT, smart-contract requires to set `approval`, which is  permission granting for smart contract address to manage or transfer NFT ownership on behalf of the owner. If approval is performed, other web app users are allowed to buy NFT at price specified by owner.
 
-Owner can withdraw `approval` at any point of time, allowing other users only to view.
+Also, an owner can withdraw `approval` at any point of time, allowing other users to view only. Whole logic is well docummented and tested on [hardhat-smart-contract](https://github.com/pleszkowicz/hardhat-smart-contract).
 
 ## Contributing
 

@@ -1,15 +1,15 @@
 'use client';
-import { ReactElement, ReactNode } from 'react';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import NetworkSwitch from '@/components/network-switch';
-import { Button } from './ui/button';
-import Link from 'next/link';
-import { ArrowLeftIcon, CopyIcon } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { useAccount, useEnsName } from 'wagmi';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { OpenInNewWindowIcon } from '@radix-ui/react-icons';
-import { useToast } from './ui/hooks/use-toast';
+import { ArrowLeftIcon, CopyIcon } from 'lucide-react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { ReactElement, ReactNode } from 'react';
+import { useAccount, useEnsName } from 'wagmi';
 import { DisconnectAccount } from './disconnect-account';
+import { Button } from './ui/button';
+import { useToast } from './ui/hooks/use-toast';
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 
 interface CardLayoutProps {
