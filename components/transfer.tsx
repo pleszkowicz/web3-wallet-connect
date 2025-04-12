@@ -3,7 +3,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { SEPOLIA_LINK_CONTRACT_ADDRESS, SEPOLIA_LINK_TOKEN_ABI } from '@/const/sepolia';
-import { getFormattedEtherValue } from '@/lib/getFormattedValue';
 import { ErrorMessage, Field, Form, Formik, useFormikContext } from 'formik';
 import { RefreshCwIcon } from 'lucide-react';
 import { useState } from 'react';
@@ -66,11 +65,11 @@ export function Transfer() {
       .required('Value is required')
       .test('is-valid-value', 'Insufficient balance', function (value) {
         const { path, createError } = this;
-        const availableBalance = currentBalance ? Number(getFormattedEtherValue(currentBalance)) : 0;
+        const availableBalance = currentBalance ? Number(formatEther(currentBalance)) : 0;
         if (parseFloat(value) > availableBalance) {
           return createError({
             path,
-            message: `Value cannot exceed available balance of ${availableBalance}`,
+            message: `Exceeds available balance of ${availableBalance} and gas fee.`,
           });
         }
         return true;
