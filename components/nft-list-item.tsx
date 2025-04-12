@@ -3,7 +3,6 @@ import { NFT_MARKET_CONTRACT_ABI } from '@/const/nft-marketplace-abi';
 import { NFT_MARKETPLACE_ADDRESS } from '@/const/nft-marketplace-address';
 import { Nft, NftMeta } from '@/types/NFT';
 import { useQuery } from '@tanstack/react-query';
-import { LoaderIcon } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
@@ -19,7 +18,11 @@ export const NftListItem = ({ tokenId, price, owner }: Nft) => {
     args: [BigInt(tokenId)],
   });
 
-  const { data: tokenDetails, isLoading: isLoadingTokenDetails } = useQuery<NftMeta, Error>({
+  const {
+    data: tokenDetails,
+    isLoading: isLoadingTokenDetails,
+    error: tokenDetailsError,
+  } = useQuery<NftMeta, Error>({
     queryKey: ['token-details', tokenId.toString()],
     queryFn: async () => {
       if (!tokenURI) {
@@ -55,11 +58,11 @@ export const NftListItem = ({ tokenId, price, owner }: Nft) => {
     <div className="flex flex-col w-full animate-fade-in opacity-0">
       <Link href={`/nft/${tokenId}`} className="">
         <div className="flex items-center rounded-lg overflow-hidden flex-col gap-2 relative group">
-          {isLoading || isLoadingTokenDetails ? (
-            <LoaderIcon />
-          ) : !tokenDetails ? (
-            <span>Loading failed</span>
-          ) : (
+          {tokenDetailsError ? (
+            <span className="text-red-500 text-sm text-center">Failed to load metadata</span>
+          ) : isLoading || isLoadingTokenDetails ? (
+            <div className="w-full aspect-square animate-pulse rounded-lg bg-muted" />
+          ) : !tokenDetails ? null : (
             <>
               <div className="relative w-full h-full">
                 <Image
