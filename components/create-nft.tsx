@@ -74,7 +74,7 @@ export function CreateNFT() {
                   console.log('data', data);
 
                   toast({ title: 'NFT successfully created!' });
-                  router.push('/');
+                  router.push('/dashboard');
                 },
                 onError: (error) => {
                   console.log('NFT creation failed');

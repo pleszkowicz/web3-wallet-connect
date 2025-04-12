@@ -4,17 +4,21 @@ import { useMounted } from '@/hooks/useMounted';
 import { cn } from '@/lib/cn';
 import { Dialog } from '@radix-ui/react-dialog';
 import { OpenInNewWindowIcon } from '@radix-ui/react-icons';
-import { Loader2, Wallet2 } from 'lucide-react';
+import { Loader2, Rocket, Wallet2 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
-import { Connector, useConnect } from 'wagmi';
+import { Connector, useAccount, useConnect } from 'wagmi';
 import { CardLayout } from './card-layout';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './ui/accordion';
-import { DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
+import { DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
 
 export function WalletConnect() {
-  const { connectors, connect, isPending } = useConnect();
+  const { connectors, connect, isPending: isConnectionPending, isSuccess: isConnectionSuccess } = useConnect();
+  const { isConnected } = useAccount();
+  const { push } = useRouter();
+  const [open, setIsOpen] = useState(false);
 
   // prevent re-render during wallet connect action
   const nftPlaceholders = useMemo(() => {
@@ -24,6 +28,13 @@ export function WalletConnect() {
   }, []);
 
   const mounted = useMounted();
+
+  useEffect(() => {
+    if (isConnectionSuccess) {
+      push('/dashboard');
+      setIsOpen(false);
+    }
+  }, [isConnectionSuccess, push]);
 
   if (!mounted) {
     return null;
@@ -41,41 +52,50 @@ export function WalletConnect() {
         <h2 className="mb-6 mt-2 text-center text-2xl font-bold">Let's dive, first</h2>{' '}
         <div className="mx-auto flex w-full flex-col items-center self-center md:max-w-[80%]">
           <div className="mb-4 flex items-center pb-2">
-            <Dialog>
-              <DialogTrigger asChild>
-                <div className=" flex items-center pb-2 text-purple-800">
-                  <Button variant="default" size="lg">
-                    <Wallet2 className="mr-2 h-6 w-6" />
-                    Connect your wallet
-                  </Button>
-                </div>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[425px]">
-                <DialogHeader>
-                  <DialogTitle>Please connect your wallet</DialogTitle>
-                </DialogHeader>
-                <div className="mt-6 grid w-full gap-2">
-                  {connectors.length ? (
-                    connectors.map((connector) => (
-                      <WalletOption
-                        key={connector.id}
-                        connector={connector}
-                        onClick={() => connect({ connector })}
-                        pending={isPending}
-                      />
-                    ))
-                  ) : (
-                    <div className="text-slate-700">
-                      <p>
-                        Unfortunately, I <b>coud not find any crypto wallet</b> enabled in your browser. Once you
-                        install, please try again.
-                      </p>
-                      <p></p>
+            {!isConnected ? (
+              <Dialog open={open}>
+                <DialogTrigger asChild>
+                  <div className=" flex items-center pb-2 text-purple-800">
+                    <Button variant="default" size="lg" onClick={() => setIsOpen(true)}>
+                      <Wallet2 className="mr-2 h-6 w-6" />
+                      Connect your wallet
+                    </Button>
+                  </div>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[425px]" aria-describedby="dialog-content">
+                  <DialogHeader>
+                    <DialogTitle>Please connect your wallet</DialogTitle>
+                  </DialogHeader>
+                  <DialogDescription asChild>
+                    <div className="mt-6 grid w-full gap-2">
+                      {connectors.length ? (
+                        connectors.map((connector) => (
+                          <WalletOption
+                            key={connector.id}
+                            connector={connector}
+                            onClick={() => connect({ connector })}
+                            pending={isConnectionPending}
+                          />
+                        ))
+                      ) : (
+                        <div className="text-slate-700">
+                          <p>
+                            Unfortunately, I <b>coud not find any crypto wallet</b> enabled in your browser. Once you
+                            install, please try again.
+                          </p>
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
-              </DialogContent>
-            </Dialog>
+                  </DialogDescription>
+                </DialogContent>
+              </Dialog>
+            ) : (
+              <Button asChild variant="default" size="lg">
+                <Link href="/dashboard">
+                  <Rocket className="mr-2" /> Go to Web3 Dashboard
+                </Link>
+              </Button>
+            )}
           </div>
 
           {/* <div className="border rounded p-4 text-slate-500 shadow-sm"> */}

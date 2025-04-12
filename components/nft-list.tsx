@@ -1,13 +1,17 @@
 'use client';
 import { NFT_MARKET_CONTRACT_ABI } from '@/const/nft-marketplace-abi';
-import { useReadContract } from 'wagmi';
-import { Loader } from './ui/loader';
-import { Nft } from '@/types/NFT';
 import { NFT_MARKETPLACE_ADDRESS } from '@/const/nft-marketplace-address';
+import { Nft } from '@/types/NFT';
+import { useReadContract } from 'wagmi';
 import { NftListItem } from './nft-list-item';
+import { Loader } from './ui/loader';
 
 export const NftList = () => {
-  const { data: nfts, isLoading, error } = useReadContract({
+  const {
+    data: nfts,
+    isLoading,
+    error,
+  } = useReadContract({
     address: NFT_MARKETPLACE_ADDRESS,
     abi: NFT_MARKET_CONTRACT_ABI,
     functionName: 'getAllNfts',
@@ -28,7 +32,7 @@ export const NftList = () => {
           ))
         ) : (
           <p className="w-full text-muted-foreground mt-4">No NFTs yet</p>
-        )}{' '}
+        )}
       </div>
     </>
   );

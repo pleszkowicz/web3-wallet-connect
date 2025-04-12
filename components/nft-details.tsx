@@ -1,18 +1,19 @@
-"use client";
-import { NFT_MARKET_CONTRACT_ABI } from "@/const/nft-marketplace-abi";
-import { useQuery } from "@tanstack/react-query";
-import { Check, EditIcon, LoaderIcon, ShoppingCart, Undo2 } from "lucide-react";
-import Image from "next/image";
-import { useAccount, useReadContract, useTransactionCount, useWriteContract } from "wagmi";
-import { Button } from "./ui/button";
-import { formatEther, parseEther } from "viem";
-import { Nft, NftMeta } from "@/types/NFT";
-import { useToast } from "./ui/hooks/use-toast";
-import { NFT_MARKETPLACE_ADDRESS } from "@/const/nft-marketplace-address";
-import { useEffect, useState } from "react";
-import { ErrorMessage, Field, Form, Formik } from "formik";
-import * as Yup from "yup";
-import { Input } from "./ui/input";
+'use client';
+import { NFT_MARKET_CONTRACT_ABI } from '@/const/nft-marketplace-abi';
+import { NFT_MARKETPLACE_ADDRESS } from '@/const/nft-marketplace-address';
+import { Nft, NftMeta } from '@/types/NFT';
+import { useQuery } from '@tanstack/react-query';
+import { ErrorMessage, Field, Form, Formik } from 'formik';
+import { Check, EditIcon, LoaderIcon, ShoppingCart, Undo2 } from 'lucide-react';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import invariant from 'tiny-invariant';
+import { formatEther, parseEther } from 'viem';
+import { useAccount, useReadContract, useTransactionCount, useWriteContract } from 'wagmi';
+import * as Yup from 'yup';
+import { NftStatusHelper } from './nft-status-helper';
+import { Button } from './ui/button';
 import {
   Dialog,
   DialogContent,
@@ -21,14 +22,13 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "./ui/dialog";
-import { Label } from "./ui/label";
-import { Loader } from "./ui/loader";
-import { useRouter } from "next/navigation";
-import invariant from "tiny-invariant";
-import { NftStatusHelper } from "./nft-status-helper";
+} from './ui/dialog';
+import { useToast } from './ui/hooks/use-toast';
+import { Input } from './ui/input';
+import { Label } from './ui/label';
+import { Loader } from './ui/loader';
 
-type NftDetailsProps = Pick<Nft, "tokenId">;
+type NftDetailsProps = Pick<Nft, 'tokenId'>;
 
 export const NftDetails = ({ tokenId }: NftDetailsProps) => {
   const {
@@ -38,7 +38,7 @@ export const NftDetails = ({ tokenId }: NftDetailsProps) => {
   } = useReadContract({
     address: NFT_MARKETPLACE_ADDRESS,
     abi: NFT_MARKET_CONTRACT_ABI,
-    functionName: "getNftById",
+    functionName: 'getNftById',
     args: [BigInt(tokenId)],
   });
 
@@ -54,24 +54,24 @@ export const NftDetails = ({ tokenId }: NftDetailsProps) => {
     );
   }
 
-  invariant(nft, "NFT data is undefined");
+  invariant(nft, 'NFT data is undefined');
 
   return <NftItem tokenId={nft.tokenId} owner={nft.owner} price={nft.price} />;
 };
 
-const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
+const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 
-type NftItemProps = Pick<Nft, "tokenId" | "owner" | "price">;
+type NftItemProps = Pick<Nft, 'tokenId' | 'owner' | 'price'>;
 const NftItem = ({ tokenId, owner, price }: NftItemProps) => {
   const { data: tokenURI, isLoading } = useReadContract({
     address: NFT_MARKETPLACE_ADDRESS,
     abi: NFT_MARKET_CONTRACT_ABI,
-    functionName: "tokenURI",
+    functionName: 'tokenURI',
     args: [BigInt(tokenId)],
   });
 
   const { data: tokenDetails } = useQuery<NftMeta, Error>({
-    queryKey: ["token-details", tokenId.toString()],
+    queryKey: ['token-details', tokenId.toString()],
     queryFn: async () => {
       if (!tokenURI) {
         return;
@@ -85,7 +85,7 @@ const NftItem = ({ tokenId, owner, price }: NftItemProps) => {
   const { data: approvedAddress, refetch: refetchGetApproved } = useReadContract({
     address: NFT_MARKETPLACE_ADDRESS,
     abi: NFT_MARKET_CONTRACT_ABI,
-    functionName: "getApproved",
+    functionName: 'getApproved',
     args: [BigInt(tokenId)],
   });
 
@@ -109,20 +109,20 @@ const NftItem = ({ tokenId, owner, price }: NftItemProps) => {
       {
         address: NFT_MARKETPLACE_ADDRESS,
         abi: NFT_MARKET_CONTRACT_ABI,
-        functionName: "approve",
+        functionName: 'approve',
         args: [addressToApprove, BigInt(tokenId)],
         nonce: transactionCount, // fix for passing the correct nonce in hardhat network
       },
       {
         onSuccess: () => {
-          toast({ title: isSaleApproved ? "NFT sell approval withdrawn!" : "NFT approved to sell!" });
+          toast({ title: isSaleApproved ? 'NFT sell approval withdrawn!' : 'NFT approved to sell!' });
           setIsSaleApproved(!isSaleApproved);
         },
         onError: (error: unknown) => {
-          console.log("error", error);
+          console.log('error', error);
           toast({
-            title: "Approval change failed",
-            description: "Please try again later.",
+            title: 'Approval change failed',
+            description: 'Please try again later.',
           });
         },
       }
@@ -134,21 +134,21 @@ const NftItem = ({ tokenId, owner, price }: NftItemProps) => {
       {
         address: NFT_MARKETPLACE_ADDRESS,
         abi: NFT_MARKET_CONTRACT_ABI,
-        functionName: "executeSale",
+        functionName: 'executeSale',
         args: [BigInt(tokenId)],
         value: BigInt(price),
       },
       {
         onSuccess: () => {
           refetchGetApproved();
-          toast({ title: "NFT purchased successfully!" });
-          router.push("/");
+          toast({ title: 'NFT successfully purchased!' });
+          router.push('/dashboard');
         },
         onError: (error) => {
-          console.error("Purchase error:", error);
+          console.error('Purchase error:', error);
           toast({
-            title: "Purchase failed",
-            description: "Please try again later.",
+            title: 'Purchase failed',
+            description: 'Please try again later.',
           });
         },
       }
@@ -166,7 +166,7 @@ const NftItem = ({ tokenId, owner, price }: NftItemProps) => {
               <Image
                 priority={true}
                 src={tokenDetails.image}
-                alt={tokenDetails.name || "NFT Image"}
+                alt={tokenDetails.name || 'NFT Image'}
                 className="pointer aspect-square w-full transform object-cover transition-transform duration-1000 group-hover:scale-110"
                 width={622}
                 height={622}
@@ -192,14 +192,14 @@ const NftItem = ({ tokenId, owner, price }: NftItemProps) => {
       <div className="mt-6 w-full">
         {isOwned && (
           <Button
-            variant={isSaleApproved ? "destructive" : "default"}
+            variant={isSaleApproved ? 'destructive' : 'default'}
             className="w-full"
             type="button"
             onClick={toggleApprove}
             disabled={isPending}
           >
             {isSaleApproved ? <Undo2 className="mr-2" /> : <Check className="mr-2" />}
-            {isSaleApproved ? "Revoke from Sale" : "Approve to Sell"}
+            {isSaleApproved ? 'Revoke from Sale' : 'Approve to Sell'}
           </Button>
         )}
 
@@ -213,7 +213,7 @@ const NftItem = ({ tokenId, owner, price }: NftItemProps) => {
   );
 };
 
-type NftPriceProps = Pick<Nft, "tokenId" | "price"> & {
+type NftPriceProps = Pick<Nft, 'tokenId' | 'price'> & {
   isOwned: boolean;
 };
 
@@ -227,10 +227,10 @@ const NftPrice = ({ tokenId, price, isOwned }: NftPriceProps) => {
 
   const validationSchema: Yup.ObjectSchema<{ price: string }> = Yup.object().shape({
     price: Yup.string()
-      .required("Price is required")
-      .test("max-decimal", "Price must have at most 18 decimal places", (value) => {
+      .required('Price is required')
+      .test('max-decimal', 'Price must have at most 18 decimal places', (value) => {
         if (value) {
-          const decimalPlaces = value.toString().split(".")[1]?.length || 0;
+          const decimalPlaces = value.toString().split('.')[1]?.length || 0;
           return decimalPlaces <= 18;
         }
         return true;
@@ -249,21 +249,21 @@ const NftPrice = ({ tokenId, price, isOwned }: NftPriceProps) => {
               {
                 address: NFT_MARKETPLACE_ADDRESS,
                 abi: NFT_MARKET_CONTRACT_ABI,
-                functionName: "updatePrice",
+                functionName: 'updatePrice',
                 args: [BigInt(tokenId), priceInWei],
                 nonce: transactionCount, // fix for passing the correct nonce in hardhat network
               },
               {
                 onSuccess: () => {
                   setPriceValue(formatEther(priceInWei)); // Update the displayed price
-                  toast({ title: "NFT listing price updated!" });
+                  toast({ title: 'NFT listing price updated!' });
                   setIsEditing(false);
                 },
                 onError: (error: unknown) => {
-                  console.log("error", error);
+                  console.log('error', error);
                   toast({
-                    title: "Price update failed",
-                    description: "Please try again later.",
+                    title: 'Price update failed',
+                    description: 'Please try again later.',
                   });
                 },
               }

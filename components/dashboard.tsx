@@ -1,21 +1,21 @@
 'use client';
-import { useAccount, useBalance, useConnect, useReadContract } from 'wagmi';
-import { formatEther } from 'viem';
-import { Button } from '@/components/ui/button';
-import { useEffect, useState } from 'react';
-import { SEPOLIA_LINK_CONTRACT_ADDRESS, SEPOLIA_LINK_TOKEN_ABI } from '@/const/sepolia';
-import WalletBalanceItem from '@/components/wallet-balance-item';
 import TransactionHistory from '@/components/transaction-history';
+import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import Link from 'next/link';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
-import invariant from 'tiny-invariant';
-import { CardLayout } from './card-layout';
-import { sepolia } from 'wagmi/chains';
+import WalletBalanceItem from '@/components/wallet-balance-item';
+import { SEPOLIA_LINK_CONTRACT_ADDRESS, SEPOLIA_LINK_TOKEN_ABI } from '@/const/sepolia';
 import { ImagePlusIcon, LucideIcon, Plus, SendIcon } from 'lucide-react';
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import invariant from 'tiny-invariant';
+import { formatEther } from 'viem';
+import { useAccount, useBalance, useConnect, useReadContract } from 'wagmi';
+import { sepolia } from 'wagmi/chains';
+import { CardLayout } from './card-layout';
 import { NftList } from './nft-list';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 
-export function WalletBalance() {
+export function Dashboard() {
   const { address, isConnected, chain } = useAccount();
   const { data: balance, isLoading: isBalanceLoading } = useBalance({ address });
 
@@ -61,13 +61,17 @@ export function WalletBalance() {
           <TabsContent value="nfts">
             <NftList />
             <Button asChild variant="default" className="w-full mt-5">
-              <Link href="/nft/create"><Plus /> Mint New NFT</Link>
+              <Link href="/nft/create">
+                <Plus /> Mint New NFT
+              </Link>
             </Button>
           </TabsContent>
           <TabsContent value="transactions">
             <TransactionHistory key={chain?.id} />
             <Button asChild variant="default" className="w-full mt-5 mb-5">
-              <Link href="/transaction"><Plus /> New transaction</Link>
+              <Link href="/transaction">
+                <Plus /> New transaction
+              </Link>
             </Button>
           </TabsContent>
         </Tabs>

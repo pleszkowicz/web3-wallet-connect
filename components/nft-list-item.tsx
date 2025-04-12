@@ -19,7 +19,7 @@ export const NftListItem = ({ tokenId, price, owner }: Nft) => {
     args: [BigInt(tokenId)],
   });
 
-  const { data: tokenDetails } = useQuery<NftMeta, Error>({
+  const { data: tokenDetails, isLoading: isLoadingTokenDetails } = useQuery<NftMeta, Error>({
     queryKey: ['token-details', tokenId.toString()],
     queryFn: async () => {
       if (!tokenURI) {
@@ -52,10 +52,10 @@ export const NftListItem = ({ tokenId, price, owner }: Nft) => {
   }, [approvedAddress]);
 
   return (
-    <div className="flex flex-col w-full">
+    <div className="flex flex-col w-full animate-fade-in opacity-0">
       <Link href={`/nft/${tokenId}`} className="">
         <div className="flex items-center rounded-lg overflow-hidden flex-col gap-2 relative group">
-          {isLoading ? (
+          {isLoading || isLoadingTokenDetails ? (
             <LoaderIcon />
           ) : !tokenDetails ? (
             <span>Loading failed</span>

@@ -43,7 +43,7 @@ export const CardLayout = ({ title, description, headerContent, showBackButton, 
                 asChild
                 variant="ghost"
                 size="icon"
-                onClick={() => router.push('/')}
+                onClick={() => router.push('/dashboard')}
                 aria-label="Go back"
                 className="p-1"
               >
