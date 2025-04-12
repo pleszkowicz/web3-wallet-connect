@@ -2,16 +2,16 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { SEPOLIA_LINK_CONTRACT_ADDRESS, SEPOLIA_LINK_TOKEN_ABI } from '@/const/sepolia';
+import { getFormattedEtherValue } from '@/lib/getFormattedValue';
+import { ErrorMessage, Field, Form, Formik, useFormikContext } from 'formik';
 import { RefreshCwIcon } from 'lucide-react';
+import { useState } from 'react';
 import { Address, formatEther, isAddress, parseEther } from 'viem';
 import { useAccount, useBalance, useGasPrice, useReadContract, useSendTransaction, useWriteContract } from 'wagmi';
-import { ErrorMessage, Field, Form, Formik, useFormikContext } from 'formik';
 import * as Yup from 'yup';
-import { getFormattedBalance } from '@/Utils/getFormattedValue';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { SEPOLIA_LINK_CONTRACT_ADDRESS, SEPOLIA_LINK_TOKEN_ABI } from '@/const/sepolia';
-import { useState } from 'react';
 import { CardLayout } from './card-layout';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 
 type Crypto = {
   value: string;
@@ -66,7 +66,7 @@ export function Transfer() {
       .required('Value is required')
       .test('is-valid-value', 'Insufficient balance', function (value) {
         const { path, createError } = this;
-        const availableBalance = currentBalance ? Number(getFormattedBalance(currentBalance)) : 0;
+        const availableBalance = currentBalance ? Number(getFormattedEtherValue(currentBalance)) : 0;
         if (parseFloat(value) > availableBalance) {
           return createError({
             path,

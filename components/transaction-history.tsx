@@ -1,7 +1,7 @@
 'use client';
-import { shrotenAddress } from '@/Utils/shortenAddress';
 import { Loader } from '@/components/ui/loader';
 import { useTransactions } from '@/hooks/useTransactions';
+import { shrotenAddress } from '@/lib/shortenAddress';
 import { useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { formatEther, parseEther, zeroAddress } from 'viem';

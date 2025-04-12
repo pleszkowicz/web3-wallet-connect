@@ -1,7 +1,7 @@
 'use client';
 import { Button } from '@/components/ui/button';
 import { useMounted } from '@/hooks/useMounted';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/cn';
 import { Dialog } from '@radix-ui/react-dialog';
 import { OpenInNewWindowIcon } from '@radix-ui/react-icons';
 import { Loader2, Wallet2 } from 'lucide-react';
