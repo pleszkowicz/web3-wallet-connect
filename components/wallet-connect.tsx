@@ -107,22 +107,20 @@ export function WalletConnect() {
               </AccordionTrigger>
               <AccordionContent>
                 <div className="text-slate-500">
-                  <p className="mt-4 text-sm">
-                    In order to test all functionalities locally, you have to:
-                    <ol className="my-2 list-decimal space-y-2 pl-6">
-                      <li>
-                        Clone and configure{' '}
-                        <Link
-                          href="https://github.com/pleszkowicz/hardhat-smart-contract"
-                          className="text-blue-600"
-                          target="_blank"
-                        >
-                          pleszkowicz/hardhat-smart-contract <OpenInNewWindowIcon className="inline" />
-                        </Link>{' '}
-                      </li>
-                      <li>Setup your environment variables as described in the repository documentation.</li>
-                    </ol>
-                  </p>
+                  <p className="mt-4 text-sm">In order to test all functionalities locally, follow steps below:</p>
+                  <ol className="my-2 list-decimal space pl-6">
+                    <li>
+                      Clone and configure{' '}
+                      <Link
+                        href="https://github.com/pleszkowicz/hardhat-smart-contract"
+                        className="text-blue-600"
+                        target="_blank"
+                      >
+                        pleszkowicz/hardhat-smart-contract <OpenInNewWindowIcon className="inline" />
+                      </Link>{' '}
+                    </li>
+                    <li>Setup your environment variables as described in the repository documentation.</li>
+                  </ol>
                   <p className="mt-4 text-sm">
                     Once you have running hardhat node locally, deploy smart-contract as described in{' '}
                     <Link

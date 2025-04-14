@@ -3,6 +3,7 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import WagmiProviderWrapper from '@/context/WagmiProviderWrapper';
 import type { Metadata } from 'next';
 import localFont from 'next/font/local';
+import { StrictMode } from 'react';
 import './globals.css';
 
 const geistSans = localFont({
@@ -31,10 +32,12 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} v0-c bg-gradient-to-br from-gray-900 via-indigo-950 to-purple-900 !opacity-100 transition-opacity duration-300`}
       >
-        <WagmiProviderWrapper>
-          <TooltipProvider>{children}</TooltipProvider>
-        </WagmiProviderWrapper>
-        <Toaster />
+        <StrictMode>
+          <WagmiProviderWrapper>
+            <TooltipProvider>{children}</TooltipProvider>
+          </WagmiProviderWrapper>
+          <Toaster />
+        </StrictMode>
       </body>
     </html>
   );
