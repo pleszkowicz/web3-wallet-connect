@@ -1,3 +1,4 @@
+import { Prisma } from "@/lib/generated/prisma";
 import { Address } from "viem";
 
 export type Nft = {
@@ -6,9 +7,5 @@ export type Nft = {
     owner: Address,
 }
 
-export type NftMeta = {
-    tokenId: `${string}-${string}-${string}-${string}-${string}`;
-    name: string;
-    description: string;
-    image: string;
-}
+// look into prisma/schema.prisma
+export type NftMeta = Prisma.NftGetPayload<false>;

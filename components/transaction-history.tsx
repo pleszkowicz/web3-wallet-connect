@@ -14,7 +14,11 @@ const TransactionHistory = () => {
   const [chainId, setChainId] = useState(currentChain?.id);
   const queryClient = useQueryClient();
 
-  const { data: transactions, error, isFetching } = useTransactions(address || '', { enabled: showTransactions });
+  const {
+    data: transactions,
+    error,
+    isFetching,
+  } = useTransactions({ address, chainId }, { enabled: showTransactions });
 
   useEffect(() => {
     if (currentChain?.id !== chainId) {

@@ -5,7 +5,6 @@ import { useMounted } from '@/hooks/useMounted';
 import { OpenInNewWindowIcon } from '@radix-ui/react-icons';
 import { ArrowLeftIcon, CopyIcon } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { ReactElement, ReactNode } from 'react';
 import { useAccount, useEnsName } from 'wagmi';
 import { DisconnectAccount } from './disconnect-account';
@@ -22,7 +21,6 @@ interface CardLayoutProps {
 }
 
 export const CardLayout = ({ title, description, headerContent, showBackButton, children }: CardLayoutProps) => {
-  const router = useRouter();
   const { toast } = useToast();
   const { address, chain: currentChain, isConnected } = useAccount();
   const { data: ensName } = useEnsName({ address });
@@ -39,15 +37,8 @@ export const CardLayout = ({ title, description, headerContent, showBackButton, 
         <div className="flex flex-row justify-between items-center relative">
           {showBackButton ? (
             <div className="flex items-center space-x-2 absolute left-0">
-              <Button
-                asChild
-                variant="ghost"
-                size="icon"
-                onClick={() => router.push('/dashboard')}
-                aria-label="Go back"
-                className="p-1"
-              >
-                <Link href="/">
+              <Button asChild variant="ghost" size="icon" aria-label="Go back" className="p-1">
+                <Link href="/dashboard">
                   <ArrowLeftIcon className="h-4 w-4" />
                 </Link>
               </Button>

@@ -15,9 +15,9 @@ datasource db {
 }
 
 model Nft {
-  id          String   @id @default(uuid())
+  id          String    @id @default(uuid())
   name        String
   description String
   image       String
-  createdAt   DateTime @default(now())
+  createdAt   DateTime? @default(now())
 }
