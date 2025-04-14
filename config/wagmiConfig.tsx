@@ -11,6 +11,12 @@ export const chainTransportsURLMap = {
   [sepolia.id]: `https://eth-sepolia.g.alchemy.com/v2/${ALCHEMY_API_KEY}`,
 };
 
+export const transports = {
+  [mainnet.id]: http(chainTransportsURLMap[mainnet.id]),
+  [sepolia.id]: http(chainTransportsURLMap[sepolia.id]),
+  [hardhat.id]: http(), // created custom transaction history handler
+};
+
 export const config = createConfig({
   chains: [
     mainnet,
@@ -18,9 +24,5 @@ export const config = createConfig({
     hardhat,
   ],
   connectors: [],
-  transports: {
-    [mainnet.id]: http(chainTransportsURLMap[mainnet.id]),
-    [sepolia.id]: http(chainTransportsURLMap[sepolia.id]),
-    [hardhat.id]: http(), // created custom transaction history handler
-  },
+  transports,
 });
