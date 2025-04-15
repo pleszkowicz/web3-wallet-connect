@@ -37,8 +37,8 @@ export function Dashboard() {
         title="Wallet Dashboard"
         headerContent={
           <p className="flex flex-row gap-6 justify-center pt-3">
-            <ActionLink href="/transaction" text="Send" Icon={SendIcon} />
             <ActionLink href="/nft/create" text="Create NFT" Icon={ImagePlusIcon} />
+            <ActionLink href="/transaction" text="Send" Icon={SendIcon} />
           </p>
         }
       >
