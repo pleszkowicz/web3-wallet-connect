@@ -1,6 +1,7 @@
 'use client';
 import { NFT_MARKET_CONTRACT_ABI } from '@/const/nft-marketplace-abi';
 import { NFT_MARKETPLACE_ADDRESS } from '@/const/nft-marketplace-address';
+import { Prisma } from '@/lib/generated/prisma';
 import { Nft, NftMeta } from '@/types/NFT';
 import { useQuery } from '@tanstack/react-query';
 import Image from 'next/image';
@@ -22,7 +23,7 @@ export const NftListItem = ({ tokenId, price, owner }: Nft) => {
     data: tokenDetails,
     isLoading: isLoadingTokenDetails,
     error: tokenDetailsError,
-  } = useQuery<NftMeta, Error>({
+  } = useQuery<Prisma.NftGetPayload<false>, Error>({
     queryKey: ['token-details', tokenId.toString()],
     queryFn: async () => {
       if (!tokenURI) {
@@ -48,19 +49,52 @@ export const NftListItem = ({ tokenId, price, owner }: Nft) => {
 
   const [isSaleApproved, setIsSaleApproved] = useState(false);
   const isOwned = owner === address;
-  const formattedPrice = formatEther(price);
 
   useEffect(() => {
     setIsSaleApproved(approvedAddress?.toLowerCase() === NFT_MARKETPLACE_ADDRESS.toLowerCase());
   }, [approvedAddress]);
 
   return (
+    <NftListItemUI
+      tokenId={tokenId}
+      tokenDetailsError={tokenDetailsError}
+      isLoading={isLoading || isLoadingTokenDetails}
+      isLoadingTokenDetails={isLoadingTokenDetails}
+      tokenDetails={tokenDetails}
+      isOwned={isOwned}
+      isSaleApproved={isSaleApproved}
+      price={price}
+    />
+  );
+};
+
+type NftListItemUIProps = {
+  tokenId: Nft['tokenId'];
+  tokenDetailsError?: ReturnType<typeof useQuery>['error'];
+  isLoading: boolean;
+  isLoadingTokenDetails: boolean;
+  tokenDetails?: NftMeta;
+  isOwned: boolean;
+  isSaleApproved: boolean;
+  price: bigint;
+};
+
+export const NftListItemUI = ({
+  tokenId,
+  tokenDetailsError,
+  isLoading,
+  tokenDetails,
+  isOwned,
+  isSaleApproved,
+  price,
+}: NftListItemUIProps) => {
+  return (
     <div className="flex flex-col w-full animate-fade-in opacity-0">
-      <Link href={`/nft/${tokenId}`} className="">
+      <Link href={`/nft/${tokenId}`}>
         <div className="flex items-center rounded-lg overflow-hidden flex-col gap-2 relative group">
           {tokenDetailsError ? (
             <span className="text-red-500 text-sm text-center">Failed to load metadata</span>
-          ) : isLoading || isLoadingTokenDetails ? (
+          ) : isLoading ? (
             <div className="w-full aspect-square animate-pulse rounded-lg bg-muted" />
           ) : !tokenDetails ? null : (
             <>
@@ -81,14 +115,17 @@ export const NftListItem = ({ tokenId, price, owner }: Nft) => {
               </div>
 
               <div className="absolute bottom-0 left-0 p-2 w-full flex flex-row items-end gap-1 z-10 text-white text-left bg-gradient-to-b from-transparent to-black bg-opacity-100">
-                <div>
-                  <h3 className="text-sm font-semibold">
+                <div className="w-full">
+                  <h3 className="text-sm font-semibold truncate overflow-hidden whitespace-nowrap">
                     <b>{tokenDetails.name}</b>
                   </h3>
-                  <p className="text-sm text-white flex flex-row">{tokenDetails.description}</p>
+
+                  <p className="text-sm text-white truncate overflow-hidden whitespace-nowrap">
+                    {tokenDetails.description}
+                  </p>
 
                   <p className="mt-1 text-lg text-green-300 font-semibold display-inline">
-                    <b>{formattedPrice} ETH</b>
+                    <b>{formatEther(price)} ETH</b>
                   </p>
                 </div>
               </div>

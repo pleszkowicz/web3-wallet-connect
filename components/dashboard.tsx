@@ -62,7 +62,7 @@ export function Dashboard() {
             <NftList />
             <Button asChild variant="default" className="w-full mt-5">
               <Link href="/nft/create">
-                <Plus /> Mint New NFT
+                <Plus /> Mint new NFT
               </Link>
             </Button>
           </TabsContent>
