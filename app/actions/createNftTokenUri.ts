@@ -7,7 +7,7 @@ export async function createNftTokenUri({ name, description, image }: Prisma.Nft
     try {
         // TODO remove after tests
         return {
-            abc: 1
+            abc: 2
         }
 
         if (!name || !description || !image) {
