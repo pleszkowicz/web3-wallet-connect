@@ -1,8 +1,6 @@
 'use server'
-import { PrismaClient } from "@/lib/generated/prisma"
+import { prisma } from "@/lib/prisma";
 import { NftMeta } from "@/types/NFT";
-
-const prisma = new PrismaClient();
 
 export async function deleteNftTokenUri({ id }: Pick<NftMeta, 'id'>) {
     try {

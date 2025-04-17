@@ -1,9 +1,8 @@
 'use server';
 import invariant from "tiny-invariant";
 import { NextRequest } from "next/server";
-import { PrismaClient } from '@/lib/generated/prisma';
+import { prisma } from "@/lib/prisma";
 
-const prisma = new PrismaClient();
 
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     try {
