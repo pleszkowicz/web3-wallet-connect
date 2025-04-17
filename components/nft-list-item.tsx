@@ -90,7 +90,7 @@ export const NftListItemUI = ({
 }: NftListItemUIProps) => {
   return (
     <div className="flex flex-col w-full animate-fade-in opacity-0">
-      <Link href={`/nft/${tokenId}`}>
+      <Link href={`/nft/view/${tokenId}`}>
         <div className="flex items-center rounded-lg overflow-hidden flex-col gap-2 relative group">
           {tokenDetailsError ? (
             <span className="text-red-500 text-sm text-center">Failed to load metadata</span>
