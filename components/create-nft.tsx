@@ -1,7 +1,6 @@
 'use client';
 import { createNftTokenUri } from '@/app/actions/createNftTokenUri';
 import { deleteNftTokenUri } from '@/app/actions/deleteNftTokenUri';
-import { validateImageUrl } from '@/app/actions/validateImage';
 import { NFT_MARKET_CONTRACT_ABI } from '@/const/nft-marketplace-abi';
 import { NFT_MARKETPLACE_ADDRESS } from '@/const/nft-marketplace-address';
 import { useMounted } from '@/hooks/useMounted';
@@ -120,7 +119,6 @@ export function CreateNFT() {
       >
         {({ isSubmitting, values }) => (
           <div className="flex flex-col md:flex-row-reverse w-full gap-4">
-            {/* {values.image ? ( */}
             <div className="max-w-full md:max-w-[240px] w-full opacity-90 relative">
               <div className="absolute inset-0 z-10 cursor-default"></div>
 
@@ -141,7 +139,6 @@ export function CreateNFT() {
                 price={1000000000000000n}
               />
             </div>
-            {/* ) : null} */}
 
             <Form className="flex flex-col gap-4 w-full" aria-disabled={isSubmitting || isTransactionPending}>
               <Field as={Input} id="image" name="image" placeholder="NFT image URL" />
@@ -185,6 +182,23 @@ export function CreateNFT() {
       </Formik>
     </CardLayout>
   );
+}
+
+async function validateImageUrl(url: string): Promise<{ valid: boolean; message?: string }> {
+  try {
+    const res = await fetch(url, { method: 'HEAD' });
+    const contentType = res.headers.get('content-type') || '';
+
+    if (!res.ok) {
+      return { valid: false, message: 'Image is unreachable' };
+    }
+    if (!contentType.startsWith('image/')) {
+      return { valid: false, message: 'URL must point to the image' };
+    }
+    return { valid: true };
+  } catch (error) {
+    return { valid: false, message: 'Invalid or blocked URL' };
+  }
 }
 
 function isValidUrl(str: string): boolean {
