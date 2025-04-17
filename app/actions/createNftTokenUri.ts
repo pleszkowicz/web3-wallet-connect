@@ -1,6 +1,7 @@
 'use server'
-import { Prisma } from "@/lib/generated/prisma"
-import { prisma } from "@/lib/prisma";
+import { Prisma, PrismaClient } from "@/lib/generated/prisma"
+
+const prisma = new PrismaClient();
 
 export async function createNftTokenUri({ name, description, image }: Prisma.NftCreateInput) {
     try {
