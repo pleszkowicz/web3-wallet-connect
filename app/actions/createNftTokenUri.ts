@@ -1,5 +1,5 @@
 'use server'
-import { Prisma, PrismaClient } from "@/lib/generated/prisma"
+import { Prisma, PrismaClient } from '@/lib/generated/prisma/edge'
 
 const prisma = new PrismaClient();
 
