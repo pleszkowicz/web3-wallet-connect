@@ -11,6 +11,7 @@ export async function getNftTokenUri(id: string) {
 
         return { success: true, nftUri }
     } catch (error) {
+        throw error
         return { error }
     }
 }
