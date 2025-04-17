@@ -1,4 +1,5 @@
 'use client';
+import { getNftTokenUri } from '@/app/actions/getNftTokenURI';
 import { NFT_MARKET_CONTRACT_ABI } from '@/const/nft-marketplace-abi';
 import { NFT_MARKETPLACE_ADDRESS } from '@/const/nft-marketplace-address';
 import { Prisma } from '@/lib/generated/prisma';
@@ -17,6 +18,17 @@ export const NftListItem = ({ tokenId, price, owner }: Nft) => {
     abi: NFT_MARKET_CONTRACT_ABI,
     functionName: 'tokenURI',
     args: [BigInt(tokenId)],
+  });
+
+  useEffect(() => {
+    async function getData(id: string) {
+      const a = await getNftTokenUri(id);
+      console.log(a);
+    }
+
+    if (tokenURI) {
+      getData(tokenURI?.split('/').pop() as string);
+    }
   });
 
   const {
