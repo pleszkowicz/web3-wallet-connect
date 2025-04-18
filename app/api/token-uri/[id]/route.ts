@@ -3,7 +3,6 @@ import invariant from "tiny-invariant";
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     try {
         const { id } = await params;

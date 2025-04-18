@@ -1,5 +1,4 @@
 'use client';
-import { getNftTokenUri } from '@/app/actions/getNftTokenURI';
 import { NFT_MARKET_CONTRACT_ABI } from '@/const/nft-marketplace-abi';
 import { NFT_MARKETPLACE_ADDRESS } from '@/const/nft-marketplace-address';
 import { Prisma } from '@/lib/generated/prisma';
@@ -18,17 +17,6 @@ export const NftListItem = ({ tokenId, price, owner }: Nft) => {
     abi: NFT_MARKET_CONTRACT_ABI,
     functionName: 'tokenURI',
     args: [BigInt(tokenId)],
-  });
-
-  useEffect(() => {
-    async function getData(id: string) {
-      const a = await getNftTokenUri(id);
-      console.log(a);
-    }
-
-    if (tokenURI) {
-      getData(tokenURI?.split('/').pop() as string);
-    }
   });
 
   const {
@@ -71,7 +59,6 @@ export const NftListItem = ({ tokenId, price, owner }: Nft) => {
       tokenId={tokenId}
       tokenDetailsError={tokenDetailsError}
       isLoading={isLoading || isLoadingTokenDetails}
-      isLoadingTokenDetails={isLoadingTokenDetails}
       tokenDetails={tokenDetails}
       isOwned={isOwned}
       isSaleApproved={isSaleApproved}
@@ -84,11 +71,10 @@ type NftListItemUIProps = {
   tokenId: Nft['tokenId'];
   tokenDetailsError?: ReturnType<typeof useQuery>['error'];
   isLoading: boolean;
-  isLoadingTokenDetails: boolean;
   tokenDetails?: NftMeta;
   isOwned: boolean;
   isSaleApproved: boolean;
-  price: bigint;
+  price?: bigint;
 };
 
 export const NftListItemUI = ({
@@ -137,7 +123,7 @@ export const NftListItemUI = ({
                   </p>
 
                   <p className="mt-1 text-lg text-green-300 font-semibold display-inline">
-                    <b>{formatEther(price)} ETH</b>
+                    <b>{price && formatEther(price)} ETH</b>
                   </p>
                 </div>
               </div>

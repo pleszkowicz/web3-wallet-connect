@@ -1,6 +1,7 @@
 'use client';
 import { createNftTokenUri } from '@/app/actions/createNftTokenUri';
 import { deleteNftTokenUri } from '@/app/actions/deleteNftTokenUri';
+import { validateImageUrl } from '@/app/actions/validateImageUrl';
 import { NFT_MARKET_CONTRACT_ABI } from '@/const/nft-marketplace-abi';
 import { NFT_MARKETPLACE_ADDRESS } from '@/const/nft-marketplace-address';
 import { useMounted } from '@/hooks/useMounted';
@@ -117,88 +118,74 @@ export function CreateNFT() {
         onSubmit={handlesubmit}
         validationSchema={validationSchema}
       >
-        {({ isSubmitting, values }) => (
-          <div className="flex flex-col md:flex-row-reverse w-full gap-4">
-            <div className="max-w-full md:max-w-[240px] w-full opacity-90 relative">
-              <div className="absolute inset-0 z-10 cursor-default"></div>
+        {({ isSubmitting, values, isValidating, errors }) => {
+          const isImageLoading = values.image == '' || !isValidUrl(values.image) || !!errors['image'];
 
-              <NftListItemUI
-                tokenId={0n}
-                tokenDetailsError={null}
-                isLoading={!values.image || !isValidUrl(values.image)}
-                isLoadingTokenDetails={true}
-                tokenDetails={{
-                  image: isValidUrl(values.image) ? values.image : '',
-                  id: 'fake',
-                  description: values.description,
-                  createdAt: null,
-                  name: values.name,
-                }}
-                isOwned={true}
-                isSaleApproved={false}
-                price={1000000000000000n}
-              />
-            </div>
+          return (
+            <div className="flex flex-col md:flex-row-reverse w-full gap-4">
+              <div className="max-w-full md:max-w-[240px] w-full opacity-90 relative">
+                <div className="absolute inset-0 z-10 cursor-default"></div>
 
-            <Form className="flex flex-col gap-4 w-full" aria-disabled={isSubmitting || isTransactionPending}>
-              <Field as={Input} id="image" name="image" placeholder="NFT image URL" />
-              <ErrorMessage name="image" component="div" className="text-red-500" />
-              <Field as={Input} id="name" name="name" placeholder="Name" />
-              <ErrorMessage name="name" component="div" className="text-red-500" />
-              <Field as={Input} id="description" name="description" placeholder="Description" />
-              <ErrorMessage name="description" component="div" className="text-red-500" />
-
-              <div>
-                <p className="text-sm my-2 text-muted-foreground">
-                  NFT creation fee{' '}
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <InfoIcon className="inline-block" width={20} />
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>NFT listing price can be updated after creation</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </p>
-
-                <div className="flex items-center justify-start gap-2 bg-muted p-2 rounded-md">
-                  <span className="text-sm">
-                    <b>{listingPrice && formatEther(listingPrice)} ETH</b>
-                  </span>
-                </div>
+                <NftListItemUI
+                  tokenId={0n}
+                  tokenDetailsError={null}
+                  isLoading={isImageLoading}
+                  tokenDetails={{
+                    image: isValidUrl(values.image) ? values.image : '',
+                    id: 'fake',
+                    description: values.description,
+                    createdAt: null,
+                    name: values.name,
+                  }}
+                  isOwned={true}
+                  isSaleApproved={false}
+                  price={listingPrice}
+                />
               </div>
 
-              <Button
-                variant="default"
-                className="w-full"
-                type="submit"
-                disabled={isSubmitting || isTransactionPending}
-              >
-                Create
-              </Button>
-            </Form>
-          </div>
-        )}
+              <Form className="flex flex-col gap-4 w-full" aria-disabled={isSubmitting || isTransactionPending}>
+                <Field as={Input} id="image" name="image" placeholder="NFT image URL" />
+                <ErrorMessage name="image" component="div" className="text-red-500" />
+                <Field as={Input} id="name" name="name" placeholder="Name" />
+                <ErrorMessage name="name" component="div" className="text-red-500" />
+                <Field as={Input} id="description" name="description" placeholder="Description" />
+                <ErrorMessage name="description" component="div" className="text-red-500" />
+
+                <div>
+                  <p className="text-sm my-2 text-muted-foreground">
+                    NFT creation fee{' '}
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <InfoIcon className="inline-block" width={20} />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>NFT listing price can be updated after creation</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </p>
+
+                  <div className="flex items-center justify-start gap-2 bg-muted p-2 rounded-md">
+                    <span className="text-sm">
+                      <b>{listingPrice && formatEther(listingPrice)} ETH</b>
+                    </span>
+                  </div>
+                </div>
+
+                <Button
+                  variant="default"
+                  className="w-full"
+                  type="submit"
+                  disabled={isSubmitting || isTransactionPending}
+                >
+                  Create
+                </Button>
+              </Form>
+            </div>
+          );
+        }}
       </Formik>
     </CardLayout>
   );
-}
-
-async function validateImageUrl(url: string): Promise<{ valid: boolean; message?: string }> {
-  try {
-    const res = await fetch(url, { method: 'HEAD' });
-    const contentType = res.headers.get('content-type') || '';
-
-    if (!res.ok) {
-      return { valid: false, message: 'Image is unreachable' };
-    }
-    if (!contentType.startsWith('image/')) {
-      return { valid: false, message: 'URL must point to the image' };
-    }
-    return { valid: true };
-  } catch (error) {
-    return { valid: false, message: 'Invalid or blocked URL' };
-  }
 }
 
 function isValidUrl(str: string): boolean {
