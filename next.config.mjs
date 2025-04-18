@@ -1,3 +1,5 @@
+import { PrismaPlugin } from '@prisma/nextjs-monorepo-workaround-plugin';
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
@@ -9,10 +11,14 @@ const nextConfig = {
       },
     ],
   },
-  experimental: {
-    serverPlugins: {
-      serverPlugins: ['@prisma/nextjs-monorepo-workaround-plugin'],
-    },
+  webpack: (config, { isServer }) => {
+    // This is a workaround to avoid this Prisma issue on Vercel
+    // https://github.com/prisma/prisma/discussions/19499
+    if (isServer) {
+      config.plugins = [...config.plugins, new PrismaPlugin()];
+    }
+
+    return config;
   },
 };
 
