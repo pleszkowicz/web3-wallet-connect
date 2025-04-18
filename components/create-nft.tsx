@@ -10,6 +10,7 @@ import { NftMeta } from '@/types/NFT';
 import { ErrorMessage, Field, Form, Formik } from 'formik';
 import { InfoIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import invariant from 'tiny-invariant';
 import { formatEther } from 'viem';
 import { useReadContract, useWriteContract } from 'wagmi';
@@ -29,22 +30,27 @@ export function CreateNFT() {
     abi: NFT_MARKET_CONTRACT_ABI,
     functionName: 'listingPrice',
   });
+
+  const [imageState, setImageState] = useState({ image: '', isValid: false });
+
   const { writeContract, isPending: isTransactionPending } = useWriteContract();
   const validationSchema: Yup.ObjectSchema<Pick<NftMeta, 'name' | 'description' | 'image'>> = Yup.object().shape({
     name: Yup.string().required('Name is required'),
     description: Yup.string().required('Description is required'),
-    image: Yup.string()
-      .url('Must be a valid URL')
-      .required('Image URL is required')
-      .test('is-image', 'URL must point to an image', async (url) => {
-        if (!url) {
-          return false;
-        }
+    image: Yup.lazy((value: unknown) =>
+      Yup.string()
+        .required('Image URL is required')
+        .url('Must be a valid URL')
+        .test('is-image', 'URL must point to an image', async function (currentImage: string | undefined) {
+          if (!currentImage || currentImage === imageState.image) {
+            return true;
+          }
 
-        const { valid } = await validateImageUrl(url);
-
-        return valid;
-      }),
+          const { valid } = await validateImageUrl(currentImage);
+          setImageState({ image: currentImage, isValid: valid });
+          return valid;
+        })
+    ),
   });
   const mounted = useMounted();
 
