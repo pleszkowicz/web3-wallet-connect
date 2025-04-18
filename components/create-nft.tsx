@@ -20,6 +20,7 @@ import { NftListItemUI } from './nft-list-item';
 import { Button } from './ui/button';
 import { useToast } from './ui/hooks/use-toast';
 import { Input } from './ui/input';
+import { Label } from './ui/label';
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 
 export function CreateNFT() {
@@ -31,7 +32,8 @@ export function CreateNFT() {
     functionName: 'listingPrice',
   });
 
-  const [imageState, setImageState] = useState({ image: '', isValid: false });
+  // Local image state to avoid unnecessary computations when any of the form fields change
+  const [imageUrl, setImageUrl] = useState('');
 
   const { writeContract, isPending: isTransactionPending } = useWriteContract();
   const validationSchema: Yup.ObjectSchema<Pick<NftMeta, 'name' | 'description' | 'image'>> = Yup.object().shape({
@@ -42,23 +44,24 @@ export function CreateNFT() {
         .required('Image URL is required')
         .url('Must be a valid URL')
         .test('is-image', 'URL must point to an image', async function (currentImage: string | undefined) {
-          if (!currentImage || currentImage === imageState.image) {
+          // TODO: apply debounce
+          if (!currentImage || currentImage === imageUrl) {
             return true;
           }
-
           const { valid } = await validateImageUrl(currentImage);
-          setImageState({ image: currentImage, isValid: valid });
+          setImageUrl(currentImage);
           return valid;
         })
     ),
   });
+
   const mounted = useMounted();
 
   if (!mounted) {
     return null;
   }
 
-  const handlesubmit = async ({ name, description, image }: Prisma.NftCreateInput) => {
+  const handleSubmit = async ({ name, description, image }: Prisma.NftCreateInput) => {
     // we need token URI record  before confirming transaction
     // in case of failure, delete it in catch
     let nftUriId: NftMeta['id'] | undefined;
@@ -95,7 +98,10 @@ export function CreateNFT() {
             console.log('NFT created successfully');
             console.log('data', data);
 
-            toast({ title: 'NFT successfully created!' });
+            toast({
+              title: 'NFT created successfully!',
+              description: 'It will appear shortly after being confirmed on the blockchain.',
+            });
             router.push('/dashboard');
           },
           onError: (error) => {
@@ -121,15 +127,15 @@ export function CreateNFT() {
 
       <Formik<Prisma.NftCreateInput>
         initialValues={{ name: '', description: '', image: '' }}
-        onSubmit={handlesubmit}
+        onSubmit={handleSubmit}
         validationSchema={validationSchema}
       >
-        {({ isSubmitting, values, isValidating, errors }) => {
+        {({ isSubmitting, values, isValid, errors }) => {
           const isImageLoading = values.image == '' || !isValidUrl(values.image) || !!errors['image'];
 
           return (
-            <div className="flex flex-col md:flex-row-reverse w-full gap-4">
-              <div className="max-w-full md:max-w-[240px] w-full opacity-90 relative">
+            <div className="flex flex-col md:flex-row-reverse w-full gap-4 items-center border rounded-lg p-4">
+              <div className="flex-1 opacity-90 relative">
                 <div className="absolute inset-0 z-10 cursor-default"></div>
 
                 <NftListItemUI
@@ -149,13 +155,24 @@ export function CreateNFT() {
                 />
               </div>
 
-              <Form className="flex flex-col gap-4 w-full" aria-disabled={isSubmitting || isTransactionPending}>
-                <Field as={Input} id="image" name="image" placeholder="NFT image URL" />
-                <ErrorMessage name="image" component="div" className="text-red-500" />
-                <Field as={Input} id="name" name="name" placeholder="Name" />
-                <ErrorMessage name="name" component="div" className="text-red-500" />
-                <Field as={Input} id="description" name="description" placeholder="Description" />
-                <ErrorMessage name="description" component="div" className="text-red-500" />
+              <Form className="flex flex-col gap-4 w-1/2" aria-disabled={isSubmitting || isTransactionPending}>
+                <div>
+                  <Label htmlFor="image">NFT image URL</Label>
+                  <Field as={Input} id="image" name="image" placeholder="https://.." />
+                  <ErrorMessage name="image" component="div" className="text-red-500" />
+                </div>
+
+                <div>
+                  <Label htmlFor="image">Name</Label>
+                  <Field as={Input} id="name" name="name" placeholder="" />
+                  <ErrorMessage name="name" component="div" className="text-red-500" />
+                </div>
+
+                <div>
+                  <Label htmlFor="description">Description</Label>
+                  <Field as={Input} id="description" name="description" placeholder="" />
+                  <ErrorMessage name="description" component="div" className="text-red-500" />
+                </div>
 
                 <div>
                   <p className="text-sm my-2 text-muted-foreground">
@@ -181,7 +198,7 @@ export function CreateNFT() {
                   variant="default"
                   className="w-full"
                   type="submit"
-                  disabled={isSubmitting || isTransactionPending}
+                  disabled={isSubmitting || isTransactionPending || !isValid}
                 >
                   Create
                 </Button>

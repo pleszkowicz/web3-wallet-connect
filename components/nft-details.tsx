@@ -123,6 +123,7 @@ const NftItem = ({ tokenId, owner, price }: NftItemProps) => {
           toast({
             title: 'Approval change failed',
             description: 'Please try again later.',
+            variant: 'destructive',
           });
         },
       }
@@ -149,6 +150,7 @@ const NftItem = ({ tokenId, owner, price }: NftItemProps) => {
           toast({
             title: 'Purchase failed',
             description: 'Please try again later.',
+            variant: 'destructive',
           });
         },
       }
@@ -264,6 +266,7 @@ const NftPrice = ({ tokenId, price, isOwned }: NftPriceProps) => {
                   toast({
                     title: 'Price update failed',
                     description: 'Please try again later.',
+                    variant: 'destructive',
                   });
                 },
               }
