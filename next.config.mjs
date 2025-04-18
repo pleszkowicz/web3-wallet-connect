@@ -9,6 +9,11 @@ const nextConfig = {
       },
     ],
   },
+  experimental: {
+    serverPlugins: {
+      serverPlugins: ['@prisma/nextjs-monorepo-workaround-plugin'],
+    },
+  },
 };
 
 export default nextConfig;
