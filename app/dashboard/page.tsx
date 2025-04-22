@@ -1,5 +1,6 @@
 'use client';
 import { Dashboard } from '@/components/dashboard';
+import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { useMounted } from '@/hooks/useMounted';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
@@ -16,7 +17,11 @@ function DashboardPage() {
     }
   });
 
-  return <Dashboard />;
+  return (
+    <ProtectedRoute>
+      <Dashboard />
+    </ProtectedRoute>
+  );
 }
 
 export default DashboardPage;

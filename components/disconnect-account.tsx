@@ -1,7 +1,8 @@
 'use client';
-import { useDisconnect } from 'wagmi';
 import { Button } from '@/components/ui/button';
 import { PowerOff } from 'lucide-react';
+import { useDisconnect } from 'wagmi';
+import { useToast } from './ui/hooks/use-toast';
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 
 type DisconnectAccountTypes = {
@@ -9,12 +10,22 @@ type DisconnectAccountTypes = {
 };
 
 export const DisconnectAccount = ({ className }: DisconnectAccountTypes) => {
-  const { disconnect } = useDisconnect();
+  const { disconnectAsync: disconnect } = useDisconnect();
+  const { toast } = useToast();
+
+  async function handleDisconnect() {
+    try {
+      await disconnect();
+    } catch (error) {
+      console.error('Wallet disconnection failed', error);
+      toast({ title: 'Wallet disconnection failed', description: 'Please try again later.', variant: 'destructive' });
+    }
+  }
 
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <Button className={className} onClick={() => disconnect()} variant="ghost">
+        <Button className={className} onClick={handleDisconnect} variant="ghost">
           <PowerOff width={20} />
         </Button>
       </TooltipTrigger>

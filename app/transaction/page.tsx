@@ -1,8 +1,11 @@
 'use client';
-import { Transfer } from "@/components/transfer";
+import { ProtectedRoute } from '@/components/ProtectedRoute';
+import { Transfer } from '@/components/transfer';
 
 export default function TransactionPage() {
   return (
-    <Transfer />
-  )
+    <ProtectedRoute>
+      <Transfer />
+    </ProtectedRoute>
+  );
 }
