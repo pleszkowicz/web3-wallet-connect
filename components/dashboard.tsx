@@ -1,8 +1,8 @@
 'use client';
-import TransactionHistory from '@/components/transaction-history';
+import TransactionHistory from '@/components/TransactionHistory';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import WalletBalanceItem from '@/components/wallet-balance-item';
+import WalletBalanceItem from '@/components/WalletBalanceItem';
 import { SEPOLIA_LINK_CONTRACT_ADDRESS, SEPOLIA_LINK_TOKEN_ABI } from '@/const/sepolia';
 import { ImagePlusIcon, LucideIcon, Plus, SendIcon } from 'lucide-react';
 import Link from 'next/link';
@@ -11,8 +11,8 @@ import invariant from 'tiny-invariant';
 import { formatEther } from 'viem';
 import { useAccount, useBalance, useConnect, useReadContract } from 'wagmi';
 import { sepolia } from 'wagmi/chains';
-import { CardLayout } from './card-layout';
-import { NftList } from './nft-list';
+import { CardLayout } from './CardLayout';
+import { NftList } from './NftList';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 
 export function Dashboard() {

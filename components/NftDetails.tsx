@@ -12,7 +12,7 @@ import invariant from 'tiny-invariant';
 import { formatEther, parseEther } from 'viem';
 import { useAccount, useReadContract, useTransactionCount, useWriteContract } from 'wagmi';
 import * as Yup from 'yup';
-import { NftStatusHelper } from './nft-status-helper';
+import { NftStatusHelper } from './NftStatusHelper';
 import { Button } from './ui/button';
 import {
   Dialog,

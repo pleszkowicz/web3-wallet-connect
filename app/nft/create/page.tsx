@@ -1,5 +1,5 @@
 'use client';
-import { CreateNFT } from '@/components/create-nft';
+import { CreateNFT } from '@/components/CreateNft';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 
 export default function TransactionPage() {

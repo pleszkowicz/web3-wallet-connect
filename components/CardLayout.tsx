@@ -1,5 +1,5 @@
 'use client';
-import NetworkSwitch from '@/components/network-switch';
+import NetworkSwitch from '@/components/NetworkSwitch';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useMounted } from '@/hooks/useMounted';
 import { OpenInNewWindowIcon } from '@radix-ui/react-icons';
@@ -7,7 +7,7 @@ import { ArrowLeftIcon, CopyIcon } from 'lucide-react';
 import Link from 'next/link';
 import { ReactElement, ReactNode } from 'react';
 import { useAccount, useEnsName } from 'wagmi';
-import { DisconnectAccount } from './disconnect-account';
+import { DisconnectAccount } from './DisconnectAccount';
 import { Button } from './ui/button';
 import { useToast } from './ui/hooks/use-toast';
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';

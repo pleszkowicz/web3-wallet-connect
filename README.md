@@ -49,7 +49,7 @@ Once the application is running, depending on available web3 wallets, you should
 
 ### Wallet Dashboard
 
-After connecting your web wallet, you can view your balance, mint, trade NFTs, check transaction history, and more...
+After connecting your [wallet](https://github.com/ethereumbook/ethereumbook/blob/develop/05wallets.asciidoc), you can view your balance, mint, trade NFTs, check transaction history, and more...
 
 ![balance](https://github.com/pleszkowicz/web3-wallet-connect/blob/main/public/images/balance.png?raw=true)
 

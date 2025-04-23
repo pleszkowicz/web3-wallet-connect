@@ -9,7 +9,7 @@ import { useState } from 'react';
 import { Address, formatEther, isAddress, parseEther } from 'viem';
 import { useAccount, useBalance, useGasPrice, useReadContract, useSendTransaction, useWriteContract } from 'wagmi';
 import * as Yup from 'yup';
-import { CardLayout } from './card-layout';
+import { CardLayout } from './CardLayout';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 
 type Crypto = {

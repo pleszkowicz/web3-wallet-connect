@@ -1,5 +1,5 @@
 'use client';
-import { CardLayout } from '@/components/card-layout';
+import { CardLayout } from '@/components/CardLayout';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 
 export default function TransactionPage() {

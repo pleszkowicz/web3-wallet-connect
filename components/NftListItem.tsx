@@ -9,7 +9,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { formatEther } from 'viem';
 import { useAccount, useReadContract } from 'wagmi';
-import { NftStatusHelper } from './nft-status-helper';
+import { NftStatusHelper } from './NftStatusHelper';
 
 export const NftListItem = ({ tokenId, price, owner }: Nft) => {
   const { data: tokenURI, isLoading } = useReadContract({
