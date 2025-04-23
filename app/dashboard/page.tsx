@@ -1,5 +1,5 @@
 'use client';
-import { Dashboard } from '@/components/dashboard';
+import { Dashboard } from '@/components/Dashboard';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { useMounted } from '@/hooks/useMounted';
 import { useRouter } from 'next/navigation';
