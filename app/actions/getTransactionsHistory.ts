@@ -17,7 +17,7 @@ export async function getTransactionsHistory({ address, chainId }: GetTransactio
     invariant(address, '`address` is required');
 
     const currentChain = config.chains.find((chain) => chainId === chain.id)
-    const apiUrl = chainTransportsURLMap[Number(chainId) as keyof typeof chainTransportsURLMap];
+    const apiUrl = chainTransportsURLMap[Number(chainId) as keyof typeof chainTransportsURLMap].http;
 
     if (apiUrl) {
         const body = {

@@ -32,6 +32,7 @@ const TransactionHistory = () => {
     return <Loader>Loading transactions...</Loader>;
   }
 
+  console.log('error', error);
   if (error) {
     return (
       <p className="text-red-500">Fetching transactions failed: Please check your connection or try again later.</p>
