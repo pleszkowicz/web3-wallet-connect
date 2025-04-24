@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { SEPOLIA_LINK_CONTRACT_ADDRESS, SEPOLIA_LINK_TOKEN_ABI } from '@/const/sepolia';
+import { cn } from '@/lib/cn';
 import { ErrorMessage, Field, Form, Formik, useFormikContext } from 'formik';
 import { RefreshCwIcon } from 'lucide-react';
 import { useState } from 'react';
@@ -36,7 +37,7 @@ export function Transfer() {
   const [selectedUnit, setSelectedUnit] = useState(CryptoMap.ETH);
   const { address } = useAccount();
   const { data: ethBalance } = useBalance({ address });
-  const { sendTransaction } = useSendTransaction();
+  const { sendTransaction, isPending: isTransactionPending } = useSendTransaction();
 
   const { data: linkBalance } = useReadContract({
     address: SEPOLIA_LINK_CONTRACT_ADDRESS,
@@ -45,7 +46,7 @@ export function Transfer() {
     args: [address!],
   });
 
-  const { writeContract } = useWriteContract();
+  const { writeContract, isPending: isWriteContractPending } = useWriteContract();
   const { data: gasPrice, isFetching: isGasPriceFetching, refetch: refetchGasPrice } = useGasPrice();
 
   const currentBalance = (selectedUnit === CryptoMap.ETH ? ethBalance?.value : (linkBalance as bigint)) ?? 0;
@@ -125,26 +126,28 @@ export function Transfer() {
             <Field as={Input} id="value" name="value" placeholder="0.00" />
             <ErrorMessage name="value" component="div" className="text-red-500" />
           </div>
-          <div className={`space-y-2 ${isGasPriceFetching ? 'animate-pulse disabled' : ''}`}>
+          <div className={cn('space-y-2', isGasPriceFetching ? 'animate-pulse disabled' : '')}>
             <Label>Estimated Gas Fee</Label>
             <div className="flex items-center justify-start gap-2 bg-muted p-2 rounded-md">
               <span className="text-sm">{gasPrice ? `${formatEther(gasPrice, 'gwei')} Gwei` : 'Loading...'}</span>{' '}
               {gasPrice ? <span className="text-xs">({formatEther(gasPrice, 'wei')} ETH)</span> : null}
               <Button
+                type="button"
                 variant="link"
                 size="sm"
-                onClick={(e) => {
-                  e.preventDefault();
-                  if (!isGasPriceFetching) {
-                    refetchGasPrice();
-                  }
-                }}
+                disabled={isGasPriceFetching}
+                onClick={() => !isGasPriceFetching && refetchGasPrice()}
               >
-                <RefreshCwIcon className="w-4 h-4 mr-2 spin-in-180 hover:animate-spin" />
+                <RefreshCwIcon className={cn('w-4 h-4 mr-2', isGasPriceFetching ? 'animate-spin' : '')} />
               </Button>
             </div>
           </div>
-          <Button variant="default" className="w-full" type="submit">
+          <Button
+            disabled={isTransactionPending || isWriteContractPending}
+            variant="default"
+            className="w-full"
+            type="submit"
+          >
             Transfer
           </Button>
         </Form>
