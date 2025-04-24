@@ -33,7 +33,7 @@ const CryptoMap: Record<CryptoMapKey, Crypto> = {
 
 const cryptos = Object.values(CryptoMap);
 
-export function Transfer() {
+export function TransferForm() {
   const [selectedUnit, setSelectedUnit] = useState(CryptoMap.ETH);
   const { address } = useAccount();
   const { data: ethBalance } = useBalance({ address });

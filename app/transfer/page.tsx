@@ -1,11 +1,11 @@
 'use client';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
-import { Transfer } from '@/components/Transfer';
+import { TransferForm } from '@/components/TransferForm';
 
 export default function TransactionPage() {
   return (
     <ProtectedRoute>
-      <Transfer />
+      <TransferForm />
     </ProtectedRoute>
   );
 }

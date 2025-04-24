@@ -15,7 +15,7 @@ import { CardLayout } from './CardLayout';
 import { NftList } from './NftList';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 
-export function Dashboard() {
+export function WalletDashboard() {
   const { address, isConnected, chain } = useAccount();
   const { data: balance, isLoading: isBalanceLoading } = useBalance({ address });
 
@@ -38,7 +38,7 @@ export function Dashboard() {
         headerContent={
           <p className="flex flex-row gap-6 justify-center pt-3">
             <ActionLink href="/nft/create" text="Create NFT" Icon={ImagePlusIcon} />
-            <ActionLink href="/transaction" text="Send" Icon={SendIcon} />
+            <ActionLink href="/transfer" text="Send" Icon={SendIcon} />
           </p>
         }
       >
@@ -69,7 +69,7 @@ export function Dashboard() {
           <TabsContent value="transactions">
             <TransactionHistory key={chain?.id} />
             <Button asChild variant="default" className="w-full mt-5 mb-5">
-              <Link href="/transaction">
+              <Link href="/transfer">
                 <Plus /> New transaction
               </Link>
             </Button>

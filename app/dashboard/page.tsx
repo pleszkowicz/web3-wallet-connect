@@ -1,6 +1,6 @@
 'use client';
-import { Dashboard } from '@/components/Dashboard';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
+import { WalletDashboard } from '@/components/WalletDashboard';
 import { useMounted } from '@/hooks/useMounted';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
@@ -19,7 +19,7 @@ function DashboardPage() {
 
   return (
     <ProtectedRoute>
-      <Dashboard />
+      <WalletDashboard />
     </ProtectedRoute>
   );
 }
