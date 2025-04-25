@@ -11,7 +11,7 @@ export const chainTransportsURLMap = {
     http: `https://eth-sepolia.g.alchemy.com/v2/${ALCHEMY_API_KEY}`,
   },
   [mainnet.id]: {
-    webSocket: `wss://eth-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`,
+    webSocket: `wss://eth-mainnet.g.alchemy.com/v2/P_GFW7qc_w2oYJmtO7PYYtdPwNESKN96`,
     http: `https://eth-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`,
   },
   [hardhat.id]: {
@@ -22,7 +22,7 @@ export const chainTransportsURLMap = {
 
 export const transports = {
   [sepolia.id]: webSocket(chainTransportsURLMap[sepolia.id].webSocket, { retryCount: 0 }),
-  [mainnet.id]: webSocket(chainTransportsURLMap[hardhat.id].webSocket, { retryCount: 0 }),
+  [mainnet.id]: webSocket(chainTransportsURLMap[mainnet.id].webSocket, { retryCount: 0 }),
   [hardhat.id]: webSocket(chainTransportsURLMap[hardhat.id].webSocket, { retryCount: 0 }),
 };
 
