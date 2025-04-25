@@ -10,7 +10,6 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { Connector, useAccount, useConnect } from 'wagmi';
-import { ActionState } from './ActionState';
 import { CardLayout } from './CardLayout';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './ui/accordion';
 import { DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
@@ -43,7 +42,6 @@ export function WalletConnect() {
 
   return (
     <CardLayout>
-      <ActionState />
       <div>
         <h1 className="text-center text-3xl font-bold md:text-4xl">Welcome to the NFT Marketplace!</h1>
         <p className="text-center text-lg text-gray-600">Mint. Trade. Discover. All in one place.</p>
