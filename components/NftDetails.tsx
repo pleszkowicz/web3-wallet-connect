@@ -118,7 +118,11 @@ const NftItem = ({ tokenId, owner, price }: NftItemProps) => {
           toast({ title: isSaleApproved ? 'NFT sell approval withdrawn!' : 'NFT approved to sell!' });
           setIsSaleApproved(!isSaleApproved);
         },
-        onError: (error: unknown) => {
+        onError: (error: Error) => {
+          if (error?.message.includes('User rejected the request')) {
+            return;
+          }
+
           console.log('error', error);
           toast({
             title: 'Approval change failed',

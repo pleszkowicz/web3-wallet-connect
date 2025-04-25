@@ -13,9 +13,9 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import invariant from 'tiny-invariant';
 import { formatEther } from 'viem';
-import { useReadContract, useWriteContract } from 'wagmi';
+import { usePublicClient, useReadContract, useWriteContract } from 'wagmi';
 import * as Yup from 'yup';
-import { CardLayout } from './CardLayout';
+import { ContentLayout } from './ContentLayout';
 import { NftListItemUI } from './NftListItem';
 import { Button } from './ui/button';
 import { useToast } from './ui/hooks/use-toast';
@@ -35,7 +35,8 @@ export function CreateNFT() {
   // Local image state to avoid unnecessary computations when any of the form fields change
   const [imageUrl, setImageUrl] = useState('');
 
-  const { writeContract, isPending: isTransactionPending } = useWriteContract();
+  const { writeContractAsync, isPending: isTransactionPending } = useWriteContract();
+  const client = usePublicClient();
   const validationSchema: Yup.ObjectSchema<Pick<NftMeta, 'name' | 'description' | 'image'>> = Yup.object().shape({
     name: Yup.string().required('Name is required'),
     description: Yup.string().required('Description is required'),
@@ -85,33 +86,24 @@ export function CreateNFT() {
 
       invariant(listingPrice, 'listingPrice is not defined');
 
-      writeContract(
-        {
-          address: NFT_MARKETPLACE_ADDRESS,
-          abi: NFT_MARKET_CONTRACT_ABI,
-          functionName: 'createNft',
-          args: [tokenURI, listingPrice],
-          value: listingPrice,
-        },
-        {
-          onSuccess: (data) => {
-            console.log('NFT created successfully');
-            console.log('data', data);
+      const txHash = await writeContractAsync({
+        address: NFT_MARKETPLACE_ADDRESS,
+        abi: NFT_MARKET_CONTRACT_ABI,
+        functionName: 'createNft',
+        args: [tokenURI, listingPrice],
+        value: listingPrice,
+      });
 
-            toast({
-              title: 'NFT created successfully!',
-              description: 'It will appear shortly after being confirmed on the blockchain.',
-            });
-            router.push('/dashboard');
-          },
-          onError: (error) => {
-            console.log('Failure during write contract', error);
-            if (nftUriId) {
-              deleteNftTokenUri({ id: nftUriId });
-            }
-          },
-        }
-      );
+      toast({
+        title: 'NFT created',
+        description: 'Waiting for confirmation on the blockchain.',
+      });
+
+      await client?.waitForTransactionReceipt({ hash: txHash });
+
+      toast({ title: 'NFT confirmed on the blockchain!' });
+
+      router.push('/dashboard');
     } catch (error) {
       if (nftUriId) {
         deleteNftTokenUri({ id: nftUriId });
@@ -122,7 +114,7 @@ export function CreateNFT() {
   };
 
   return (
-    <CardLayout title="Create NFT" showBackButton>
+    <ContentLayout title="Create NFT" showBackButton>
       <h2 className="text-center">Mint your own NFT</h2>
 
       <Formik<Prisma.NftCreateInput>
@@ -207,7 +199,7 @@ export function CreateNFT() {
           );
         }}
       </Formik>
-    </CardLayout>
+    </ContentLayout>
   );
 }
 

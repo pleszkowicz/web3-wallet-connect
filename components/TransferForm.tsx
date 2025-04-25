@@ -10,7 +10,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Address, formatEther, isAddress, parseEther } from 'viem';
 import { useAccount, useBalance, usePublicClient, useReadContract, useSendTransaction, useWriteContract } from 'wagmi';
 import * as Yup from 'yup';
-import { CardLayout } from './CardLayout';
+import { ContentLayout } from './ContentLayout';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 
 type Crypto = {
@@ -95,7 +95,7 @@ export function TransferForm() {
   });
 
   return (
-    <CardLayout title="Crypto Transfer" description="Transfer your crypto to another address" showBackButton>
+    <ContentLayout title="Crypto Transfer" description="Transfer your crypto to another address" showBackButton>
       <Formik
         initialValues={{ unit: CryptoMap.ETH.value, from: address, to: '', value: 0 }}
         onSubmit={(values) => {
@@ -184,7 +184,7 @@ export function TransferForm() {
           );
         }}
       </Formik>
-    </CardLayout>
+    </ContentLayout>
   );
 }
 

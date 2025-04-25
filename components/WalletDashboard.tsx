@@ -11,7 +11,7 @@ import invariant from 'tiny-invariant';
 import { formatEther } from 'viem';
 import { useAccount, useBalance, useConnect, useReadContract } from 'wagmi';
 import { sepolia } from 'wagmi/chains';
-import { CardLayout } from './CardLayout';
+import { ContentLayout } from './ContentLayout';
 import { NftList } from './NftList';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 
@@ -29,72 +29,53 @@ export function WalletDashboard() {
     });
   }, [connectors]);
 
-  if (isConnected) {
-    const formattedBalance = balance && `${parseFloat(formatEther(balance.value)).toFixed(4)} ${balance.symbol}`;
-
-    return (
-      <CardLayout
-        title="Wallet Dashboard"
-        headerContent={
-          <p className="flex flex-row gap-6 justify-center pt-3">
-            <ActionLink href="/nft/create" text="Create NFT" Icon={ImagePlusIcon} />
-            <ActionLink href="/transfer" text="Send" Icon={SendIcon} />
-          </p>
-        }
-      >
-        <WalletBalanceItem
-          address={address}
-          balance={formattedBalance}
-          isLoading={isBalanceLoading}
-          symbol={balance?.symbol}
-          name="Ethereum"
-        />
-        {chain?.id === sepolia.id && <SepoliaLinkBalance />}
-
-        <Separator />
-
-        <Tabs defaultValue="nfts" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-4">
-            <TabsTrigger value="nfts">NFTs</TabsTrigger>
-            <TabsTrigger value="transactions">Transactions</TabsTrigger>
-          </TabsList>
-          <TabsContent value="nfts">
-            <NftList />
-            <Button asChild variant="default" className="w-full mt-5">
-              <Link href="/nft/create">
-                <Plus /> Mint new NFT
-              </Link>
-            </Button>
-          </TabsContent>
-          <TabsContent value="transactions">
-            <TransactionHistory key={chain?.id} />
-            <Button asChild variant="default" className="w-full mt-5 mb-5">
-              <Link href="/transfer">
-                <Plus /> New transaction
-              </Link>
-            </Button>
-          </TabsContent>
-        </Tabs>
-        <Separator />
-      </CardLayout>
-    );
-  }
+  const formattedBalance = balance && `${parseFloat(formatEther(balance.value)).toFixed(4)} ${balance.symbol}`;
 
   return (
-    <CardLayout title="Connect Wallet">
-      <div className="grid gap-4">
-        {connectors.map((connector) => (
-          <Button
-            key={connector.id}
-            onClick={() => connect({ connector })}
-            disabled={!ready[connector.id]}
-            variant="outline"
-          >
-            {connector.name}
+    <ContentLayout
+      title="Wallet Dashboard"
+      headerContent={
+        <p className="flex flex-row gap-6 justify-center pt-3">
+          <ActionLink href="/nft/create" text="Create NFT" Icon={ImagePlusIcon} />
+          <ActionLink href="/transfer" text="Send" Icon={SendIcon} />
+        </p>
+      }
+    >
+      <WalletBalanceItem
+        address={address}
+        balance={formattedBalance}
+        isLoading={isBalanceLoading}
+        symbol={balance?.symbol}
+        name="Ethereum"
+      />
+      {chain?.id === sepolia.id && <SepoliaLinkBalance />}
+
+      <Separator />
+
+      <Tabs defaultValue="nfts" className="w-full">
+        <TabsList className="grid w-full grid-cols-2 mb-4">
+          <TabsTrigger value="nfts">NFTs</TabsTrigger>
+          <TabsTrigger value="transactions">Transactions</TabsTrigger>
+        </TabsList>
+        <TabsContent value="nfts">
+          <NftList />
+          <Button asChild variant="default" className="w-full mt-5">
+            <Link href="/nft/create">
+              <Plus /> Mint new NFT
+            </Link>
           </Button>
-        ))}
-      </div>
-    </CardLayout>
+        </TabsContent>
+        <TabsContent value="transactions">
+          <TransactionHistory key={chain?.id} />
+          <Button asChild variant="default" className="w-full mt-5 mb-5">
+            <Link href="/transfer">
+              <Plus /> New transaction
+            </Link>
+          </Button>
+        </TabsContent>
+      </Tabs>
+      <Separator />
+    </ContentLayout>
   );
 }
 

@@ -1,30 +1,30 @@
-"use client"
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { ArrowRightIcon, RefreshCwIcon } from "lucide-react"
+'use client';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ArrowRightIcon, RefreshCwIcon } from 'lucide-react';
+import { useState } from 'react';
 
 const cryptos = [
-  { value: "btc", label: "Bitcoin (BTC)" },
-  { value: "eth", label: "Ethereum (ETH)" },
-  { value: "bnb", label: "Binance Coin (BNB)" },
-  { value: "sol", label: "Solana (SOL)" },
-  { value: "ada", label: "Cardano (ADA)" },
-]
+  { value: 'btc', label: 'Bitcoin (BTC)' },
+  { value: 'eth', label: 'Ethereum (ETH)' },
+  { value: 'bnb', label: 'Binance Coin (BNB)' },
+  { value: 'sol', label: 'Solana (SOL)' },
+  { value: 'ada', label: 'Cardano (ADA)' },
+];
 
 export function CryptoExchange() {
-  const [fromCrypto, setFromCrypto] = useState("")
-  const [toCrypto, setToCrypto] = useState("")
-  const [amount, setAmount] = useState("")
-  const [gasFee, setGasFee] = useState("0.0025") // Simulated gas fee
+  const [fromCrypto, setFromCrypto] = useState('');
+  const [toCrypto, setToCrypto] = useState('');
+  const [amount, setAmount] = useState('');
+  const [gasFee, setGasFee] = useState('0.0025'); // Simulated gas fee
 
   const handleExchange = () => {
     // Here you would implement the actual exchange logic
-    console.log(`Exchanging ${amount} ${fromCrypto} to ${toCrypto}`)
-  }
+    console.log(`Exchanging ${amount} ${fromCrypto} to ${toCrypto}`);
+  };
 
   return (
     <Card className="w-full max-w-md mx-auto">
@@ -50,12 +50,7 @@ export function CryptoExchange() {
         </div>
         <div className="space-y-2">
           <Label htmlFor="amount">Amount</Label>
-          <Input
-            id="amount"
-            placeholder="0.00"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-          />
+          <Input id="amount" placeholder="0.00" value={amount} onChange={(e) => setAmount(e.target.value)} />
         </div>
         <div className="flex justify-center">
           <ArrowRightIcon className="text-muted-foreground" />
@@ -92,5 +87,5 @@ export function CryptoExchange() {
         </Button>
       </CardFooter>
     </Card>
-  )
+  );
 }

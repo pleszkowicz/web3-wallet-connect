@@ -20,7 +20,7 @@ interface CardLayoutProps {
   children: ReactNode;
 }
 
-export const CardLayout = ({ title, description, headerContent, showBackButton, children }: CardLayoutProps) => {
+export const ContentLayout = ({ title, description, headerContent, showBackButton, children }: CardLayoutProps) => {
   const { toast } = useToast();
   const { address, chain: currentChain, isConnected } = useAccount();
   const { data: ensName } = useEnsName({ address });
