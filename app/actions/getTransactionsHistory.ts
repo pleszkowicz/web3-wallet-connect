@@ -18,7 +18,6 @@ export async function getTransactionsHistory({ address, chainId }: GetTransactio
     const currentChain = config.chains.find((chain) => chainId === chain.id)
     const apiUrl = chainTransportsURLMap[Number(chainId) as keyof typeof chainTransportsURLMap].http;
 
-    console.log('apiUrl', apiUrl)
     if (apiUrl) {
         const body = {
             jsonrpc: "2.0",
