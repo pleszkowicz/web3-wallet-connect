@@ -1,3 +1,4 @@
+import { AuthManager } from '@/components/AuthManager';
 import { Toaster } from '@/components/ui/toaster';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import WagmiProviderWrapper from '@/context/WagmiProviderWrapper';
@@ -34,7 +35,9 @@ export default function RootLayout({
       >
         <StrictMode>
           <WagmiProviderWrapper>
-            <TooltipProvider>{children}</TooltipProvider>
+            <TooltipProvider>
+              <AuthManager>{children}</AuthManager>
+            </TooltipProvider>
           </WagmiProviderWrapper>
           <Toaster />
         </StrictMode>
