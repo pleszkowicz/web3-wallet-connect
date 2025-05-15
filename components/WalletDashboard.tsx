@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import WalletBalanceItem from '@/components/WalletBalanceItem';
 import { SEPOLIA_LINK_CONTRACT_ADDRESS, SEPOLIA_LINK_TOKEN_ABI } from '@/const/sepolia';
-import { ImagePlusIcon, LucideIcon, Plus, SendIcon } from 'lucide-react';
+import { ImagePlusIcon, LucideIcon, Plus, ReplaceIcon, SendIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import invariant from 'tiny-invariant';
@@ -38,6 +38,7 @@ export function WalletDashboard() {
         <p className="flex flex-row gap-6 justify-center pt-3">
           <ActionLink href="/nft/create" text="Create NFT" Icon={ImagePlusIcon} />
           <ActionLink href="/transfer" text="Send" Icon={SendIcon} />
+          <ActionLink href="/exchange" text="Swap" Icon={ReplaceIcon} />
         </p>
       }
     >

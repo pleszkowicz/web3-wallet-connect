@@ -32,8 +32,8 @@ const TransactionHistory = () => {
     return <Loader>Loading transactions...</Loader>;
   }
 
-  console.log('error', error);
   if (error) {
+    console.log('error', error);
     return (
       <p className="text-red-500">Fetching transactions failed: Please check your connection or try again later.</p>
     );
@@ -82,7 +82,7 @@ const TransactionHistory = () => {
                 </td>
                 <td className="py-2 px-4 border-b">{new Date(tx.metadata.blockTimestamp).toLocaleString()}</td>
                 <td className="py-2 px-4 border-b text-right whitespace-nowrap">
-                  {tx.to && !!(Number(tx.value) > 0) && (tx.to === address ? '+' : '-')}
+                  {tx.to && !!(Number(tx.value) > 0) && (tx.to.toLowerCase() === address?.toLowerCase() ? '+' : '-')}
                   {tx.asset?.toLocaleLowerCase() === 'eth'
                     ? tx.value &&
                       formatEther(

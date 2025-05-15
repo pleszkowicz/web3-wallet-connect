@@ -91,7 +91,7 @@ const NftItem = ({ tokenId, owner, price }: NftItemProps) => {
 
   const router = useRouter();
   const { address } = useAccount();
-  const { writeContract, isPending } = useWriteContract();
+  const { writeContractAsync, isPending } = useWriteContract();
   const { toast } = useToast();
   const { data: transactionCount } = useTransactionCount({ address });
 
@@ -105,7 +105,7 @@ const NftItem = ({ tokenId, owner, price }: NftItemProps) => {
   const toggleApprove = async () => {
     const addressToApprove = isSaleApproved ? ZERO_ADDRESS : NFT_MARKETPLACE_ADDRESS;
 
-    await writeContract(
+    await writeContractAsync(
       {
         address: NFT_MARKETPLACE_ADDRESS,
         abi: NFT_MARKET_CONTRACT_ABI,
@@ -135,7 +135,7 @@ const NftItem = ({ tokenId, owner, price }: NftItemProps) => {
   };
 
   const handleBuyNft = async () => {
-    await writeContract(
+    await writeContractAsync(
       {
         address: NFT_MARKETPLACE_ADDRESS,
         abi: NFT_MARKET_CONTRACT_ABI,
