@@ -22,8 +22,15 @@ Real-time blockchain communication via **web sockets** ensures smooth responsive
 
 ## 🌐 Supported Networks
 
-- **Sepolia Testnet**
+- **Base Sepolia Testnet**
 - **Localhost (Hardhat)** with detailed transaction history.
+
+## Faucet (free test tokens)
+
+In order to get free ETH tokens on Base Sepolia testnet, you can use:
+
+- [alchemy faucet](https://www.alchemy.com/faucets/)
+- [coinbse faucet](https://portal.cdp.coinbase.com/products/faucet?projectId=a5929976-e2b2-4b53-b168-d019482cc625)
 
 ## 🛠 Tech Stack
 
