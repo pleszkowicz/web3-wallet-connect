@@ -3,7 +3,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { PropsWithChildren, useEffect, useRef } from 'react';
 import { useAccount } from 'wagmi';
 
-export const ProtectedLayout = ({ children }: PropsWithChildren) => {
+export const AuthManager = ({ children }: PropsWithChildren) => {
   const { status } = useAccount();
   const router = useRouter();
 
