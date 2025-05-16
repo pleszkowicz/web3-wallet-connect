@@ -2,8 +2,8 @@
 import { createNftTokenUri } from '@/app/actions/createNftTokenUri';
 import { deleteNftTokenUri } from '@/app/actions/deleteNftTokenUri';
 import { validateImageUrl } from '@/app/actions/validateImageUrl';
-import { NFT_MARKET_CONTRACT_ABI } from '@/const/nft-marketplace-abi';
-import { NFT_MARKETPLACE_ADDRESS } from '@/const/nft-marketplace-address';
+import { NFT_MARKET_CONTRACT_ABI } from '@/const/nft-marketplace/nft-marketplace-abi';
+import { NFT_MARKETPLACE_ADDRESS } from '@/const/nft-marketplace/nft-marketplace-address';
 import { useMounted } from '@/hooks/useMounted';
 import { Prisma } from '@/lib/generated/prisma';
 import { NftMeta } from '@/types/NFT';

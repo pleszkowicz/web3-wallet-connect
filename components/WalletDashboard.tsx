@@ -3,7 +3,7 @@ import TransactionHistory from '@/components/TransactionHistory';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import WalletBalanceItem from '@/components/WalletBalanceItem';
-import { SEPOLIA_LINK_CONTRACT_ADDRESS, SEPOLIA_LINK_TOKEN_ABI } from '@/const/sepolia';
+import { tokenMap } from '@/const/tokens';
 import { ImagePlusIcon, LucideIcon, Plus, ReplaceIcon, SendIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
@@ -86,36 +86,23 @@ export default function SepoliaLinkBalance() {
   invariant(address, 'Address is required');
 
   const { data: balance, isLoading } = useReadContract({
-    address: SEPOLIA_LINK_CONTRACT_ADDRESS,
-    abi: SEPOLIA_LINK_TOKEN_ABI,
+    address: tokenMap.link.address,
+    abi: tokenMap.link.abi,
     functionName: 'balanceOf',
     args: [address],
   });
 
-  const { data: symbol } = useReadContract({
-    address: SEPOLIA_LINK_CONTRACT_ADDRESS,
-    abi: SEPOLIA_LINK_TOKEN_ABI,
-    functionName: 'symbol',
-  });
-
-  const { data: name } = useReadContract({
-    address: SEPOLIA_LINK_CONTRACT_ADDRESS,
-    abi: SEPOLIA_LINK_TOKEN_ABI,
-    functionName: 'name',
-  });
-
   // Convert balance from token decimals
   const formattedBalance = balance ? formatEther(balance) : 'N/A';
-  const formattedSymbol = String(symbol);
 
   return (
     <div>
       {isConnected ? (
         <WalletBalanceItem
           address={address}
-          balance={`${formattedBalance} ${formattedSymbol}`}
+          balance={`${formattedBalance} ${tokenMap.link.symbol}`}
           isLoading={isLoading}
-          name={name}
+          name={tokenMap.link.label}
         />
       ) : (
         <p>Please connect your wallet to Sepolia</p>

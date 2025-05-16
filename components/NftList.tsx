@@ -1,6 +1,6 @@
 'use client';
-import { NFT_MARKET_CONTRACT_ABI } from '@/const/nft-marketplace-abi';
-import { NFT_MARKETPLACE_ADDRESS } from '@/const/nft-marketplace-address';
+import { NFT_MARKET_CONTRACT_ABI } from '@/const/nft-marketplace/nft-marketplace-abi';
+import { NFT_MARKETPLACE_ADDRESS } from '@/const/nft-marketplace/nft-marketplace-address';
 import { Nft } from '@/types/NFT';
 import { useReadContract } from 'wagmi';
 import { NftListItem } from './NftListItem';

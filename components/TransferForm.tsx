@@ -2,12 +2,13 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { SEPOLIA_LINK_CONTRACT_ADDRESS, SEPOLIA_LINK_TOKEN_ABI } from '@/const/sepolia';
+import { BASE_SEPOLIA_LINK_TOKEN_ABI } from '@/const/abi/base-sepolia-link-token-abi';
+import { tokenMap } from '@/const/tokens';
 import { cn } from '@/lib/cn';
 import { ErrorMessage, Field, Form, Formik, useFormikContext } from 'formik';
 import { RefreshCwIcon } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
-import { Address, formatEther, isAddress, parseEther } from 'viem';
+import { Abi, Address, formatEther, isAddress, parseEther } from 'viem';
 import { useAccount, useBalance, usePublicClient, useReadContract, useSendTransaction, useWriteContract } from 'wagmi';
 import * as Yup from 'yup';
 import { ContentLayout } from './ContentLayout';
@@ -40,8 +41,8 @@ export function TransferForm() {
   const { sendTransaction, isPending: isTransactionPending } = useSendTransaction();
 
   const { data: linkBalance } = useReadContract({
-    address: SEPOLIA_LINK_CONTRACT_ADDRESS,
-    abi: SEPOLIA_LINK_TOKEN_ABI,
+    address: tokenMap.link.address,
+    abi: BASE_SEPOLIA_LINK_TOKEN_ABI,
     functionName: 'balanceOf',
     args: [address!],
   });
@@ -95,7 +96,7 @@ export function TransferForm() {
   });
 
   return (
-    <ContentLayout title="Crypto Transfer" description="Transfer your crypto to another address" showBackButton>
+    <ContentLayout title="Send" description="Transfer your crypto to another address" showBackButton>
       <Formik
         initialValues={{ unit: CryptoMap.ETH.value, from: address, to: '', value: 0 }}
         onSubmit={(values) => {
@@ -104,8 +105,8 @@ export function TransferForm() {
             return;
           } else {
             writeContract({
-              address: SEPOLIA_LINK_CONTRACT_ADDRESS,
-              abi: SEPOLIA_LINK_TOKEN_ABI,
+              address: tokenMap.link.address,
+              abi: tokenMap.link.abi as Abi,
               functionName: 'transfer',
               args: [
                 values.to as Address, // Recipient address

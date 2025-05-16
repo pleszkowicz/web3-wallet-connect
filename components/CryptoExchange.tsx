@@ -3,47 +3,15 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { BASE_SEPOLIA_SWAP_ROUTER_ABI } from '@/const/abis';
-import { UNISWAP_V3_QUOTER_ABI } from '@/const/uniswap-v3-abi';
+import { Token, tokenMap, tokens } from '@/const/tokens';
+import { UNISWAP_V3_QUOTER_ABI } from '@/const/uniswap/uniswap-v3-quoter-abi';
+import { UNISWAP_V3_ROUTER_ABI } from '@/const/uniswap/uniswap-v3-router-abi';
 import { ArrowRightIcon } from 'lucide-react';
 import { useState } from 'react';
 import { Address, formatEther, formatUnits, parseEther, parseUnits } from 'viem';
 import { useAccount, useBalance, useSimulateContract, useWriteContract } from 'wagmi';
 import { useSendCalls } from 'wagmi/experimental';
 import { ContentLayout } from './ContentLayout';
-
-type Crypto = {
-  address: Address;
-  decimals: number;
-  label: string;
-  value: string;
-};
-
-const cryptos: Crypto[] = [
-  {
-    value: 'weth',
-    label: 'Wrapped Ethereum (WETH)',
-    address: '0x4200000000000000000000000000000000000006',
-    decimals: 18,
-  },
-  { value: 'usdc', label: 'USD Coin (USDC)', address: '0x036CbD53842c5426634e7929541eC2318f3dCF7e', decimals: 6 },
-  {
-    value: 'link',
-    label: 'ChainLink Token (LINK)',
-    address: '0xE4aB69C077896252FAFBD49EFD26B5D171A32410',
-    decimals: 18,
-  },
-  { value: 'ora', label: 'ORA Coin (ORA)', address: '0xfCdb7D436faE3D330c408d1187eef1E9a5419a5A', decimals: 18 },
-  { value: 'dog', label: 'DogToken (DOG)', address: '0x41e7D8eD48b01138B7532D70b1edCb551df8c9d6', decimals: 18 },
-  {
-    value: 'anymal',
-    label: 'Anymal Protocol (ANYMAL)',
-    address: '0xfb65eF78e5B8D7718cf9BebAdfcCF3E46bD846Ac',
-    decimals: 18,
-  },
-];
-
-const cryptoMap = Object.fromEntries(cryptos.map((crypto) => [crypto.value, crypto]));
 
 const feeMap = {
   '0.05%': 500,
@@ -53,8 +21,8 @@ const feeMap = {
 const fees = Object.keys(feeMap);
 
 export function CryptoExchange() {
-  const [fromCrypto, setFromCrypto] = useState(cryptoMap.weth);
-  const [toCrypto, setToCrypto] = useState(cryptoMap.usdc);
+  const [fromCrypto, setFromCrypto] = useState<Token>(tokenMap.weth);
+  const [toCrypto, setToCrypto] = useState<Token>(tokenMap.usdc);
   const [amount, setAmount] = useState('0.1');
   const [fee, setFee] = useState<keyof typeof feeMap>('0.3%');
   const { address, chain } = useAccount();
@@ -113,12 +81,12 @@ export function CryptoExchange() {
     // Swap
     await writeContractAsync({
       address: '0x94cC0AaC535CCDB3C01d6787D6413C739ae12bc4',
-      abi: BASE_SEPOLIA_SWAP_ROUTER_ABI,
+      abi: UNISWAP_V3_ROUTER_ABI,
       functionName: 'exactInputSingle',
       args: [
         {
-          tokenIn: cryptoMap.weth.address, // Input token address
-          tokenOut: cryptoMap.link.address, // Output token address
+          tokenIn: tokenMap.weth.address, // Input token address
+          tokenOut: tokenMap.link.address, // Output token address
           fee: 500, // Pool fee (e.g., 0.5%)
           recipient: address as Address, // Recipient address
           amountIn: parseUnits(amount, fromCrypto.decimals), // Amount of input token
@@ -187,14 +155,17 @@ export function CryptoExchange() {
       <div className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="from-crypto">From</Label>
-          <Select value={fromCrypto.value} onValueChange={(value) => setFromCrypto(cryptoMap[value])}>
+          <Select
+            value={fromCrypto.symbol}
+            onValueChange={(value) => setFromCrypto(tokenMap[value as keyof typeof tokenMap])}
+          >
             <SelectTrigger id="from-crypto">
               <SelectValue placeholder="Select crypto" />
             </SelectTrigger>
             <SelectContent>
-              {cryptos.map((crypto) => (
-                <SelectItem key={crypto.value} value={crypto.value}>
-                  {crypto.label}
+              {tokens.map((token) => (
+                <SelectItem key={token.symbol} value={token.symbol}>
+                  {token.label}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -215,14 +186,17 @@ export function CryptoExchange() {
         </div>
         <div className="space-y-2">
           <Label htmlFor="to-crypto">To</Label>
-          <Select value={toCrypto.value} onValueChange={(value) => setToCrypto(cryptoMap[value])}>
+          <Select
+            value={toCrypto.symbol}
+            onValueChange={(value) => setToCrypto(tokenMap[value as keyof typeof tokenMap])}
+          >
             <SelectTrigger id="to-crypto">
               <SelectValue placeholder="Select crypto" />
             </SelectTrigger>
             <SelectContent>
-              {cryptos.map((crypto) => (
-                <SelectItem key={crypto.value} value={crypto.value}>
-                  {crypto.label}
+              {tokens.map((token) => (
+                <SelectItem key={token.symbol} value={token.symbol}>
+                  {token.label}
                 </SelectItem>
               ))}
             </SelectContent>
