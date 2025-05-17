@@ -1,6 +1,6 @@
 'use client';
-import { TransferForm } from '@/components/TransferForm';
+import { TokenTransferForm } from '@/components/TokenTransferForm';
 
 export default function TransactionPage() {
-  return <TransferForm />;
+  return <TokenTransferForm />;
 }

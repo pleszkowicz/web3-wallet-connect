@@ -2,75 +2,66 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { BASE_SEPOLIA_LINK_TOKEN_ABI } from '@/const/abi/base-sepolia-link-token-abi';
-import { tokenMap } from '@/const/tokens';
+import { tokenMap, TokenMapKey, tokens } from '@/const/tokens';
 import { cn } from '@/lib/cn';
-import { ErrorMessage, Field, Form, Formik, useFormikContext } from 'formik';
+import { ErrorMessage, Field, Form, Formik } from 'formik';
 import { RefreshCwIcon } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { Abi, Address, formatEther, isAddress, parseEther } from 'viem';
 import { useAccount, useBalance, usePublicClient, useReadContract, useSendTransaction, useWriteContract } from 'wagmi';
 import * as Yup from 'yup';
 import { ContentLayout } from './ContentLayout';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import { TokenSelect } from './TokenSelect';
+import { useToast } from './ui/hooks/use-toast';
 
-type Crypto = {
-  value: string;
-  label: string;
-};
-
-type CryptoMapKey = 'ETH' | 'LINK';
-
-const CryptoMap: Record<CryptoMapKey, Crypto> = {
-  ETH: {
-    value: 'eth',
-    label: 'Ethereum (ETH)',
-  },
-  LINK: {
-    value: 'link',
-    label: 'Chainlink (LINK)',
-  },
-};
-
-const cryptos = Object.values(CryptoMap);
-
-export function TransferForm() {
-  const [selectedUnit, setSelectedUnit] = useState(CryptoMap.ETH);
-  const { address } = useAccount();
+export function TokenTransferForm() {
+  const [selectedToken, setSelectedToken] = useState<TokenMapKey>(tokenMap.eth.symbol);
+  const { address, chain } = useAccount();
   const { data: ethBalance } = useBalance({ address });
-  const { sendTransaction, isPending: isTransactionPending } = useSendTransaction();
+  const { sendTransactionAsync, isPending: isTransactionPending } = useSendTransaction();
+  const { toast } = useToast();
 
-  const { data: linkBalance } = useReadContract({
-    address: tokenMap.link.address,
-    abi: BASE_SEPOLIA_LINK_TOKEN_ABI,
+  const { data: erc20Balance } = useReadContract({
+    address: tokenMap[selectedToken].address,
+    abi: tokenMap[selectedToken].abi,
     functionName: 'balanceOf',
-    args: [address!],
+    args: [address],
+    query: { enabled: !!tokenMap[selectedToken].abi && !!tokenMap[selectedToken].address && !!address },
   });
 
-  const { writeContract, isPending: isWriteContractPending } = useWriteContract();
+  const { writeContractAsync, isPending: isWriteContractPending } = useWriteContract();
 
   const client = usePublicClient();
   const [gasPrice, setGasPrice] = useState<bigint | undefined>();
   const [isGasPriceFetching, setIsGasPriceFetching] = useState(false);
 
   const fetchGas = useCallback(async () => {
+    if (chain === undefined) {
+      return;
+    }
     try {
       setIsGasPriceFetching(true);
-      const gasPrice = await client?.estimateMaxPriorityFeePerGas();
+      const gasPrice = await client?.estimateGas({
+        to: tokenMap[selectedToken].address,
+        data: '0x',
+        value: parseEther('1'),
+      });
       setGasPrice(gasPrice);
     } finally {
       setIsGasPriceFetching(false);
     }
-  }, [client]);
+  }, [client, selectedToken, chain]);
 
   useEffect(() => {
     fetchGas();
   }, [fetchGas]);
 
-  const currentBalance = (selectedUnit === CryptoMap.ETH ? ethBalance?.value : (linkBalance as bigint)) ?? 0;
+  const currentBalance = (selectedToken === tokenMap.eth.symbol ? ethBalance?.value : (erc20Balance as bigint)) ?? 0;
 
   const validationSchema = Yup.object().shape({
-    unit: Yup.string().required('Unit is required'),
+    unit: Yup.string()
+      .oneOf(Object.keys(tokenMap) as TokenMapKey[])
+      .required('Unit is required'),
     from: Yup.string()
       .matches(/^0x[a-fA-F0-9]{40}$/, 'Invalid wallet address format')
       .required('Sender address is required'),
@@ -98,32 +89,55 @@ export function TransferForm() {
   return (
     <ContentLayout title="Send" description="Transfer your crypto to another address" showBackButton>
       <Formik
-        initialValues={{ unit: CryptoMap.ETH.value, from: address, to: '', value: 0 }}
-        onSubmit={(values) => {
-          if (selectedUnit === CryptoMap.ETH) {
-            sendTransaction({ to: values.to as Address, value: parseEther(String(values.value)) });
-            return;
-          } else {
-            writeContract({
-              address: tokenMap.link.address,
-              abi: tokenMap.link.abi as Abi,
-              functionName: 'transfer',
-              args: [
-                values.to as Address, // Recipient address
-                parseEther(String(values.value)), // Amount to transfer
-              ],
+        initialValues={{ unit: tokenMap.eth.symbol, from: address, to: '', value: 0 }}
+        onSubmit={async (values, { resetForm }) => {
+          try {
+            const txHash =
+              selectedToken === tokenMap.eth.symbol
+                ? await sendTransactionAsync({
+                    to: values.to as Address,
+                    value: parseEther(String(values.value)),
+                  })
+                : await writeContractAsync({
+                    address: tokenMap[selectedToken].address,
+                    abi: tokenMap[selectedToken].abi as Abi,
+                    functionName: 'transfer',
+                    args: [
+                      values.to as Address, // Recipient address
+                      parseEther(String(values.value)), // Amount to transfer
+                    ],
+                  });
+
+            toast({
+              title: 'Transaction sent',
+              description: 'Waiting for confirmation on the blockchain.',
+            });
+
+            await client?.waitForTransactionReceipt({ hash: txHash });
+
+            toast({ title: 'Transaction confirmed on the blockchain!' });
+
+            resetForm();
+          } catch (error) {
+            console.error('Error sending transaction:', error);
+            toast({
+              title: 'Transaction failed',
+              description: 'An error occurred while sending the transaction. Please try again.',
+              variant: 'destructive',
             });
           }
         }}
         validationSchema={validationSchema}
       >
-        {({ values }) => {
+        {() => {
           return (
             <Form className="space-y-4">
               <div className="space-y-2">
-                <CryptoSelect
+                <TokenSelect
+                  label="Select Token"
                   name="unit"
-                  onChange={(unitValue) => setSelectedUnit(CryptoMap[unitValue.toUpperCase() as CryptoMapKey])}
+                  tokens={tokens}
+                  onChange={(tokenSymbol: TokenMapKey) => setSelectedToken(tokenSymbol)}
                 />
               </div>
               <div className="space-y-2">
@@ -140,7 +154,7 @@ export function TransferForm() {
                   Value{' '}
                   <span className="text-xs">
                     (max {currentBalance ? formatEther(currentBalance as bigint) : '0.00'}{' '}
-                    {selectedUnit.value.toUpperCase()})
+                    {tokenMap[selectedToken].label})
                   </span>
                 </Label>
                 <Field as={Input} id="value" name="value" placeholder="0.00" />
@@ -188,41 +202,3 @@ export function TransferForm() {
     </ContentLayout>
   );
 }
-
-type CryptoSelectProps = {
-  name: string;
-  onChange: (value: Crypto['value']) => void;
-};
-
-const CryptoSelect = ({ name, onChange }: CryptoSelectProps) => {
-  const { setFieldValue, values } = useFormikContext<Record<string, string>>();
-  const selectedValue = values[name];
-
-  return (
-    <div className="space-y-2">
-      <Label htmlFor={name}>Crypto</Label>
-      <Select
-        value={selectedValue}
-        onValueChange={(value) => {
-          setFieldValue(name, value);
-          onChange(value);
-        }}
-      >
-        <SelectTrigger id={name}>
-          <SelectValue placeholder="Select crypto" />
-        </SelectTrigger>
-
-        <SelectContent>
-          {cryptos.map((crypto) => {
-            return (
-              <SelectItem key={crypto.value} value={crypto.value}>
-                {crypto.label}
-              </SelectItem>
-            );
-          })}
-        </SelectContent>
-      </Select>
-      <ErrorMessage name={name} component="div" className="text-red-500" />
-    </div>
-  );
-};
