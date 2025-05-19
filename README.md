@@ -9,7 +9,7 @@ Leveraging [wagmi](https://wagmi.sh/react/getting-started), this project showcas
 The dApp allows users to:
 
 - **Connect wallets** and view balances.
-- **Switch blockchain networks** effortlessly.
+- **Swap tokens using Uniswap v3**: Seamlessly swap supported tokens directly in the dApp via Uniswap v3 integration, utilizing both the **Uniswap Quoter** (for real-time price quotes) and **Swap Router** (for executing swaps) contracts.
 - **Manage NFTs lifecycle**:
   - Mint NFTs.
   - List NFTs for sale, edit prices, execute sales.
@@ -17,6 +17,7 @@ The dApp allows users to:
   - Store NFT metadata in PostgreSQL for demo purposes (production version ideally uses IPFS).
 - **Send transactions** and monitor transaction history.
 - Utilize integrated **blockchain explorer** links.
+- **Switch blockchain networks**.
 
 Real-time blockchain communication via **web sockets** ensures smooth responsiveness and user experience.
 
