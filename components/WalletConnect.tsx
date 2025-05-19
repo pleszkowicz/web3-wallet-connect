@@ -43,13 +43,13 @@ export function WalletConnect() {
   return (
     <ContentLayout>
       <div>
-        <h1 className="text-center text-3xl font-bold md:text-4xl">Welcome to the NFT Marketplace!</h1>
-        <p className="text-center text-lg text-gray-600">Mint. Trade. Discover. All in one place.</p>
+        <h1 className="text-center text-3xl font-bold md:text-4xl">Explore NFTs, Swap Tokens & Go Web3!</h1>
+        <p className="text-center text-lg text-gray-600">Mint. Trade. Swap. Connect.</p>
         <div className="mb-10 mt-8 rounded-xl bg-gray-50 p-2 sm:p-4">
           <h2 className="mb-6 mt-2 text-center text-2xl font-bold">Explore & Trade NFTs</h2>{' '}
           <div className="grid grid-cols-3 gap-4">{nftPlaceholders}</div>
         </div>
-        <h2 className="mb-6 mt-2 text-center text-2xl font-bold">Let's dive, first</h2>{' '}
+        <h2 className="mb-6 mt-2 text-center text-2xl font-bold">Let's dive</h2>{' '}
         <div className="mx-auto flex w-full flex-col items-center self-center md:max-w-[80%]">
           <div className="mb-4 flex items-center pb-2">
             {!isConnected ? (
@@ -92,7 +92,7 @@ export function WalletConnect() {
             ) : (
               <Button asChild variant="default" size="lg">
                 <Link href="/dashboard">
-                  <Rocket className="mr-2" /> Go to Web3 Dashboard
+                  <Rocket className="mr-2" /> Go to Web3
                 </Link>
               </Button>
             )}

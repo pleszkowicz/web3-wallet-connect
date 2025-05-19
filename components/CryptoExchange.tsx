@@ -1,25 +1,28 @@
 'use client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { tokenMap, TokenMapKey, tokens } from '@/const/tokens';
 import { UNISWAP_V3_QUOTER_ABI } from '@/const/uniswap/uniswap-v3-quoter-abi';
 import { UNISWAP_V3_ROUTER_ABI } from '@/const/uniswap/uniswap-v3-router-abi';
 import { CHAIN_TO_ADDRESSES_MAP } from '@uniswap/sdk-core';
 import { ErrorMessage, Field, Form, Formik } from 'formik';
-import { useState } from 'react';
-import { Abi, Address, formatEther, formatUnits, parseEther, parseUnits } from 'viem';
-import { baseSepolia } from 'viem/chains';
+import { RefreshCw } from 'lucide-react';
+import { ChangeEvent, useMemo, useState } from 'react';
+import { Abi, Address, formatUnits, Hash, parseEther, parseUnits } from 'viem';
+import { sepolia } from 'viem/chains';
 import { useAccount, useBalance, usePublicClient, useReadContract, useSimulateContract, useWriteContract } from 'wagmi';
 import { useSendCalls } from 'wagmi/experimental';
 import * as Yup from 'yup';
 import { ContentLayout } from './ContentLayout';
 import { TokenSelect } from './TokenSelect';
 import { useToast } from './ui/hooks/use-toast';
+import { Label } from './ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 
-const swapRouterAddress = CHAIN_TO_ADDRESSES_MAP[baseSepolia.id].swapRouter02Address;
-const quoterAddress = CHAIN_TO_ADDRESSES_MAP[baseSepolia.id].quoterAddress;
+const swapRouterAddress = CHAIN_TO_ADDRESSES_MAP[sepolia.id].swapRouter02Address;
+const quoterAddress = CHAIN_TO_ADDRESSES_MAP[sepolia.id].quoterAddress;
+
+console.log('quoterAddress', quoterAddress);
 
 const feeMap = {
   '0.05%': 500,
@@ -29,12 +32,18 @@ const feeMap = {
 
 const fees = Object.keys(feeMap);
 
+const initialValues = {
+  tokenIn: tokenMap.weth.symbol,
+  tokenOut: tokenMap.usdc.symbol,
+  value: 0.000001,
+};
+
 export function CryptoExchange() {
-  const [tokenInSymbol, setTokenInSymbol] = useState<TokenMapKey>(tokenMap.weth.symbol);
-  const [tokenOutSymbol, setTokenOutSymbol] = useState<TokenMapKey>(tokenMap.usdc.symbol);
-  const [amount, setAmount] = useState('0.1');
+  const [tokenInSymbol, setTokenInSymbol] = useState<TokenMapKey>(initialValues.tokenIn);
+  const [tokenOutSymbol, setTokenOutSymbol] = useState<TokenMapKey>(initialValues.tokenOut);
+  const [amount, setAmount] = useState(initialValues.value.toString());
   const [fee, setFee] = useState<keyof typeof feeMap>('0.3%');
-  const { address, chain } = useAccount();
+  const { address } = useAccount();
   const { data: ethBalance } = useBalance({ address });
   const { sendCallsAsync } = useSendCalls();
   const client = usePublicClient();
@@ -44,7 +53,7 @@ export function CryptoExchange() {
   const tokenOut = tokenMap[tokenOutSymbol];
 
   const { data: erc20Balance } = useReadContract({
-    address: tokenIn.address,
+    address: tokenIn.address!,
     abi: tokenIn.abi,
     functionName: 'balanceOf',
     args: [address],
@@ -53,7 +62,7 @@ export function CryptoExchange() {
 
   const { writeContractAsync, isPending: isWriteContractPending } = useWriteContract();
 
-  const currentBalance = (tokenIn === tokenMap.eth ? ethBalance?.value : (erc20Balance as bigint)) ?? 0;
+  const tokenInBalance = (tokenIn === tokenMap.eth ? ethBalance?.value : (erc20Balance as bigint)) ?? 0n;
 
   const validationSchema = Yup.object().shape({
     tokenIn: Yup.string()
@@ -64,9 +73,21 @@ export function CryptoExchange() {
       .required('Token is required'),
     value: Yup.string()
       .required('Value is required')
+      .test('is-positive', 'Value must be greater than 0', function (value) {
+        const { path, createError } = this;
+        if (parseFloat(value) <= 0) {
+          return createError({ path, message: 'Value must be greater than 0' });
+        }
+        return true;
+      })
       .test('is-valid-value', 'Insufficient balance', function (value) {
         const { path, createError } = this;
-        const availableBalance = currentBalance ? Number(formatEther(currentBalance)) : 0;
+        const availableBalance = tokenInBalance ? Number(formatUnits(tokenInBalance, tokenIn.decimals)) : 0;
+
+        if (availableBalance === 0) {
+          return createError({ path, message: 'Insufficient balance' });
+        }
+
         if (parseFloat(value) > availableBalance) {
           return createError({
             path,
@@ -78,14 +99,15 @@ export function CryptoExchange() {
   });
 
   console.log('quoterAddress', quoterAddress);
+
   const { data: quoteExactInputSingle, isLoading: isQuoteLoading } = useSimulateContract({
-    address: '0xC5290058841028F1614F3A6F0F5816cAd0df5E27', // Quoter V2 on Sepolia
+    address: quoterAddress as Address, // Quoter V2 on Sepolia
     abi: UNISWAP_V3_QUOTER_ABI,
     functionName: 'quoteExactInputSingle',
     args: [
       {
-        tokenIn: tokenIn.address as Address, // Input token address
-        tokenOut: tokenOut.address as Address, // Output token address
+        tokenIn: tokenIn?.address as Address, // Input token address
+        tokenOut: tokenOut?.address as Address, // Output token address
         amountIn: parseUnits(amount, tokenIn.decimals), // Amount of input token
         amountOutMinimum: 0n, // Minimum amount of output tokens to receive
         fee: feeMap[fee], // Pool fee (e.g., 0.5%)
@@ -93,13 +115,19 @@ export function CryptoExchange() {
       },
     ],
     query: {
-      enabled: !!address && amount !== '0' && !!tokenIn.address && !!tokenOut.address,
+      enabled: !!address && amount !== '0' && !!tokenIn?.address && !!tokenOut?.address,
       retry: 0,
     },
   });
 
-  console.log('quoteExactInputSingle', quoteExactInputSingle);
-  console.log('formatether', formatEther(parseEther(amount)));
+  const tokensOut = useMemo(() => {
+    return tokens.filter((token) => token !== tokenIn);
+  }, [tokenIn]);
+
+  const isSubmitDisabled =
+    tokenInBalance === 0n ||
+    (tokenIn !== tokenMap.eth && tokenOut !== tokenMap.weth && !quoteExactInputSingle) ||
+    isWriteContractPending;
 
   const handleExchange = async () => {
     // Deposit WETH
@@ -115,7 +143,7 @@ export function CryptoExchange() {
       address: tokenIn.address as Address,
       abi: tokenIn.abi as Abi,
       functionName: 'approve',
-      args: [swapRouterAddress, parseEther(amount)],
+      args: [swapRouterAddress, parseUnits(amount, tokenIn.decimals)],
     });
 
     // Swap
@@ -173,35 +201,48 @@ export function CryptoExchange() {
   };
 
   return (
-    <ContentLayout title="Crypto Exchange" description="Swap your crypto across different blockchains" showBackButton>
+    <ContentLayout title="Swap" showBackButton>
       <Formik
-        initialValues={{ tokenIn: tokenMap.eth.symbol, tokenOut: tokenMap.usdc.symbol, value: 0.000001 }}
+        initialValues={{ tokenIn: initialValues.tokenIn, tokenOut: initialValues.tokenOut, value: initialValues.value }}
         onSubmit={async (values, { resetForm }) => {
           try {
-            await writeContractAsync({
-              address: tokenIn.address as Address,
-              abi: tokenIn.abi as Abi,
-              functionName: 'approve',
-              args: [swapRouterAddress, parseEther(amount)],
-            });
+            let txHash: Hash;
 
-            // Swap
-            const txHash = await writeContractAsync({
-              address: swapRouterAddress as Address,
-              abi: UNISWAP_V3_ROUTER_ABI,
-              functionName: 'exactInputSingle',
-              args: [
-                {
-                  tokenIn: tokenIn.address as Address, // Input token address
-                  tokenOut: tokenOut.address as Address, // Output token address
-                  fee: feeMap[fee], // Pool fee (e.g., 0.5%)
-                  recipient: address as Address, // Recipient address
-                  amountIn: parseUnits(amount, tokenIn.decimals), // Amount of input token
-                  amountOutMinimum: 0n, // Minimum amount of output tokens to receive
-                  sqrtPriceLimitX96: 0n, // No price limit
-                },
-              ],
-            });
+            if (tokenIn === tokenMap.eth && tokenOut === tokenMap.weth) {
+              txHash = await writeContractAsync({
+                address: tokenMap.weth.address,
+                abi: tokenMap.weth.abi,
+                functionName: 'deposit',
+                args: [],
+                value: parseEther(amount), // Amount of WETH to deposit
+              });
+            } else {
+              // Approve
+              await writeContractAsync({
+                address: tokenIn.address as Address,
+                abi: tokenIn.abi as Abi,
+                functionName: 'approve',
+                args: [swapRouterAddress, parseEther(values.value.toString())],
+              });
+
+              // Swap
+              txHash = await writeContractAsync({
+                address: swapRouterAddress as Address,
+                abi: UNISWAP_V3_ROUTER_ABI,
+                functionName: 'exactInputSingle',
+                args: [
+                  {
+                    tokenIn: tokenIn.address as Address,
+                    tokenOut: tokenOut.address as Address,
+                    fee: feeMap[fee],
+                    recipient: address as Address,
+                    amountIn: parseUnits(amount, tokenIn.decimals),
+                    amountOutMinimum: 0n, // Minimum amount of output tokens to receive
+                    sqrtPriceLimitX96: 0n, // No price limit
+                  },
+                ],
+              });
+            }
 
             toast({
               title: 'Swap initiated',
@@ -224,69 +265,159 @@ export function CryptoExchange() {
         }}
         validationSchema={validationSchema}
       >
-        <Form className="space-y-4">
-          <div className="space-y-2">
-            <TokenSelect
-              label="From"
-              name="tokenIn"
-              tokens={tokens}
-              onChange={(tokenSymbol: TokenMapKey) => setTokenInSymbol(tokenSymbol)}
-            />
-          </div>
+        {({ setFieldValue, values, setFieldError }) => {
+          return (
+            <Form className="space-y-2">
+              <div className="bg-black bg-gradient-to-br from-gray-900 via-indigo-950 to-purple-900 rounded-xl p-6 space-y-4">
+                <div className="flex flex-row">
+                  <div className="flex-1 text-gray-400 text-lg font-medium">You Pay</div>
 
-          <div className="space-y-2">
-            <TokenSelect
-              label="To"
-              name="tokenOut"
-              tokens={tokens}
-              onChange={(tokenSymbol: TokenMapKey) => setTokenOutSymbol(tokenSymbol)}
-            />
-          </div>
+                  <div className="flex flex-row items-center text-gray-200">
+                    <Label htmlFor="fee" className="text-nowrap">
+                      Pool fee
+                    </Label>
+                    <Select value={fee} onValueChange={(value) => setFee(value as keyof typeof feeMap)}>
+                      <SelectTrigger id="fee" className="border-none focus:ring-0">
+                        <SelectValue placeholder="Fee %" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {fees.map((fee) => (
+                          <SelectItem key={fee} value={fee}>
+                            {fee}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="value">
-              Value{' '}
-              <span className="text-xs">
-                (max {currentBalance ? formatEther(currentBalance as bigint) : '0.00'} {tokenIn.label})
-              </span>
-            </Label>
-            <Field as={Input} id="value" name="value" placeholder="0.00" />
-            <ErrorMessage name="value" component="div" className="text-red-500" />
-          </div>
+                <div className="flex flex-row relative items-center">
+                  <div>
+                    <Field
+                      as={Input}
+                      onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                        setFieldValue('value', e.target.value);
+                        setAmount(e.target.value);
+                      }}
+                      id="value"
+                      type="number"
+                      name="value"
+                      placeholder="0.00"
+                      className="text-5xl text-gray-200 font-bold bg-transparent border-none shadow-none p-0 h-auto focus-visible:ring-0 focus-visible:ring-offset-0 appearance-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-inner-spin-button]:m-0"
+                    />
 
-          <div className="space-y-2">
-            <Label htmlFor="fee">Fee</Label>
-            <Select value={fee} onValueChange={(value) => setFee(value as keyof typeof feeMap)}>
-              <SelectTrigger id="fee">
-                <SelectValue placeholder="Fee %" />
-              </SelectTrigger>
-              <SelectContent>
-                {fees.map((fee) => (
-                  <SelectItem key={fee} value={fee}>
-                    {fee}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+                    <div className="text-sm text-gray-400 mt-1">
+                      {formatUnits(
+                        (tokenIn === tokenMap.eth ? ethBalance?.value : (erc20Balance as bigint)) ?? 0n,
+                        tokenIn.decimals
+                      )}{' '}
+                      {tokenIn.symbol.toUpperCase()}
+                    </div>
+                  </div>
 
-          <div className="space-y-2">
-            <Label>You will get</Label>
-            <p className="text-sm text-muted-foreground">
-              {isQuoteLoading ? (
-                <span className="animate-pulse">Loading...</span>
-              ) : (
-                <span>
-                  {quoteExactInputSingle?.result ? formatUnits(quoteExactInputSingle.result[0], tokenOut.decimals) : ''}
-                </span>
-              )}
-            </p>
-          </div>
+                  <ErrorMessage name="value" component="div" className="text-red-500 text-sm absolute -bottom-6" />
 
-          <Button type="submit" className="w-full" disabled={!quoteExactInputSingle || isWriteContractPending}>
-            Exchange
-          </Button>
-        </Form>
+                  <div className="flex flex-1 items-center">
+                    <TokenSelect
+                      className="bg-purple-200 text-gray-950 border-none rounded-full p-6 pl-3 pr-4 focus:ring-0 overflow-hidden"
+                      name="tokenIn"
+                      tokens={tokens}
+                      onChange={(tokenSymbol: TokenMapKey) => {
+                        setFieldError('amount', undefined);
+                        setTokenInSymbol(tokenSymbol);
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* TODO: idea - add support for showing price in USD
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center text-gray-400">
+                    <span>${amount === '0' ? '0.00' : (Number(amount) * 20).toFixed(2)}</span>
+                    <RefreshCw className="h-4 w-4 ml-2 cursor-pointer" />
+                  </div>
+
+                  <div className="flex space-x-2">
+                    <Button
+                      variant="outline"
+                      className="rounded-full h-8 px-3 bg-[#3a3a3a] border-none text-gray-300 hover:bg-[#4a4a4a]"
+                      onClick={() => {}}
+                    >
+                      0
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="rounded-full h-8 px-3 bg-[#3a3a3a] border-none text-gray-300 hover:bg-[#4a4a4a]"
+                      onClick={() => {}}
+                    >
+                      50%
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="rounded-full h-8 px-3 bg-[#3a3a3a] border-none text-gray-300 hover:bg-[#4a4a4a]"
+                      onClick={() => {}}
+                    >
+                      Max
+                    </Button>
+                  </div>
+                </div>
+                 */}
+                {/* </div> */}
+
+                {/* Swap Button */}
+                <div className="relative flex justify-center">
+                  <Button
+                    type="button"
+                    onClick={() => {
+                      const { tokenIn, tokenOut } = values;
+                      setFieldValue('tokenIn', tokenOut);
+                      setFieldValue('tokenOut', tokenIn);
+                      setTokenInSymbol(tokenOut);
+                      setTokenOutSymbol(tokenIn);
+                      setAmount('0.1');
+                    }}
+                    className="absolute -mt-6 rounded-full w-12 h-12 bg-[#6c5ce7] hover:bg-[#5b4bc4] flex items-center justify-center p-0 border border-[#1c1c1c]"
+                  >
+                    <RefreshCw className="h-5 w-5" />
+                  </Button>
+                </div>
+
+                {/* <div className="bg-black bg-gradient-to-br from-gray-900 via-indigo-950 to-purple-900 rounded-xl p-6 space-y-4"> */}
+                <div className="text-gray-400 text-lg font-medium">You Receive</div>
+
+                <div className="flex items-center">
+                  <div className="text-5xl text-gray-200 font-bold flex-1">
+                    {isQuoteLoading ? (
+                      <span className="animate-pulse text-xs">Fetching quote</span>
+                    ) : quoteExactInputSingle?.result ? (
+                      Number(formatUnits(quoteExactInputSingle.result[0], tokenOut.decimals))
+                    ) : (
+                      '0'
+                    )}
+                  </div>
+
+                  <div className="flex items-center">
+                    <TokenSelect
+                      className="bg-white text-gray-950 border-none rounded-full p-6 pl-3 pr-4 focus:ring-0 overflow-hidden"
+                      name="tokenOut"
+                      tokens={tokensOut}
+                      onChange={(tokenSymbol: TokenMapKey) => {
+                        setFieldError('amount', undefined);
+                        setTokenOutSymbol(tokenSymbol);
+                      }}
+                    />
+                  </div>
+                </div>
+
+                <div className="mt-4 flex w-full justify-center text-">
+                  <Button type="submit" variant="secondary" className="mt-4" size="xl" disabled={isSubmitDisabled}>
+                    Swap
+                  </Button>
+                </div>
+              </div>
+            </Form>
+          );
+        }}
       </Formik>
     </ContentLayout>
   );

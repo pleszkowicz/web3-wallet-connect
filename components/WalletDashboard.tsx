@@ -2,17 +2,15 @@
 import TransactionHistory from '@/components/TransactionHistory';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import WalletBalanceItem from '@/components/WalletBalanceItem';
-import { tokenMap } from '@/const/tokens';
+import { Token, tokenMap, tokens } from '@/const/tokens';
 import { ImagePlusIcon, LucideIcon, Plus, RefreshCw, SendIcon } from 'lucide-react';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import invariant from 'tiny-invariant';
-import { formatEther } from 'viem';
 import { useAccount, useBalance, useConnect, useReadContract } from 'wagmi';
-import { sepolia } from 'wagmi/chains';
 import { ContentLayout } from './ContentLayout';
 import { NftList } from './NftList';
+import TokenBalance from './TokenBalance';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 
 export function WalletDashboard() {
@@ -29,35 +27,39 @@ export function WalletDashboard() {
     });
   }, [connectors]);
 
-  const formattedBalance = balance && `${parseFloat(formatEther(balance.value)).toFixed(4)} ${balance.symbol}`;
+  const erc20tokens = useMemo(() => {
+    return tokens.filter((token) => !!token.address);
+  }, []);
 
   return (
     <ContentLayout
       title="Wallet Dashboard"
       headerContent={
         <p className="flex flex-row gap-6 justify-center pt-3">
-          <ActionLink href="/nft/create" text="Create NFT" Icon={ImagePlusIcon} />
-          <ActionLink href="/transfer" text="Send" Icon={SendIcon} />
+          <ActionLink href="/nft/create" text="Mint NFT" Icon={ImagePlusIcon} />
           <ActionLink href="/exchange" text="Swap" Icon={RefreshCw} />
+          <ActionLink href="/transfer" text="Send" Icon={SendIcon} />
         </p>
       }
     >
-      <WalletBalanceItem
-        address={address}
-        balance={formattedBalance}
-        isLoading={isBalanceLoading}
-        symbol={balance?.symbol}
-        name="Ethereum"
-      />
-      {chain?.id === sepolia.id && <SepoliaLinkBalance />}
-
       <Separator />
 
-      <Tabs defaultValue="nfts" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 mb-4">
+      <Tabs defaultValue="tokens" className="w-full">
+        <TabsList className="grid w-full grid-cols-3 mb-4">
+          <TabsTrigger value="tokens">NFTs</TabsTrigger>
           <TabsTrigger value="nfts">NFTs</TabsTrigger>
           <TabsTrigger value="transactions">Transactions</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="tokens">
+          <div className="flex flex-col gap-4">
+            <TokenBalance balance={balance?.value} isLoading={isBalanceLoading} token={tokenMap.eth} />
+            {erc20tokens.map((token) => (
+              <ERC20TokenBalance key={token.symbol} token={token} />
+            ))}
+          </div>
+        </TabsContent>
+
         <TabsContent value="nfts">
           <NftList />
           <Button asChild variant="default" className="w-full mt-5">
@@ -66,6 +68,7 @@ export function WalletDashboard() {
             </Link>
           </Button>
         </TabsContent>
+
         <TabsContent value="transactions">
           <TransactionHistory key={chain?.id} />
           <Button asChild variant="default" className="w-full mt-5 mb-5">
@@ -75,35 +78,32 @@ export function WalletDashboard() {
           </Button>
         </TabsContent>
       </Tabs>
-      <Separator />
     </ContentLayout>
   );
 }
 
-export default function SepoliaLinkBalance() {
+type ERC20TokenBalanceProps = {
+  token: Token;
+};
+
+export default function ERC20TokenBalance({ token }: ERC20TokenBalanceProps) {
   const { address, isConnected } = useAccount();
 
   invariant(address, 'Address is required');
 
   const { data: balance, isLoading } = useReadContract({
-    address: tokenMap.link.address,
-    abi: tokenMap.link.abi,
+    address: token.address,
+    abi: token.abi,
     functionName: 'balanceOf',
     args: [address],
+    query: { enabled: !!token.address },
   });
 
   // Convert balance from token decimals
-  const formattedBalance = balance ? formatEther(balance) : 'N/A';
-
   return (
     <div>
       {isConnected ? (
-        <WalletBalanceItem
-          address={address}
-          balance={`${formattedBalance} ${tokenMap.link.symbol}`}
-          isLoading={isLoading}
-          name={tokenMap.link.label}
-        />
+        <TokenBalance token={token} balance={balance as bigint | undefined} isLoading={isLoading} />
       ) : (
         <p>Please connect your wallet to Sepolia</p>
       )}

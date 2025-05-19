@@ -1,22 +1,25 @@
 import { Token, TokenMapKey } from '@/const/tokens';
+import { cn } from '@/lib/cn';
 import { ErrorMessage, useFormikContext } from 'formik';
+import Image from 'next/image';
 import { Label } from './ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 
 type CryptoSelectProps = {
-  label: string;
+  className?: string;
+  label?: string;
   name: string;
   onChange: (value: TokenMapKey) => void;
   tokens: Token[];
 };
 
-export const TokenSelect = ({ label, name, onChange, tokens }: CryptoSelectProps) => {
+export const TokenSelect = ({ label, name, onChange, tokens, className }: CryptoSelectProps) => {
   const { setFieldValue, values } = useFormikContext<Record<string, string>>();
   const selectedValue = values[name] as TokenMapKey;
 
   return (
     <>
-      <Label htmlFor={name}>{label}</Label>
+      {label && <Label htmlFor={name}>{label}</Label>}
       <Select
         value={selectedValue}
         onValueChange={(value) => {
@@ -24,15 +27,24 @@ export const TokenSelect = ({ label, name, onChange, tokens }: CryptoSelectProps
           onChange(value as TokenMapKey);
         }}
       >
-        <SelectTrigger id={name}>
+        <SelectTrigger id={name} className={cn(className, 'overflow-hidden')}>
           <SelectValue placeholder="Select token" />
         </SelectTrigger>
 
         <SelectContent>
           {tokens.map((token) => {
             return (
-              <SelectItem key={token.symbol} value={token.symbol}>
-                {token.label}
+              <SelectItem key={token.symbol} value={token.symbol} className="flex flex-row">
+                <span className="contents">
+                  <Image
+                    className="mr-2 inline-block shrink-0"
+                    src={token.logo}
+                    width={24}
+                    height={24}
+                    alt={token.label}
+                  />
+                  {token.label} ({token.symbol.toUpperCase()}){' '}
+                </span>
               </SelectItem>
             );
           })}

@@ -30,7 +30,7 @@ export const NftList = () => {
           </div>
         ))
       ) : (
-        <p className="w-full text-muted-foreground mt-4">No NFTs yet</p>
+        <p className="w-full text-gray-400 mt-4">You don't own any NFTs yet.</p>
       )}
     </div>
   );
