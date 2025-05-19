@@ -18,7 +18,7 @@ export type TokenMapKey = keyof typeof tokenMap;
 export const tokenMap = {
   eth: {
     symbol: 'eth',
-    label: 'SepoliaETH',
+    label: 'Sepolia ETH',
     address: undefined,
     decimals: 18,
     abi: undefined,

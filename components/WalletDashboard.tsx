@@ -46,7 +46,7 @@ export function WalletDashboard() {
 
       <Tabs defaultValue="tokens" className="w-full">
         <TabsList className="grid w-full grid-cols-3 mb-4">
-          <TabsTrigger value="tokens">NFTs</TabsTrigger>
+          <TabsTrigger value="tokens">Tokens</TabsTrigger>
           <TabsTrigger value="nfts">NFTs</TabsTrigger>
           <TabsTrigger value="transactions">Transactions</TabsTrigger>
         </TabsList>

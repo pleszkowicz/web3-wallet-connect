@@ -45,13 +45,15 @@ globs: **/*.tsx, **/*.ts, src/**/*.ts, src/**/*.tsx
 - Handle parallel routes when needed
 
 ## Forms and Validation
+
 - Use Zod for form validation
 - Implement proper server-side validation
 - Handle form errors appropriately
 - Show loading states during form submission
 
 ## State Management
+
 - Minimize client-side state
 - Use React Context sparingly
 - Prefer server state when possible
-- Implement proper loading states 
+- Implement proper loading states
