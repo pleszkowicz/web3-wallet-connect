@@ -85,15 +85,21 @@ export const ContentLayout = ({ title, description, headerContent, showBackButto
             </Tooltip>
 
             {currentChain?.blockExplorers?.default.url ? (
-              <a
-                href={`${currentChain?.blockExplorers?.default.url}/address/${address}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-500 hover:underline"
-                title="Go to Explorer"
-              >
-                <OpenInNewWindowIcon />
-              </a>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <a
+                    href={`${currentChain?.blockExplorers?.default.url}/address/${address}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-500 hover:underline"
+                  >
+                    <OpenInNewWindowIcon />
+                  </a>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Open in blockchain explorer</p>
+                </TooltipContent>
+              </Tooltip>
             ) : null}
           </div>
         )}
