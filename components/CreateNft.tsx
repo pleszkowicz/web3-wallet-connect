@@ -108,6 +108,10 @@ export function CreateNFT() {
       if (nftUriId) {
         deleteNftTokenUri({ id: nftUriId });
       }
+
+      if ((error as Error)?.message?.includes('User rejected the request')) {
+        return;
+      }
       console.error('Error creating NFT:', error);
       toast({ title: 'Error creating NFT', description: 'Please try again later.', variant: 'destructive' });
     }

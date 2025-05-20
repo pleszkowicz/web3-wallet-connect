@@ -255,6 +255,9 @@ export function CryptoExchange() {
 
             resetForm();
           } catch (error) {
+            if ((error as Error)?.message?.includes('User rejected the request')) {
+              return;
+            }
             console.error('Error sending transaction:', error);
             toast({
               title: 'Swap failed',

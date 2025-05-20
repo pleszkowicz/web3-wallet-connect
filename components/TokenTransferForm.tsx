@@ -119,6 +119,9 @@ export function TokenTransferForm() {
 
             resetForm();
           } catch (error) {
+            if ((error as Error)?.message?.includes('User rejected the request')) {
+              return;
+            }
             console.error('Error sending transaction:', error);
             toast({
               title: 'Transaction failed',

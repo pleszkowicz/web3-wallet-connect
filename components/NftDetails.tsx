@@ -10,7 +10,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import invariant from 'tiny-invariant';
 import { formatEther, parseEther } from 'viem';
-import { useAccount, useReadContract, useTransactionCount, useWriteContract } from 'wagmi';
+import { useAccount, usePublicClient, useReadContract, useTransactionCount, useWriteContract } from 'wagmi';
 import * as Yup from 'yup';
 import { NftStatusHelper } from './NftStatusHelper';
 import { Button } from './ui/button';
@@ -63,6 +63,7 @@ const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 
 type NftItemProps = Pick<Nft, 'tokenId' | 'owner' | 'price'>;
 const NftItem = ({ tokenId, owner, price }: NftItemProps) => {
+  const client = usePublicClient();
   const { data: tokenURI, isLoading } = useReadContract({
     address: NFT_MARKETPLACE_ADDRESS,
     abi: NFT_MARKET_CONTRACT_ABI,
@@ -103,35 +104,37 @@ const NftItem = ({ tokenId, owner, price }: NftItemProps) => {
   }, [approvedAddress]);
 
   const toggleApprove = async () => {
-    const addressToApprove = isSaleApproved ? ZERO_ADDRESS : NFT_MARKETPLACE_ADDRESS;
+    try {
+      const addressToApprove = isSaleApproved ? ZERO_ADDRESS : NFT_MARKETPLACE_ADDRESS;
 
-    await writeContractAsync(
-      {
+      const txHash = await writeContractAsync({
         address: NFT_MARKETPLACE_ADDRESS,
         abi: NFT_MARKET_CONTRACT_ABI,
         functionName: 'approve',
         args: [addressToApprove, BigInt(tokenId)],
         nonce: transactionCount, // fix for passing the correct nonce in hardhat network
-      },
-      {
-        onSuccess: () => {
-          toast({ title: isSaleApproved ? 'NFT sell approval withdrawn!' : 'NFT approved to sell!' });
-          setIsSaleApproved(!isSaleApproved);
-        },
-        onError: (error: Error) => {
-          if (error?.message.includes('User rejected the request')) {
-            return;
-          }
+      });
 
-          console.log('error', error);
-          toast({
-            title: 'Approval change failed',
-            description: 'Please try again later.',
-            variant: 'destructive',
-          });
-        },
+      toast({
+        title: `NFT sell ${isSaleApproved ? 'withdrawal' : 'approval'} initiated!`,
+        description: 'Waiting for confirmation on the blockchain',
+      });
+      setIsSaleApproved(!isSaleApproved);
+
+      await client?.waitForTransactionReceipt({ hash: txHash });
+      toast({ title: 'NFT confirmed on the blockchain!' });
+    } catch (error) {
+      if ((error as Error)?.message?.includes('User rejected the request')) {
+        return;
       }
-    );
+      console.log('error', error);
+
+      toast({
+        title: 'Approval change failed',
+        description: 'Please try again later.',
+        variant: 'destructive',
+      });
+    }
   };
 
   const handleBuyNft = async () => {
