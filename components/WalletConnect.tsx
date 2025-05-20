@@ -11,11 +11,10 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { Connector, useAccount, useConnect } from 'wagmi';
 import { ContentLayout } from './ContentLayout';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './ui/accordion';
 import { DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
 
 export function WalletConnect() {
-  const { connectors, connect, isPending: isConnectionPending, isSuccess: isConnectionSuccess } = useConnect();
+  const { connectors, connectAsync, isPending: isConnectionPending, isSuccess: isConnectionSuccess } = useConnect();
   const { isConnected } = useAccount();
   const { push } = useRouter();
   const [open, setIsOpen] = useState(false);
@@ -29,13 +28,6 @@ export function WalletConnect() {
 
   const mounted = useMounted();
 
-  useEffect(() => {
-    if (isConnectionSuccess) {
-      push('/dashboard');
-      setIsOpen(false);
-    }
-  }, [isConnectionSuccess, push]);
-
   if (!mounted) {
     return null;
   }
@@ -43,8 +35,8 @@ export function WalletConnect() {
   return (
     <ContentLayout>
       <div>
-        <h1 className="text-center text-3xl font-bold md:text-4xl">Explore NFTs, Swap Tokens & Go Web3!</h1>
-        <p className="text-center text-lg text-gray-600">Mint. Trade. Swap. Connect.</p>
+        <h1 className="text-center text-3xl font-bold md:text-4xl">Your All-in-One Web3 Dashboard</h1>
+        <p className="text-center text-lg text-gray-600">Swap tokens, trade NFTs, and connect your wallet</p>
         <div className="mb-10 mt-8 rounded-xl bg-gray-50 p-2 sm:p-4">
           <h2 className="mb-6 mt-2 text-center text-2xl font-bold">Explore & Trade NFTs</h2>{' '}
           <div className="grid grid-cols-3 gap-4">{nftPlaceholders}</div>
@@ -73,7 +65,11 @@ export function WalletConnect() {
                           <WalletOption
                             key={connector.id}
                             connector={connector}
-                            onClick={() => connect({ connector })}
+                            onClick={async () => {
+                              await connectAsync({ connector });
+                              setIsOpen(false);
+                              push('/dashboard');
+                            }}
                             pending={isConnectionPending}
                           />
                         ))
@@ -90,39 +86,41 @@ export function WalletConnect() {
                 </DialogContent>
               </Dialog>
             ) : (
-              <Button asChild variant="default" size="lg">
+              <Button asChild variant="default" size="xl">
                 <Link href="/dashboard">
-                  <Rocket className="mr-2" /> Go to Web3
+                  <Rocket className="mr-2" /> Launch Dashboard
                 </Link>
               </Button>
             )}
           </div>
 
-          {/* <div className="border rounded p-4 text-slate-500 shadow-sm"> */}
-          <Accordion type="single" collapsible className="mt-8 w-full rounded-lg border px-4">
-            <AccordionItem value="item-1">
-              <AccordionTrigger>
-                {' '}
-                <span className="text-slate-500">🔧 Developer Setup Instructions</span>
-              </AccordionTrigger>
-              <AccordionContent>
-                <div className="text-slate-500">
-                  <p className="mt-4 text-sm">In order to test all functionalities locally, follow steps below:</p>
-                  <ol className="my-2 list-decimal space pl-6">
-                    <li>
-                      Clone and configure{' '}
-                      <Link
-                        href="https://github.com/pleszkowicz/hardhat-smart-contract"
-                        className="text-blue-600"
-                        target="_blank"
-                      >
-                        pleszkowicz/hardhat-smart-contract <OpenInNewWindowIcon className="inline" />
-                      </Link>{' '}
-                    </li>
-                    <li>Setup your environment variables as described in the repository documentation.</li>
-                  </ol>
-                  <p className="mt-4 text-sm">
-                    Once you have running hardhat node locally, deploy smart-contract as described in{' '}
+          <Dialog>
+            <DialogTrigger asChild>
+              <span className="text-slate-500 underline cursor-pointer">🔧 Local Setup Guide for Developers</span>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Local Setup Guide for Developers</DialogTitle>
+              </DialogHeader>
+              <div className="text-slate-500">
+                <h3>To test all features locally, follow these steps:</h3>
+                <ol className="my-2 list-decimal space pl-6">
+                  <li>
+                    <b>Clone and configure</b> the repository
+                    <br />
+                    <Link
+                      href="https://github.com/pleszkowicz/hardhat-smart-contract"
+                      className="text-blue-600"
+                      target="_blank"
+                    >
+                      pleszkowicz/hardhat-smart-contract <OpenInNewWindowIcon className="inline" />
+                    </Link>{' '}
+                  </li>
+                  <li>
+                    <b>Set up environment variables</b> as described in the repository’s documentation. .
+                  </li>
+                  <li>
+                    <b>Start a local Hardhat node</b> and deploy the smart contract by following the instructions in the{' '}
                     <Link
                       href="https://github.com/pleszkowicz/web3-wallet-connect/blob/main/README.md"
                       className="inline-block text-blue-600"
@@ -130,11 +128,11 @@ export function WalletConnect() {
                     >
                       readme <OpenInNewWindowIcon className="inline" />.
                     </Link>
-                  </p>
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
+                  </li>
+                </ol>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
     </ContentLayout>
