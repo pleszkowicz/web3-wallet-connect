@@ -5,14 +5,14 @@ import { Label } from '@/components/ui/label';
 import { tokenMap, TokenMapKey, tokens } from '@/const/tokens';
 import { cn } from '@/lib/cn';
 import { ErrorMessage, Field, Form, Formik } from 'formik';
-import { RefreshCwIcon } from 'lucide-react';
-import { useCallback, useEffect, useState } from 'react';
-import { Abi, Address, formatEther, isAddress, parseEther } from 'viem';
+import { useEffect, useState } from 'react';
+import { Abi, Address, encodeFunctionData, formatEther, formatUnits, isAddress, parseEther, parseUnits } from 'viem';
 import { useAccount, useBalance, usePublicClient, useReadContract, useSendTransaction, useWriteContract } from 'wagmi';
 import * as Yup from 'yup';
 import { ContentLayout } from './ContentLayout';
 import { TokenSelect } from './TokenSelect';
 import { useToast } from './ui/hooks/use-toast';
+import { Loader } from './ui/loader';
 
 export function TokenTransferForm() {
   const [selectedToken, setSelectedToken] = useState<TokenMapKey>(tokenMap.eth.symbol);
@@ -35,26 +35,51 @@ export function TokenTransferForm() {
   const [gasPrice, setGasPrice] = useState<bigint | undefined>();
   const [isGasPriceFetching, setIsGasPriceFetching] = useState(false);
 
-  const fetchGas = useCallback(async () => {
+  useEffect(() => {
     if (chain === undefined) {
       return;
     }
-    try {
-      setIsGasPriceFetching(true);
-      const gasPrice = await client?.estimateGas({
-        to: tokenMap[selectedToken].address,
-        data: '0x',
-        value: parseEther('1'),
-      });
-      setGasPrice(gasPrice);
-    } finally {
-      setIsGasPriceFetching(false);
-    }
-  }, [client, selectedToken, chain]);
-
-  useEffect(() => {
+    const fetchGas = async () => {
+      try {
+        setIsGasPriceFetching(true);
+        let gasPrice: bigint | undefined;
+        if (selectedToken === tokenMap.eth.symbol) {
+          // Native ETH transfer
+          gasPrice = await client?.estimateGas({
+            to: address as Address,
+            value: parseEther('0.01'),
+          });
+        } else {
+          // ERC20 transfer
+          const erc20 = tokenMap[selectedToken];
+          // Try-catch to handle tokens that revert on estimation (e.g. paused, blacklisted, etc.)
+          try {
+            const dummyRecipient = '0x000000000000000000000000000000000000dead';
+            const data = encodeFunctionData({
+              abi: erc20.abi as Abi,
+              functionName: 'transfer',
+              args: [dummyRecipient, parseUnits('0.01', erc20.decimals)],
+            });
+            gasPrice = await client?.estimateGas({
+              account: address as Address,
+              to: erc20.address as Address,
+              data,
+              value: 0n,
+            });
+          } catch (err) {
+            // If estimation fails, set undefined and optionally log or handle gracefully
+            gasPrice = undefined;
+          }
+        }
+        setGasPrice(gasPrice);
+      } catch (error) {
+        console.log('Error while fetching gas price', error);
+      } finally {
+        setIsGasPriceFetching(false);
+      }
+    };
     fetchGas();
-  }, [fetchGas]);
+  }, [client, selectedToken, chain, address]);
 
   const currentBalance = (selectedToken === tokenMap.eth.symbol ? ethBalance?.value : (erc20Balance as bigint)) ?? 0;
 
@@ -104,7 +129,7 @@ export function TokenTransferForm() {
                     functionName: 'transfer',
                     args: [
                       values.to as Address, // Recipient address
-                      parseEther(String(values.value)), // Amount to transfer
+                      parseUnits(values.value.toString(), tokenMap[selectedToken].decimals), // Amount to transfer
                     ],
                   });
 
@@ -137,10 +162,13 @@ export function TokenTransferForm() {
             <Form className="space-y-4">
               <div className="space-y-2">
                 <TokenSelect
+                  className="w-auto"
                   label="Select Token"
                   name="unit"
                   tokens={tokens}
-                  onChange={(tokenSymbol: TokenMapKey) => setSelectedToken(tokenSymbol)}
+                  onChange={(tokenSymbol: TokenMapKey) => {
+                    setSelectedToken(tokenSymbol);
+                  }}
                 />
               </div>
               <div className="space-y-2">
@@ -156,7 +184,7 @@ export function TokenTransferForm() {
                 <Label htmlFor="value">
                   Value{' '}
                   <span className="text-xs">
-                    (max {currentBalance ? formatEther(currentBalance as bigint) : '0.00'}{' '}
+                    (max {currentBalance ? formatUnits(currentBalance, tokenMap[selectedToken].decimals) : '0.00'}{' '}
                     {tokenMap[selectedToken].label})
                   </span>
                 </Label>
@@ -167,9 +195,9 @@ export function TokenTransferForm() {
                 <div className="flex items-center justify-start gap-2 bg-muted p-2 rounded-md">
                   <Label>Estimated Gas Fee:</Label>
                   <span className="text-sm">
-                    {gasPrice ? `${formatEther(gasPrice, 'gwei')} Gwei` : 'Loading...'}
+                    {gasPrice ? `${formatEther(gasPrice, 'gwei')} Gwei` : <Loader size="sm" iconOnly />}
                   </span>{' '}
-                  <Button
+                  {/* <Button
                     type="button"
                     variant="link"
                     size="sm"
@@ -177,7 +205,7 @@ export function TokenTransferForm() {
                     onClick={() => !isGasPriceFetching && fetchGas()}
                   >
                     <RefreshCwIcon className={cn('w-4 h-4 mr-2', isGasPriceFetching ? 'animate-spin' : '')} />
-                  </Button>
+                  </Button> */}
                   {/* {gasPrice ? (
                     <Tooltip>
                       <TooltipTrigger asChild>

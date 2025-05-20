@@ -32,6 +32,14 @@ export const tokenMap = {
     abi: WETH_ABI,
     logo: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/logo.png',
   },
+  link: {
+    symbol: 'link',
+    label: 'ChainLink Token',
+    address: '0x779877A7B0D9E8603169DdbD7836e478b4624789',
+    decimals: 18,
+    abi: LINK_TOKEN_ABI,
+    logo: 'https://coin-images.coingecko.com/coins/images/877/large/chainlink-new-logo.png',
+  },
   usdc: {
     symbol: 'usdc',
     label: 'USD Coin',
@@ -47,22 +55,6 @@ export const tokenMap = {
     decimals: 18,
     abi: DAI_TOKEN_ABI,
     logo: 'https://coin-images.coingecko.com/coins/images/9956/large/Badge_Dai.png'
-  },
-  link: {
-    symbol: 'link',
-    label: 'ChainLink Token',
-    address: '0x779877A7B0D9E8603169DdbD7836e478b4624789',
-    decimals: 18,
-    abi: LINK_TOKEN_ABI,
-    logo: 'https://coin-images.coingecko.com/coins/images/877/large/chainlink-new-logo.png',
-  },
-  wbtc: {
-    symbol: 'wbtc',
-    label: 'Wrapped BTC',
-    address: '0x21472df1b5d2b673f6444b41258c6460294a2c06',
-    decimals: 8,
-    abi: undefined,
-    logo: 'https://coin-images.coingecko.com/coins/images/7598/large/wrapped_bitcoin_wbtc.png?1696507857'
   },
 } as const;
 

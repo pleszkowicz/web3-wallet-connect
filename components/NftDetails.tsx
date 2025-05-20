@@ -43,7 +43,7 @@ export const NftDetails = ({ tokenId }: NftDetailsProps) => {
   });
 
   if (isLoading) {
-    return <Loader>Loading...</Loader>;
+    return <Loader />;
   }
 
   if (error) {

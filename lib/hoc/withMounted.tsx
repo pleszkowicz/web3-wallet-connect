@@ -11,7 +11,7 @@ export const withMounted = <P extends object>(WrappedComponent: (props: P) => JS
     }, []);
 
     if (!isMounted) {
-      return <Loader>Loading...</Loader>;
+      return <Loader />;
     }
 
     return <WrappedComponent {...props} />;

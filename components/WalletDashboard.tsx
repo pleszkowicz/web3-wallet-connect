@@ -1,23 +1,13 @@
 'use client';
-import TransactionHistory from '@/components/TransactionHistory';
-import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
-import { Token, tokenMap, tokens } from '@/const/tokens';
-import { ImagePlusIcon, LucideIcon, Plus, RefreshCw, SendIcon } from 'lucide-react';
+import { ImagePlusIcon, LucideIcon, RefreshCw, SendIcon } from 'lucide-react';
 import Link from 'next/link';
-import { useEffect, useMemo, useState } from 'react';
-import invariant from 'tiny-invariant';
-import { useAccount, useBalance, useConnect, useReadContract } from 'wagmi';
+import { usePathname } from 'next/navigation';
+import { PropsWithChildren, useEffect, useState } from 'react';
+import { useConnect } from 'wagmi';
 import { ContentLayout } from './ContentLayout';
-import { NftList } from './NftList';
-import TokenBalance from './TokenBalance';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 
-export function WalletDashboard() {
-  const { address, isConnected, chain } = useAccount();
-  const { data: balance, isLoading: isBalanceLoading } = useBalance({ address });
-
-  const { connectors, connect } = useConnect();
+export function WalletDashboard({ children }: PropsWithChildren) {
+  const { connectors } = useConnect();
   const [ready, setReady] = useState<{ [key: string]: boolean }>({});
 
   useEffect(() => {
@@ -27,9 +17,14 @@ export function WalletDashboard() {
     });
   }, [connectors]);
 
-  const erc20tokens = useMemo(() => {
-    return tokens.filter((token) => !!token.address);
-  }, []);
+  const pathname = usePathname();
+
+  // Tab routes and labels
+  const tabLinks = [
+    { href: '/dashboard/tokens', label: 'Tokens' },
+    { href: '/dashboard/nfts', label: 'NFTs' },
+    { href: '/dashboard/transactions', label: 'Transactions' },
+  ];
 
   return (
     <ContentLayout
@@ -42,72 +37,26 @@ export function WalletDashboard() {
         </p>
       }
     >
-      <Separator />
-
-      <Tabs defaultValue="tokens" className="w-full">
-        <TabsList className="grid w-full grid-cols-3 mb-4">
-          <TabsTrigger value="tokens">Tokens</TabsTrigger>
-          <TabsTrigger value="nfts">NFTs</TabsTrigger>
-          <TabsTrigger value="transactions">Transactions</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="tokens">
-          <div className="flex flex-col gap-4">
-            <TokenBalance balance={balance?.value} isLoading={isBalanceLoading} token={tokenMap.eth} />
-            {erc20tokens.map((token) => (
-              <ERC20TokenBalance key={token.symbol} token={token} />
-            ))}
-          </div>
-        </TabsContent>
-
-        <TabsContent value="nfts">
-          <NftList />
-          <Button asChild variant="default" className="w-full mt-5">
-            <Link href="/nft/create">
-              <Plus /> Mint new NFT
+      <div className="grid w-full grid-cols-3 mb-4">
+        {tabLinks.map((tab) => {
+          const isActive = pathname.startsWith(tab.href);
+          return (
+            <Link
+              key={tab.href}
+              href={tab.href}
+              className={`text-center py-2 rounded-t-md font-medium transition-all border-b ${
+                isActive ? 'bg-purple-950 text-white' : 'text-gray-500 hover:text-gray-800'
+              }`}
+              aria-current={isActive ? 'page' : undefined}
+            >
+              {tab.label}
             </Link>
-          </Button>
-        </TabsContent>
+          );
+        })}
+      </div>
 
-        <TabsContent value="transactions">
-          <TransactionHistory key={chain?.id} />
-          <Button asChild variant="default" className="w-full mt-5 mb-5">
-            <Link href="/transfer">
-              <Plus /> New transaction
-            </Link>
-          </Button>
-        </TabsContent>
-      </Tabs>
+      {children}
     </ContentLayout>
-  );
-}
-
-type ERC20TokenBalanceProps = {
-  token: Token;
-};
-
-export default function ERC20TokenBalance({ token }: ERC20TokenBalanceProps) {
-  const { address, isConnected } = useAccount();
-
-  invariant(address, 'Address is required');
-
-  const { data: balance, isLoading } = useReadContract({
-    address: token.address,
-    abi: token.abi,
-    functionName: 'balanceOf',
-    args: [address],
-    query: { enabled: !!token.address },
-  });
-
-  // Convert balance from token decimals
-  return (
-    <div>
-      {isConnected ? (
-        <TokenBalance token={token} balance={balance as bigint | undefined} isLoading={isLoading} />
-      ) : (
-        <p>Please connect your wallet to Sepolia</p>
-      )}
-    </div>
   );
 }
 

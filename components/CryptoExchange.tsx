@@ -121,8 +121,9 @@ export function CryptoExchange() {
   });
 
   const tokensOut = useMemo(() => {
-    return tokens.filter((token) => token !== tokenIn);
+    return tokens.filter((token) => token.symbol !== tokenIn.symbol);
   }, [tokenIn]);
+  console.log('tokensOut', tokensOut);
 
   const isSubmitDisabled =
     tokenInBalance === 0n ||
@@ -191,8 +192,7 @@ export function CryptoExchange() {
     //       fee: 500, // Pool fee (e.g., 0.5%)
     //       recipient: address as Address, // Recipient address
     //       amountIn: parseEther(amount), // Amount of input token
-    //       amountOutMinimum: 0n, // Minimum amount of output tokens to receive
-    //       sqrtPriceLimitX96: 0n, // No price limit
+    //       amountOutMinimum: 0n, // No price limit
     //     },
     //   ],
     // },
@@ -388,12 +388,12 @@ export function CryptoExchange() {
                 {/* <div className="bg-black bg-gradient-to-br from-gray-900 via-indigo-950 to-purple-900 rounded-xl p-6 space-y-4"> */}
                 <div className="text-gray-400 text-lg font-medium">You Receive</div>
 
-                <div className="flex items-center">
-                  <div className="text-5xl text-gray-200 font-bold flex-1">
+                <div className="flex items-center gap-1">
+                  <div className="text-5xl text-gray-200 font-bold flex-1 truncate overflow-hidden">
                     {isQuoteLoading ? (
                       <span className="animate-pulse text-xs">Fetching quote</span>
                     ) : quoteExactInputSingle?.result ? (
-                      Number(formatUnits(quoteExactInputSingle.result[0], tokenOut.decimals))
+                      Number(formatUnits(quoteExactInputSingle.result[0], tokenOut.decimals)).toFixed(6)
                     ) : (
                       '0'
                     )}
@@ -403,7 +403,7 @@ export function CryptoExchange() {
                     <TokenSelect
                       className="bg-white text-gray-950 border-none rounded-full p-6 pl-3 pr-4 focus:ring-0 overflow-hidden"
                       name="tokenOut"
-                      tokens={tokensOut}
+                      tokens={tokens}
                       onChange={(tokenSymbol: TokenMapKey) => {
                         setFieldError('amount', undefined);
                         setTokenOutSymbol(tokenSymbol);

@@ -1,8 +1,15 @@
 'use client';
-import { WalletDashboard } from '@/components/WalletDashboard';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
 function DashboardPage() {
-  return <WalletDashboard />;
+  const router = useRouter();
+
+  useEffect(() => {
+    router.replace('/dashboard/tokens');
+  }, [router]);
+
+  return null;
 }
 
 export default DashboardPage;
