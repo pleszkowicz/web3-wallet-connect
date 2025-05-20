@@ -30,6 +30,7 @@ export async function getTransactionsHistory({ address, chainId }: GetTransactio
                     toAddress: address,
                     category: ["external", "erc20", "erc721", "erc1155"],
                     withMetadata: true,
+                    order: "desc",
                 },
             ],
         };
@@ -41,7 +42,7 @@ export async function getTransactionsHistory({ address, chainId }: GetTransactio
         });
         const { result }: { result: AlchemyResponse } = await response.json();
 
-        return result.transfers
+        return result.transfers.sort()
     } else if (currentChain?.id === Number(hardhat.id)) {
         // custom solution for hardhat local node since there is no explorer
         // and we need to fetch transactions from the local node
