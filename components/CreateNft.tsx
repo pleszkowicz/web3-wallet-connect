@@ -103,7 +103,7 @@ export function CreateNFT() {
 
       toast({ title: 'NFT confirmed on the blockchain!' });
 
-      router.push('/dashboard');
+      router.push('/dashboard/nfts');
     } catch (error) {
       if (nftUriId) {
         deleteNftTokenUri({ id: nftUriId });

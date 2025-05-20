@@ -150,7 +150,6 @@ const NftItem = ({ tokenId, owner, price }: NftItemProps) => {
         onSuccess: () => {
           refetchGetApproved();
           toast({ title: 'NFT successfully purchased!' });
-          router.push('/dashboard');
         },
         onError: (error) => {
           console.error('Purchase error:', error);
