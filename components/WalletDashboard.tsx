@@ -45,7 +45,7 @@ export function WalletDashboard({ children }: PropsWithChildren) {
               key={tab.href}
               href={tab.href}
               className={`text-center py-2 rounded-t-md font-medium transition-all border-b ${
-                isActive ? 'bg-purple-950 text-white' : 'text-gray-500 hover:text-gray-800'
+                isActive ? 'bg-purple-900 text-white' : 'text-gray-500 hover:text-gray-800'
               }`}
               aria-current={isActive ? 'page' : undefined}
             >
