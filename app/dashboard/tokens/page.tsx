@@ -1,6 +1,7 @@
 'use client';
-import TokenBalance from '@/components/TokenBalance';
+import { TokenBalance } from '@/components/TokenBalance';
 import { Token, tokenMap, tokens } from '@/const/tokens';
+import Link from 'next/link';
 import { useMemo } from 'react';
 import invariant from 'tiny-invariant';
 import { useAccount, useBalance, useReadContract } from 'wagmi';
@@ -12,9 +13,24 @@ export default function TokensPage() {
   const erc20tokens = useMemo(() => {
     return tokens.filter((token) => !!token.address);
   }, []);
+
   return (
     <div className="flex flex-col gap-4">
-      <TokenBalance balance={balance?.value} isLoading={isBalanceLoading} token={tokenMap.eth} />
+      <TokenBalance
+        balance={balance?.value}
+        description={
+          <Link
+            className="text-xs flex hover:underline"
+            href="https://cloud.google.com/application/web3/faucet/ethereum/sepolia"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Get tokens
+          </Link>
+        }
+        isLoading={isBalanceLoading}
+        token={tokenMap.eth}
+      />
       {erc20tokens.map((token) => (
         <ERC20TokenBalance key={token.symbol} token={token} />
       ))}
@@ -27,7 +43,7 @@ type ERC20TokenBalanceProps = {
 };
 
 function ERC20TokenBalance({ token }: ERC20TokenBalanceProps) {
-  const { address, isConnected } = useAccount();
+  const { address } = useAccount();
 
   invariant(address, 'Address is required');
 
@@ -40,12 +56,8 @@ function ERC20TokenBalance({ token }: ERC20TokenBalanceProps) {
   });
 
   return (
-    <div>
-      {isConnected ? (
-        <TokenBalance token={token} balance={balance as bigint | undefined} isLoading={isLoading} />
-      ) : (
-        <p>Please connect your wallet to Sepolia</p>
-      )}
-    </div>
+    <>
+      <TokenBalance token={token} balance={balance as bigint | undefined} isLoading={isLoading} />
+    </>
   );
 }
