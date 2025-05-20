@@ -118,9 +118,7 @@ export function CreateNFT() {
   };
 
   return (
-    <ContentLayout title="Create NFT" showBackButton>
-      <h2 className="text-center">Mint your own NFT</h2>
-
+    <ContentLayout title="Mint NFT" showBackButton>
       <Formik<Prisma.NftCreateInput>
         initialValues={{ name: '', description: '', image: '' }}
         onSubmit={handleSubmit}
@@ -196,7 +194,7 @@ export function CreateNFT() {
                   type="submit"
                   disabled={isSubmitting || isTransactionPending || !isValid}
                 >
-                  Create
+                  Mint
                 </Button>
               </Form>
             </div>
