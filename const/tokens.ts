@@ -1,5 +1,4 @@
 import { Abi, Address } from 'viem';
-import { DAI_TOKEN_ABI } from './abi/dai-token-abi';
 import { LINK_TOKEN_ABI } from './abi/link-token-abi';
 import { USDC_ABI } from './abi/usdc-abi';
 import { WETH_ABI } from './abi/weth-abi';
@@ -47,14 +46,6 @@ export const tokenMap = {
     decimals: 6,
     abi: USDC_ABI,
     logo: 'https://coin-images.coingecko.com/coins/images/6319/large/usdc.png',
-  },
-  dai: {
-    symbol: 'dai',
-    label: 'Dai Stablecoin',
-    address: '0xFF34B3d4Aee8ddCd6F9AFFFB6Fe49bD371b8a357',
-    decimals: 18,
-    abi: DAI_TOKEN_ABI,
-    logo: 'https://coin-images.coingecko.com/coins/images/9956/large/Badge_Dai.png'
   },
 } as const;
 

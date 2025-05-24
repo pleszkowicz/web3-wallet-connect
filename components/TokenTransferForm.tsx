@@ -1,21 +1,22 @@
 'use client';
+import { ContentLayout } from '@/components/ContentLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { tokenMap, TokenMapKey, tokens } from '@/const/tokens';
-import { cn } from '@/lib/cn';
-import { ErrorMessage, Field, Form, Formik } from 'formik';
+import { Field, Form, Formik } from 'formik';
 import { useEffect, useState } from 'react';
 import { Abi, Address, encodeFunctionData, formatEther, formatUnits, isAddress, parseEther, parseUnits } from 'viem';
 import { useAccount, useBalance, usePublicClient, useReadContract, useSendTransaction, useWriteContract } from 'wagmi';
 import * as Yup from 'yup';
-import { ContentLayout } from './ContentLayout';
+import { FormError } from './form/FormError';
 import { TokenSelect } from './TokenSelect';
 import { useToast } from './ui/hooks/use-toast';
-import { Loader } from './ui/loader';
+import { Label } from './ui/label';
+
+const initialValues = { unit: tokenMap.eth.symbol, to: '', value: '' };
 
 export function TokenTransferForm() {
-  const [selectedToken, setSelectedToken] = useState<TokenMapKey>(tokenMap.eth.symbol);
+  const [selectedToken, setSelectedToken] = useState<TokenMapKey>(initialValues.unit);
   const { address, chain } = useAccount();
   const { data: ethBalance } = useBalance({ address });
   const { sendTransactionAsync, isPending: isTransactionPending } = useSendTransaction();
@@ -81,48 +82,31 @@ export function TokenTransferForm() {
     fetchGas();
   }, [client, selectedToken, chain, address]);
 
-  const currentBalance = (selectedToken === tokenMap.eth.symbol ? ethBalance?.value : (erc20Balance as bigint)) ?? 0;
+  const currentBalance = (selectedToken === tokenMap.eth.symbol ? ethBalance?.value : (erc20Balance as bigint)) ?? 0n;
 
   const validationSchema = Yup.object().shape({
-    unit: Yup.string()
-      .oneOf(Object.keys(tokenMap) as TokenMapKey[])
-      .required('Unit is required'),
-    from: Yup.string()
-      .matches(/^0x[a-fA-F0-9]{40}$/, 'Invalid wallet address format')
-      .required('Sender address is required'),
     to: Yup.string()
-      .matches(/^0x[a-fA-F0-9]{40}$/, 'Invalid wallet address format')
-      .required('Recipient address is required')
-      .test('is-valid-address', 'Invalid wallet address', function (value) {
-        return isAddress(value);
-      }),
-    value: Yup.string()
+      .matches(/^0x[a-fA-F0-9]{40}$/, 'Invalid wallet address')
+      .required('Recipient is required')
+      .test('is-valid-address', 'Invalid wallet address', (v) => !!v && isAddress(v)),
+    value: Yup.number()
       .required('Value is required')
-      .test('is-valid-value', 'Insufficient balance', function (value) {
-        const { path, createError } = this;
-        const availableBalance = currentBalance ? Number(formatEther(currentBalance)) : 0;
-        if (parseFloat(value) > availableBalance) {
-          return createError({
-            path,
-            message: `Exceeds available balance of ${availableBalance} and gas fee.`,
-          });
-        }
-        return true;
+      .test('balance', 'Insufficient balance', (v) => {
+        const available = Number(formatUnits(currentBalance, tokenMap[selectedToken].decimals));
+        return typeof v === 'number' && v > 0 && v <= available;
       }),
   });
 
   return (
-    <ContentLayout title="Send" description="Transfer your crypto to another address" showBackButton>
+    <ContentLayout title="Send" showBackButton>
       <Formik
-        initialValues={{ unit: tokenMap.eth.symbol, from: address, to: '', value: 0 }}
+        validationSchema={validationSchema}
+        initialValues={initialValues}
         onSubmit={async (values, { resetForm }) => {
           try {
             const txHash =
               selectedToken === tokenMap.eth.symbol
-                ? await sendTransactionAsync({
-                    to: values.to as Address,
-                    value: parseEther(String(values.value)),
-                  })
+                ? await sendTransactionAsync({ to: values.to as Address, value: parseEther(String(values.value)) })
                 : await writeContractAsync({
                     address: tokenMap[selectedToken].address,
                     abi: tokenMap[selectedToken].abi as Abi,
@@ -133,102 +117,97 @@ export function TokenTransferForm() {
                     ],
                   });
 
-            toast({
-              title: 'Transaction sent',
-              description: 'Waiting for confirmation on the blockchain.',
-            });
-
+            toast({ title: 'Transaction sent', description: 'Waiting for confirmation.' });
             await client?.waitForTransactionReceipt({ hash: txHash });
-
-            toast({ title: 'Transaction confirmed on the blockchain!' });
-
+            toast({ title: 'Confirmed on-chain!' });
             resetForm();
           } catch (error) {
             if ((error as Error)?.message?.includes('User rejected the request')) {
               return;
             }
-            console.error('Error sending transaction:', error);
             toast({
               title: 'Transaction failed',
-              description: 'An error occurred while sending the transaction. Please try again.',
+              description: 'An error occurred during transfer',
               variant: 'destructive',
             });
           }
         }}
-        validationSchema={validationSchema}
       >
-        {() => {
-          return (
-            <Form className="space-y-4">
-              <div className="space-y-2">
-                <TokenSelect
-                  className="w-auto"
-                  label="Select Token"
-                  name="unit"
-                  tokens={tokens}
-                  onChange={(tokenSymbol: TokenMapKey) => {
-                    setSelectedToken(tokenSymbol);
-                  }}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="from">From</Label>
-                <Field as={Input} id="from" name="from" type="text" disabled className="bg-muted" />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="to">To</Label>
-                <Field as={Input} id="to" name="to" placeholder="0x..." />
-                <ErrorMessage name="to" component="div" className="text-red-500" />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="value">
-                  Value{' '}
-                  <span className="text-xs">
-                    (max {currentBalance ? formatUnits(currentBalance, tokenMap[selectedToken].decimals) : '0.00'}{' '}
-                    {tokenMap[selectedToken].label})
-                  </span>
+        {({ setFieldError, setFieldValue }) => (
+          <Form className="space-y-2">
+            <div className="bg-black bg-gradient-to-br from-gray-900 via-indigo-950 to-purple-900 rounded-xl p-6 space-y-4">
+              <div>
+                <Label htmlFor="to" className="flex-1 text-gray-400 text-lg font-medium">
+                  To
                 </Label>
-                <Field as={Input} id="value" name="value" placeholder="0.00" />
-                <ErrorMessage name="value" component="div" className="text-red-500" />
+
+                <Field
+                  as={Input}
+                  id="to"
+                  name="to"
+                  placeholder="Enter public address 0x"
+                  className="flex w-full rounded-md border px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-indigo-900/40 border-indigo-700 text-white placeholder:text-indigo-300 h-14 pr-12"
+                />
+                {/* <Field
+                  as={Input}
+                  id="to"
+                  type="text"
+                  name="to"
+                  placeholder="Enter public address 0x"
+                  className="text-5xl text-gray-200 font-bold bg-transparent border-none shadow-none p-0 h-auto focus-visible:ring-0 focus-visible:ring-offset-0 appearance-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-inner-spin-button]:m-0"
+                /> */}
+                <FormError name="to" className="text-yellow-300 text-sm mt-1" />
               </div>
-              <div className={cn('space-y-2', isGasPriceFetching ? 'animate-pulse disabled' : '')}>
-                <div className="flex items-center justify-start gap-2 bg-muted p-2 rounded-md">
-                  <Label>Estimated Gas Fee:</Label>
-                  <span className="text-sm">
-                    {gasPrice ? `${formatEther(gasPrice, 'gwei')} Gwei` : <Loader size="sm" iconOnly />}
-                  </span>{' '}
-                  {/* <Button
-                    type="button"
-                    variant="link"
-                    size="sm"
-                    disabled={isGasPriceFetching}
-                    onClick={() => !isGasPriceFetching && fetchGas()}
-                  >
-                    <RefreshCwIcon className={cn('w-4 h-4 mr-2', isGasPriceFetching ? 'animate-spin' : '')} />
-                  </Button> */}
-                  {/* {gasPrice ? (
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <InfoIcon className="inline-block" width={20} />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <span className="text-xs">({formatEther(gasPrice, 'wei')} ETH)</span>
-                      </TooltipContent>
-                    </Tooltip>
-                  ) : null} */}
+              <div className="flex flex-row relative items-start">
+                <div>
+                  <Field
+                    as={Input}
+                    id="value"
+                    type="number"
+                    name="value"
+                    placeholder="0.00"
+                    className="text-5xl text-gray-200 font-bold bg-transparent border-none shadow-none p-0 h-auto focus-visible:ring-0 focus-visible:ring-offset-0 appearance-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-inner-spin-button]:m-0"
+                  />
+
+                  <div className="text-sm text-gray-400 mt-1">
+                    {formatUnits(
+                      (selectedToken === tokenMap.eth.symbol ? ethBalance?.value : (erc20Balance as bigint)) ?? 0n,
+                      tokenMap[selectedToken].decimals
+                    )}{' '}
+                    {selectedToken.toUpperCase()}
+                  </div>
+
+                  <FormError name="value" />
+                </div>
+
+                <div className="flex flex-1 items-center">
+                  <TokenSelect
+                    className="bg-white text-gray-950 border-none rounded-full p-6 pl-3 pr-4 focus:ring-0 overflow-hidden"
+                    name="unit"
+                    tokens={tokens}
+                    onChange={(tokenSymbol: TokenMapKey) => {
+                      setFieldValue('value', '');
+                      setSelectedToken(tokenSymbol);
+                    }}
+                  />
                 </div>
               </div>
-              <Button
-                disabled={isTransactionPending || isWriteContractPending}
-                variant="default"
-                className="w-full"
-                type="submit"
-              >
-                Transfer
+
+              <div className="bg-black bg-opacity-30 rounded-lg p-4 flex items-center justify-between">
+                <span className="text-white">Estimated Gas:</span>
+                {/* {isGasPriceFetching ? (
+                  <Loader size="sm" />
+                ) : ( */}
+                <span className="text-white">{gasPrice ? `${formatEther(gasPrice, 'gwei')} Gwei` : 'N/A'}</span>
+                {/* )} */}
+              </div>
+
+              <Button type="submit" className="w-full bg-white text-black hover:bg-gray-200">
+                Send
               </Button>
-            </Form>
-          );
-        }}
+            </div>
+          </Form>
+        )}
       </Formik>
     </ContentLayout>
   );
