@@ -1,10 +1,10 @@
+import { FormError } from '@/components/ui/form/FormError';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Token, TokenMapKey } from '@/const/tokens';
 import { cn } from '@/lib/cn';
 import { useFormikContext } from 'formik';
 import Image from 'next/image';
-import { FormError } from './form/FormError';
-import { Label } from './ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 
 type CryptoSelectProps = {
   className?: string;

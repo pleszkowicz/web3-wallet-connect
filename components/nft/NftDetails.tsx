@@ -1,4 +1,13 @@
 'use client';
+import { NftStatusHelper } from '@/components/nft/NftStatusHelper';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { FormError } from '@/components/ui/form/FormError';
+import { useToast } from '@/components/ui/hooks/use-toast';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Loader } from '@/components/ui/loader';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { NFT_MARKET_CONTRACT_ABI } from '@/const/nft-marketplace/nft-marketplace-abi';
 import { NFT_MARKETPLACE_ADDRESS } from '@/const/nft-marketplace/nft-marketplace-address';
 import { Nft, NftMeta } from '@/types/NFT';
@@ -12,15 +21,6 @@ import invariant from 'tiny-invariant';
 import { formatEther, parseEther } from 'viem';
 import { useAccount, usePublicClient, useReadContract, useTransactionCount, useWriteContract } from 'wagmi';
 import * as Yup from 'yup';
-import { FormError } from './form/FormError';
-import { NftStatusHelper } from './NftStatusHelper';
-import { Button } from './ui/button';
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
-import { useToast } from './ui/hooks/use-toast';
-import { Input } from './ui/input';
-import { Label } from './ui/label';
-import { Loader } from './ui/loader';
-import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 
 type NftDetailsProps = Pick<Nft, 'tokenId'>;
 

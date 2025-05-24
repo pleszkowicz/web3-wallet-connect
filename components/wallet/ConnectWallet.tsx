@@ -1,5 +1,7 @@
 'use client';
+import { ContentLayout } from '@/components/ContentLayout';
 import { Button } from '@/components/ui/button';
+import { DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useMounted } from '@/hooks/useMounted';
 import { cn } from '@/lib/cn';
 import { Dialog } from '@radix-ui/react-dialog';
@@ -10,8 +12,6 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { Connector, useAccount, useConnect } from 'wagmi';
-import { ContentLayout } from './ContentLayout';
-import { DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
 
 export function WalletConnect() {
   const { connectors, connectAsync, isPending: isConnectionPending, isSuccess: isConnectionSuccess } = useConnect();

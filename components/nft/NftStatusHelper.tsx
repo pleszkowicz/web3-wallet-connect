@@ -1,7 +1,7 @@
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/cn';
 import { ShieldCheck, Tag } from 'lucide-react';
 import { JSX } from 'react';
-import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 
 type NftStatusHelperProps = {
   variant: 'owner' | 'for-sale';

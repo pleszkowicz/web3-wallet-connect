@@ -1,15 +1,15 @@
 'use client';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { DisconnectWallet } from '@/components/wallet/DisconnectWallet';
+import { NetworkSwitch } from '@/components/wallet/NetworkSwitch';
 import { useMounted } from '@/hooks/useMounted';
 import { OpenInNewWindowIcon } from '@radix-ui/react-icons';
 import { ArrowLeftIcon, CheckIcon, CopyIcon } from 'lucide-react';
 import Link from 'next/link';
 import { ReactElement, ReactNode, useEffect, useState } from 'react';
 import { useAccount, useEnsName } from 'wagmi';
-import { DisconnectAccount } from './DisconnectAccount';
-import NetworkSwitch from './NetworkSwitch';
-import { Button } from './ui/button';
-import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 
 interface CardLayoutProps {
   title?: string;
@@ -63,7 +63,7 @@ export const ContentLayout = ({ title, description, headerContent, goBackUrl, ch
 
           {isConnected && (
             <div className="absolute right-0">
-              <DisconnectAccount />
+              <DisconnectWallet />
             </div>
           )}
         </div>

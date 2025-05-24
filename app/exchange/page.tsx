@@ -1,6 +1,6 @@
 'use client';
-import { CryptoExchange } from '@/components/CryptoExchange';
+import { TokenExchange } from '@/components/swap/TokenExchange';
 
 export default function TransactionPage() {
-  return <CryptoExchange />;
+  return <TokenExchange />;
 }

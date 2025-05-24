@@ -1,15 +1,15 @@
 'use client';
 import { Button } from '@/components/ui/button';
+import { useToast } from '@/components/ui/hooks/use-toast';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { PowerOff } from 'lucide-react';
 import { useDisconnect } from 'wagmi';
-import { useToast } from './ui/hooks/use-toast';
-import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 
 type DisconnectAccountTypes = {
   className?: string;
 };
 
-export const DisconnectAccount = ({ className }: DisconnectAccountTypes) => {
+export const DisconnectWallet = ({ className }: DisconnectAccountTypes) => {
   const { disconnectAsync: disconnect } = useDisconnect();
   const { toast } = useToast();
 

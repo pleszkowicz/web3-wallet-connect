@@ -1,10 +1,10 @@
 'use client';
+import { ContentLayout } from '@/components/ContentLayout';
 import { ImagePlusIcon, LucideIcon, RefreshCw, SendIcon } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { PropsWithChildren, useEffect, useState } from 'react';
 import { useConnect } from 'wagmi';
-import { ContentLayout } from './ContentLayout';
 
 export function WalletDashboard({ children }: PropsWithChildren) {
   const { connectors } = useConnect();

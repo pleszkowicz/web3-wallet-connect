@@ -1,5 +1,5 @@
 'use client';
-import { TokenBalance } from '@/components/TokenBalance';
+import { TokenBalance } from '@/components/wallet/TokenBalance';
 import { Token, tokenMap, tokens } from '@/const/tokens';
 import Link from 'next/link';
 import { useMemo } from 'react';

@@ -1,5 +1,5 @@
 'use client';
-import TransactionHistory from '@/components/TransactionHistory';
+import TransactionHistory from '@/components/transactions/TransactionHistory';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';

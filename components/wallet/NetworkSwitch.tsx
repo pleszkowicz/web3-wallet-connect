@@ -1,9 +1,9 @@
 'use client';
-import { useChainId, useSwitchChain } from 'wagmi';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { config } from '@/config/wagmiConfig';
-import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
+import { useChainId, useSwitchChain } from 'wagmi';
 
-export default function NetworkSwitch() {
+export const NetworkSwitch = () => {
   const { chains } = config;
   const { switchChain, isPending } = useSwitchChain();
   const chainId = useChainId();
@@ -29,4 +29,4 @@ export default function NetworkSwitch() {
       </TooltipContent>
     </Tooltip>
   );
-}
+};

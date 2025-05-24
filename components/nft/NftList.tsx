@@ -1,13 +1,13 @@
 'use client';
+import { NftListItem } from '@/components/nft/NftListItem';
+import { Button } from '@/components/ui/button';
+import { Loader } from '@/components/ui/loader';
 import { NFT_MARKET_CONTRACT_ABI } from '@/const/nft-marketplace/nft-marketplace-abi';
 import { NFT_MARKETPLACE_ADDRESS } from '@/const/nft-marketplace/nft-marketplace-address';
 import { Nft } from '@/types/NFT';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
 import { useReadContract } from 'wagmi';
-import { NftListItem } from './NftListItem';
-import { Button } from './ui/button';
-import { Loader } from './ui/loader';
 
 export const NftList = () => {
   const {

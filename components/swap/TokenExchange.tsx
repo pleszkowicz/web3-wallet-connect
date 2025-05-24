@@ -1,25 +1,26 @@
 'use client';
 import { ContentLayout } from '@/components/ContentLayout';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { FormError } from '@/components/ui/form/FormError';
+import { TokenSelect } from '@/components/ui/form/TokenSelect';
+import { useToast } from '@/components/ui/hooks/use-toast';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { tokenMap, TokenMapKey, tokens } from '@/const/tokens';
 import { UNISWAP_V3_QUOTER_ABI } from '@/const/uniswap/uniswap-v3-quoter-abi';
 import { UNISWAP_V3_ROUTER_ABI } from '@/const/uniswap/uniswap-v3-router-abi';
 import { CHAIN_TO_ADDRESSES_MAP } from '@uniswap/sdk-core';
 import { Field, Form, Formik } from 'formik';
 import { RefreshCw } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { ChangeEvent, useMemo, useState } from 'react';
 import { Abi, Address, formatUnits, Hash, parseEther, parseUnits } from 'viem';
 import { sepolia } from 'viem/chains';
 import { useAccount, useBalance, usePublicClient, useReadContract, useSimulateContract, useWriteContract } from 'wagmi';
 import { useSendCalls } from 'wagmi/experimental';
 import * as Yup from 'yup';
-import { FormError } from './form/FormError';
-import { TokenSelect } from './TokenSelect';
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from './ui/dialog';
-import { useToast } from './ui/hooks/use-toast';
-import { Label } from './ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 
 const swapRouterAddress = CHAIN_TO_ADDRESSES_MAP[sepolia.id].swapRouter02Address;
 const quoterAddress = CHAIN_TO_ADDRESSES_MAP[sepolia.id].quoterAddress;
@@ -40,12 +41,13 @@ const initialValues = {
   value: 0.000001,
 };
 
-export function CryptoExchange() {
+export function TokenExchange() {
   const [tokenInSymbol, setTokenInSymbol] = useState<TokenMapKey>(initialValues.tokenIn);
   const [tokenOutSymbol, setTokenOutSymbol] = useState<TokenMapKey>(initialValues.tokenOut);
   const [amount, setAmount] = useState(initialValues.value.toString());
   const [fee, setFee] = useState<keyof typeof feeMap>('0.3%');
   const { address } = useAccount();
+  const { push } = useRouter();
   const { data: ethBalance } = useBalance({ address });
   const { sendCallsAsync } = useSendCalls();
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -128,7 +130,6 @@ export function CryptoExchange() {
   const tokensOut = useMemo(() => {
     return tokens.filter((token) => token.symbol !== tokenIn.symbol);
   }, [tokenIn]);
-  console.log('tokensOut', tokensOut);
 
   const isSubmitDisabled =
     tokenInBalance === 0n ||
@@ -433,6 +434,7 @@ export function CryptoExchange() {
         onClose={() => {
           setDialogOpen(false);
           setTxStatus('idle');
+          push('/dashboard/tokens');
         }}
         onNewSwap={() => {
           setDialogOpen(false);
@@ -443,75 +445,69 @@ export function CryptoExchange() {
   );
 }
 
-type TransacrionStatusDialogProps = {
+type TransactionStatus = 'idle' | 'waiting-approve' | 'pending' | 'confirmed' | 'error';
+
+type TransactionStatusDialogProps = {
   open: boolean;
   status: TransactionStatus;
   onClose: () => void;
   onNewSwap?: () => void;
 };
 
-type TransactionStatus = 'idle' | 'waiting-approve' | 'pending' | 'confirmed' | 'error';
+const STATUSES = {
+  'waiting-approve': {
+    title: 'Awaiting wallet confirmation',
+    icon: <span className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-400 mb-2" />,
+    message: 'Please confirm the transaction in your wallet.',
+  },
+  pending: {
+    title: 'Transaction Pending',
+    icon: <span className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-400 mb-2" />,
+    message: 'Waiting for confirmation on the blockchain...',
+  },
+  confirmed: {
+    title: <span className="flex items-center">Swap Confirmed </span>,
+    icon: undefined,
+    message: undefined,
+  },
+  error: {
+    title: 'Transaction Failed',
+    icon: <span className="text-red-400 text-3xl">✗</span>,
+    message: 'Transaction failed. Please try again.',
+  },
+};
 
-const TransactionStatusDialog = ({ open, status, onClose, onNewSwap }: TransacrionStatusDialogProps) => {
+const TransactionStatusDialog = ({ open, status, onClose, onNewSwap }: TransactionStatusDialogProps) => {
+  const current = STATUSES[status as keyof typeof STATUSES];
+
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>
-            {status === 'waiting-approve'
-              ? 'Awaiting wallet confirmation'
-              : status === 'pending'
-                ? 'Transaction Pending'
-                : status === 'confirmed'
-                  ? 'Swap Confirmed!'
-                  : status === 'error'
-                    ? 'Transaction Failed'
-                    : 'Swap'}
-          </DialogTitle>
+          <DialogTitle>{current?.title || 'Swap'}</DialogTitle>
         </DialogHeader>
-        <div className="py-4">
-          {status === 'waiting-approve' && (
-            <div className="flex flex-col items-center gap-2">
-              <span className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-400 mb-2" />
-              <p className="text-gray-400 text-center">Please confirm the transaction in your wallet.</p>
-            </div>
-          )}
-          {status === 'pending' && (
-            <div className="flex flex-col items-center gap-2">
-              <span className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-400 mb-2" />
-              <p className="text-gray-400 text-center">Waiting for confirmation on the blockchain...</p>
-            </div>
-          )}
-          {status === 'confirmed' && (
-            <div className="flex flex-col items-center gap-2">
-              <span className="text-green-400 text-3xl">✓</span>
-              <p className="text-gray-400 text-center">
-                Swap confirmed! You can send another transaction or return to the dashboard.
-              </p>
-            </div>
-          )}
-          {status === 'error' && (
-            <div className="flex flex-col items-center gap-2">
-              <span className="text-red-400 text-3xl">✗</span>
-              <p className="text-gray-400 text-center">Transaction failed. Please try again.</p>
-            </div>
-          )}
-        </div>
+        {current && (
+          <div className="py-4 flex flex-col items-center gap-2">
+            {current?.icon}
+            <p className="text-gray-400 text-center">{current.message}</p>
+          </div>
+        )}
         <DialogFooter>
-          {status === 'confirmed' ? (
+          {status === 'confirmed' && (
             <>
-              <Button variant="secondary" onClick={onNewSwap}>
-                New Swap
-              </Button>
               <Button variant="outline" onClick={onClose}>
                 Go to Dashboard
               </Button>
+              <Button variant="secondary" onClick={onNewSwap}>
+                New Swap
+              </Button>
             </>
-          ) : status === 'error' ? (
+          )}
+          {status === 'error' && (
             <Button variant="outline" onClick={onClose}>
               Close
             </Button>
-          ) : null}
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>

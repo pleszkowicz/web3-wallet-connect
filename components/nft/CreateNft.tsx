@@ -2,6 +2,14 @@
 import { createNftTokenUri } from '@/app/actions/createNftTokenUri';
 import { deleteNftTokenUri } from '@/app/actions/deleteNftTokenUri';
 import { validateImageUrl } from '@/app/actions/validateImageUrl';
+import { ContentLayout } from '@/components/ContentLayout';
+import { NftListItemUI } from '@/components/nft/NftListItem';
+import { Button } from '@/components/ui/button';
+import { FormError } from '@/components/ui/form/FormError';
+import { FormInput } from '@/components/ui/form/FormInput';
+import { useToast } from '@/components/ui/hooks/use-toast';
+import { Label } from '@/components/ui/label';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { NFT_MARKET_CONTRACT_ABI } from '@/const/nft-marketplace/nft-marketplace-abi';
 import { NFT_MARKETPLACE_ADDRESS } from '@/const/nft-marketplace/nft-marketplace-address';
 import { useMounted } from '@/hooks/useMounted';
@@ -15,14 +23,6 @@ import invariant from 'tiny-invariant';
 import { formatEther } from 'viem';
 import { usePublicClient, useReadContract, useWriteContract } from 'wagmi';
 import * as Yup from 'yup';
-import { ContentLayout } from './ContentLayout';
-import { FormError } from './form/FormError';
-import { FormInput } from './form/FormInput';
-import { NftListItemUI } from './NftListItem';
-import { Button } from './ui/button';
-import { useToast } from './ui/hooks/use-toast';
-import { Label } from './ui/label';
-import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 
 export function CreateNFT() {
   const { toast } = useToast();

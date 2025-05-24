@@ -1,12 +1,12 @@
 'use client';
+import { Badge } from '@/components/ui/badge';
+import { Loader } from '@/components/ui/loader';
 import { useTransactions } from '@/hooks/useTransactions';
 import { shrotenAddress } from '@/lib/shortenAddress';
 import { useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { formatEther, parseEther, zeroAddress } from 'viem';
 import { useAccount } from 'wagmi';
-import { Badge } from './ui/badge';
-import { Loader } from './ui/loader';
 
 const TransactionHistory = () => {
   const { address, chain: currentChain } = useAccount();

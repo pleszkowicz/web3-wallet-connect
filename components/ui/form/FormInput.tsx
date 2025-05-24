@@ -1,6 +1,6 @@
 import { Field } from 'formik';
 import { InputHTMLAttributes } from 'react';
-import { Input } from '../ui/input';
+import { Input } from '../input';
 
 type FormInputProps = InputHTMLAttributes<HTMLInputElement> & {
   id: string;

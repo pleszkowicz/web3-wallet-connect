@@ -1,4 +1,5 @@
 'use client';
+import { NftStatusHelper } from '@/components/nft/NftStatusHelper';
 import { NFT_MARKET_CONTRACT_ABI } from '@/const/nft-marketplace/nft-marketplace-abi';
 import { NFT_MARKETPLACE_ADDRESS } from '@/const/nft-marketplace/nft-marketplace-address';
 import { Prisma } from '@/lib/generated/prisma';
@@ -9,7 +10,6 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { formatEther } from 'viem';
 import { useAccount, useReadContract } from 'wagmi';
-import { NftStatusHelper } from './NftStatusHelper';
 
 export const NftListItem = ({ tokenId, price, owner }: Nft) => {
   const { data: tokenURI, isLoading } = useReadContract({
