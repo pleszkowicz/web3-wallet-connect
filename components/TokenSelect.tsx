@@ -1,7 +1,8 @@
 import { Token, TokenMapKey } from '@/const/tokens';
 import { cn } from '@/lib/cn';
-import { ErrorMessage, useFormikContext } from 'formik';
+import { useFormikContext } from 'formik';
 import Image from 'next/image';
+import { FormError } from './form/FormError';
 import { Label } from './ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 
@@ -50,7 +51,7 @@ export const TokenSelect = ({ label, name, onChange, tokens, className }: Crypto
           })}
         </SelectContent>
       </Select>
-      <ErrorMessage name={name} component="div" className="text-red-500" />
+      <FormError name={name} />
     </>
   );
 };

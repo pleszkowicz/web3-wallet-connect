@@ -5,7 +5,7 @@ export default async function NftItemPage({ params }: { params: Promise<{ id: st
   const { id: tokenId } = await params;
 
   return (
-    <ContentLayout title="NFT details" showBackButton>
+    <ContentLayout title="NFT details" goBackUrl="/dashboard/nfts">
       <NftDetails tokenId={BigInt(tokenId)} />
     </ContentLayout>
   );

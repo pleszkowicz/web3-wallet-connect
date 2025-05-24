@@ -7,7 +7,7 @@ import { NFT_MARKETPLACE_ADDRESS } from '@/const/nft-marketplace/nft-marketplace
 import { useMounted } from '@/hooks/useMounted';
 import { Prisma } from '@/lib/generated/prisma';
 import { NftMeta } from '@/types/NFT';
-import { ErrorMessage, Field, Form, Formik } from 'formik';
+import { Form, Formik } from 'formik';
 import { InfoIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -16,10 +16,11 @@ import { formatEther } from 'viem';
 import { usePublicClient, useReadContract, useWriteContract } from 'wagmi';
 import * as Yup from 'yup';
 import { ContentLayout } from './ContentLayout';
+import { FormError } from './form/FormError';
+import { FormInput } from './form/FormInput';
 import { NftListItemUI } from './NftListItem';
 import { Button } from './ui/button';
 import { useToast } from './ui/hooks/use-toast';
-import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 
@@ -118,7 +119,7 @@ export function CreateNFT() {
   };
 
   return (
-    <ContentLayout title="Mint NFT" showBackButton>
+    <ContentLayout title="Mint NFT" goBackUrl="/dashboard/nfts">
       <Formik<Prisma.NftCreateInput>
         initialValues={{ name: '', description: '', image: '' }}
         onSubmit={handleSubmit}
@@ -128,8 +129,8 @@ export function CreateNFT() {
           const isImageLoading = values.image == '' || !isValidUrl(values.image) || !!errors['image'];
 
           return (
-            <div className="flex flex-col md:flex-row-reverse w-full gap-4 items-center border rounded-lg p-4">
-              <div className="flex-1 opacity-90 relative">
+            <div className="flex flex-col md:flex-row-reverse gap-8 w-full bg-black bg-gradient-to-br from-gray-900 via-indigo-950 to-purple-900 rounded-xl p-6 space-y-4">
+              <div className="flex items-center opacity-90 relative w-2/5">
                 <div className="absolute inset-0 z-10 cursor-default"></div>
 
                 <NftListItemUI
@@ -149,42 +150,48 @@ export function CreateNFT() {
                 />
               </div>
 
-              <Form className="flex flex-col gap-4 w-1/2" aria-disabled={isSubmitting || isTransactionPending}>
+              <Form className="flex flex-col gap-4 w-3/5" aria-disabled={isSubmitting || isTransactionPending}>
                 <div>
-                  <Label htmlFor="image">NFT image URL</Label>
-                  <Field as={Input} id="image" name="image" placeholder="https://.." />
-                  <ErrorMessage name="image" component="div" className="text-red-500" />
+                  <Label htmlFor="image" className="flex-1 text-gray-400 text-lg font-medium">
+                    Image URL
+                  </Label>
+                  <FormInput id="image" name="image" placeholder="https://" />
+                  <FormError name="image" />
                 </div>
 
                 <div>
-                  <Label htmlFor="image">Name</Label>
-                  <Field as={Input} id="name" name="name" placeholder="" />
-                  <ErrorMessage name="name" component="div" className="text-red-500" />
+                  <Label htmlFor="name" className="flex-1 text-gray-400 text-lg font-medium">
+                    Name
+                  </Label>
+                  <FormInput id="name" name="name" />
+                  <FormError name="name" />
                 </div>
 
                 <div>
-                  <Label htmlFor="description">Description</Label>
-                  <Field as={Input} id="description" name="description" placeholder="" />
-                  <ErrorMessage name="description" component="div" className="text-red-500" />
+                  <Label htmlFor="description" className="flex-1 text-gray-400 text-lg font-medium">
+                    Description
+                  </Label>
+                  <FormInput id="description" name="description" />
+                  <FormError name="description" />
                 </div>
 
                 <div>
-                  <p className="text-sm my-2 text-muted-foreground">
-                    NFT creation fee{' '}
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <InfoIcon className="inline-block" width={20} />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>NFT listing price can be updated after creation</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </p>
-
-                  <div className="flex items-center justify-start gap-2 bg-muted p-2 rounded-md">
-                    <span className="text-sm">
-                      <b>{listingPrice && formatEther(listingPrice)} ETH</b>
-                    </span>
+                  <div className="text-gray-400 bg-black bg-opacity-30 rounded-lg p-4 flex items-center justify-between">
+                    <p className="">
+                      NFT creation fee{' '}
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <InfoIcon className="inline-block" width={20} />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>
+                            There's a <b>0.001 ETH fee</b> to mint an NFT. Once it's created, you can set your own sale
+                            price.
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </p>
+                    <span>{listingPrice && formatEther(listingPrice)} ETH</span>
                   </div>
                 </div>
 

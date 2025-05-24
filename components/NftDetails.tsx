@@ -3,7 +3,7 @@ import { NFT_MARKET_CONTRACT_ABI } from '@/const/nft-marketplace/nft-marketplace
 import { NFT_MARKETPLACE_ADDRESS } from '@/const/nft-marketplace/nft-marketplace-address';
 import { Nft, NftMeta } from '@/types/NFT';
 import { useQuery } from '@tanstack/react-query';
-import { ErrorMessage, Field, Form, Formik } from 'formik';
+import { Field, Form, Formik } from 'formik';
 import { Check, EditIcon, LoaderIcon, ShoppingCart, Undo2 } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -12,21 +12,15 @@ import invariant from 'tiny-invariant';
 import { formatEther, parseEther } from 'viem';
 import { useAccount, usePublicClient, useReadContract, useTransactionCount, useWriteContract } from 'wagmi';
 import * as Yup from 'yup';
+import { FormError } from './form/FormError';
 import { NftStatusHelper } from './NftStatusHelper';
 import { Button } from './ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from './ui/dialog';
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
 import { useToast } from './ui/hooks/use-toast';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Loader } from './ui/loader';
+import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 
 type NftDetailsProps = Pick<Nft, 'tokenId'>;
 
@@ -180,17 +174,15 @@ const NftItem = ({ tokenId, owner, price }: NftItemProps) => {
                 height={622}
               />
             </div>
-            <div className="absolute left-0 top-0 z-10 flex cursor-default flex-col gap-1 p-4">
+            <div className="absolute top-2 right-2 flex flex-row gap-1 z-10 cursor-default">
+              {isOwned && <NftStatusHelper variant="owner" />}
               {isSaleApproved && <NftStatusHelper variant="for-sale" />}
             </div>
 
             <div className="absolute bottom-0 left-0 z-10 flex w-full flex-row items-end gap-1 bg-opacity-100 bg-gradient-to-b from-transparent to-black p-4 text-left text-white">
               <div className="">
-                <h2 className="font-bold text-slate-100">{tokenDetails.name}</h2>
-                <p className="text-sm text-slate-200">{tokenDetails.description}</p>
-                <div className="mb-2 mt-2 flex items-center justify-start text-sm text-slate-300">
-                  {isOwned ? <NftStatusHelper className="" variant="owner" /> : <span>Owner: {owner}</span>}
-                </div>
+                <h2 className="font-bold text-3xl text-slate-100">{tokenDetails.name}</h2>
+                <p className="text-xl text-slate-200">{tokenDetails.description}</p>
                 <NftPrice tokenId={tokenId} price={price} isOwned={isOwned} />
               </div>
             </div>
@@ -284,31 +276,36 @@ const NftPrice = ({ tokenId, price, isOwned }: NftPriceProps) => {
           {({ isSubmitting, submitForm }) => (
             <Dialog open={isEditing} onOpenChange={setIsEditing}>
               <DialogTrigger asChild>
-                <span className="flex flex-row items-center" title="Edit NFT price">
-                  <EditIcon className="ml-1 h-5 w-5 cursor-pointer" />
+                <span className="flex flex-row items-center">
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <EditIcon className="ml-1 h-5 w-5 cursor-pointer" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Set Your NFT Price</p>
+                    </TooltipContent>
+                  </Tooltip>
                 </span>
               </DialogTrigger>
               <Form aria-disabled={isSubmitting || isWriteContractPending}>
                 <DialogContent className="sm:max-w-[425px]">
                   <DialogHeader>
-                    <DialogTitle>Edit NFT price</DialogTitle>
-                    <DialogDescription>
-                      Once you submit, you will be asked to confirm the transaction in your wallet.
-                    </DialogDescription>
+                    <DialogTitle>Set Your NFT Price</DialogTitle>
                   </DialogHeader>
                   <div className="grid gap-4 py-4">
                     <div className="flex flex-col gap-2">
-                      <Label htmlFor="price">Price in ETH</Label>
+                      <Label htmlFor="price">Price (ETH)</Label>
                       <Field as={Input} id="price" name="price" type="string" placeholder="Price" />
-                      <ErrorMessage name="price" component="div" className="text-red-500" />
+                      <FormError name="price" />
                     </div>
                   </div>
+                  <p className="text-gray-400 text-sm"> Once saved, you’ll confirm the transaction in your wallet.</p>
                   <DialogFooter>
                     <Button variant="outline" onClick={() => setIsEditing(false)}>
                       Cancel
                     </Button>
                     <Button type="submit" disabled={isSubmitting || isWriteContractPending} onClick={submitForm}>
-                      Update Price
+                      Save Price
                     </Button>
                   </DialogFooter>
                 </DialogContent>

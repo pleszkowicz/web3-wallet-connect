@@ -1,31 +1,39 @@
 'use client';
-import NetworkSwitch from '@/components/NetworkSwitch';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useMounted } from '@/hooks/useMounted';
 import { OpenInNewWindowIcon } from '@radix-ui/react-icons';
-import { ArrowLeftIcon, CopyIcon } from 'lucide-react';
+import { ArrowLeftIcon, CheckIcon, CopyIcon } from 'lucide-react';
 import Link from 'next/link';
-import { ReactElement, ReactNode } from 'react';
+import { ReactElement, ReactNode, useEffect, useState } from 'react';
 import { useAccount, useEnsName } from 'wagmi';
 import { DisconnectAccount } from './DisconnectAccount';
+import NetworkSwitch from './NetworkSwitch';
 import { Button } from './ui/button';
-import { useToast } from './ui/hooks/use-toast';
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 
 interface CardLayoutProps {
   title?: string;
   description?: ReactElement | string;
   headerContent?: ReactElement;
-  showBackButton?: boolean;
+  goBackUrl?: string;
   children: ReactNode;
 }
 
-export const ContentLayout = ({ title, description, headerContent, showBackButton, children }: CardLayoutProps) => {
-  const { toast } = useToast();
+export const ContentLayout = ({ title, description, headerContent, goBackUrl, children }: CardLayoutProps) => {
   const { address, chain: currentChain, isConnected } = useAccount();
   const { data: ensName } = useEnsName({ address });
   const formattedAddress = ensName || address?.slice(0, 6) + '...' + address?.slice(-4);
   const mounted = useMounted();
+  const [isAddressCopiedIconVisible, setIsAddressCopiedIconVisible] = useState(false);
+
+  useEffect(() => {
+    if (isAddressCopiedIconVisible) {
+      const timer = setTimeout(() => {
+        setIsAddressCopiedIconVisible(false);
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [isAddressCopiedIconVisible]);
 
   if (!mounted) {
     return null;
@@ -35,10 +43,10 @@ export const ContentLayout = ({ title, description, headerContent, showBackButto
     <Card className="max-w-3xl w-full min-h-screen sm:min-h-[80vh]">
       <CardHeader>
         <div className="flex flex-row justify-between items-center relative">
-          {showBackButton ? (
+          {goBackUrl ? (
             <div className="flex items-center space-x-2 absolute left-0">
               <Button asChild variant="ghost" size="icon" aria-label="Go back" className="p-1">
-                <Link href="/dashboard">
+                <Link href={goBackUrl}>
                   <ArrowLeftIcon className="h-4 w-4" />
                 </Link>
               </Button>
@@ -65,22 +73,29 @@ export const ContentLayout = ({ title, description, headerContent, showBackButto
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
-                  className="text-muted-foreground"
+                  className="text-muted-foreground bg-transparent hover:bg-transparent focus:bg-transparent focus-visible:ring-0 focus-visible:outline-none"
                   variant="ghost"
                   size="sm"
                   onClick={() => {
                     navigator.clipboard.writeText(address as string);
-                    toast({
-                      title: 'Address copied!',
-                    });
+                    setIsAddressCopiedIconVisible(true);
                   }}
                 >
-                  <span>{formattedAddress}</span>
-                  <CopyIcon className="ml-2 w-4 h-4" />
+                  {isAddressCopiedIconVisible ? (
+                    <>
+                      <span>Address copied</span>
+                      <CheckIcon className="ml-2 w-4 h-4" />
+                    </>
+                  ) : (
+                    <>
+                      <span>{formattedAddress}</span>
+                      <CopyIcon className="ml-2 w-4 h-4" />
+                    </>
+                  )}
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Copy address to clipboard</p>
+                <p>{isAddressCopiedIconVisible ? 'Copied!' : 'Copy to clipboard'}</p>
               </TooltipContent>
             </Tooltip>
 

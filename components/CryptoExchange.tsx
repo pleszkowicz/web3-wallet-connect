@@ -1,11 +1,12 @@
 'use client';
+import { ContentLayout } from '@/components/ContentLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { tokenMap, TokenMapKey, tokens } from '@/const/tokens';
 import { UNISWAP_V3_QUOTER_ABI } from '@/const/uniswap/uniswap-v3-quoter-abi';
 import { UNISWAP_V3_ROUTER_ABI } from '@/const/uniswap/uniswap-v3-router-abi';
 import { CHAIN_TO_ADDRESSES_MAP } from '@uniswap/sdk-core';
-import { ErrorMessage, Field, Form, Formik } from 'formik';
+import { Field, Form, Formik } from 'formik';
 import { RefreshCw } from 'lucide-react';
 import { ChangeEvent, useMemo, useState } from 'react';
 import { Abi, Address, formatUnits, Hash, parseEther, parseUnits } from 'viem';
@@ -13,8 +14,9 @@ import { sepolia } from 'viem/chains';
 import { useAccount, useBalance, usePublicClient, useReadContract, useSimulateContract, useWriteContract } from 'wagmi';
 import { useSendCalls } from 'wagmi/experimental';
 import * as Yup from 'yup';
-import { ContentLayout } from './ContentLayout';
+import { FormError } from './form/FormError';
 import { TokenSelect } from './TokenSelect';
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from './ui/dialog';
 import { useToast } from './ui/hooks/use-toast';
 import { Label } from './ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
@@ -46,6 +48,9 @@ export function CryptoExchange() {
   const { address } = useAccount();
   const { data: ethBalance } = useBalance({ address });
   const { sendCallsAsync } = useSendCalls();
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [txStatus, setTxStatus] = useState<TransactionStatus>('idle');
+
   const client = usePublicClient();
   const { toast } = useToast();
 
@@ -127,7 +132,8 @@ export function CryptoExchange() {
 
   const isSubmitDisabled =
     tokenInBalance === 0n ||
-    (tokenIn !== tokenMap.eth && tokenOut !== tokenMap.weth && !quoteExactInputSingle) ||
+    tokenIn.symbol === tokenOut.symbol ||
+    !quoteExactInputSingle?.result?.[0] ||
     isWriteContractPending;
 
   const handleExchange = async () => {
@@ -201,10 +207,13 @@ export function CryptoExchange() {
   };
 
   return (
-    <ContentLayout title="Swap" showBackButton>
+    <ContentLayout title="Swap" goBackUrl="/dashboard/tokens">
       <Formik
         initialValues={{ tokenIn: initialValues.tokenIn, tokenOut: initialValues.tokenOut, value: initialValues.value }}
         onSubmit={async (values, { resetForm }) => {
+          setDialogOpen(true);
+          setTxStatus('waiting-approve');
+
           try {
             let txHash: Hash;
 
@@ -216,6 +225,7 @@ export function CryptoExchange() {
                 args: [],
                 value: parseEther(amount), // Amount of WETH to deposit
               });
+              setTxStatus('pending');
             } else {
               // Approve
               await writeContractAsync({
@@ -224,6 +234,8 @@ export function CryptoExchange() {
                 functionName: 'approve',
                 args: [swapRouterAddress, parseEther(values.value.toString())],
               });
+
+              setTxStatus('pending');
 
               // Swap
               txHash = await writeContractAsync({
@@ -244,26 +256,18 @@ export function CryptoExchange() {
               });
             }
 
-            toast({
-              title: 'Swap initiated',
-              description: 'Waiting for confirmation on the blockchain.',
-            });
-
             await client?.waitForTransactionReceipt({ hash: txHash });
 
-            toast({ title: 'Swap confirmed on the blockchain!' });
-
+            setTxStatus('confirmed');
             resetForm();
           } catch (error) {
+            setDialogOpen(false);
+
             if ((error as Error)?.message?.includes('User rejected the request')) {
               return;
             }
             console.error('Error sending transaction:', error);
-            toast({
-              title: 'Swap failed',
-              description: 'An error occurred while swapping. Please try again.',
-              variant: 'destructive',
-            });
+            setTxStatus('error');
           }
         }}
         validationSchema={validationSchema}
@@ -294,7 +298,7 @@ export function CryptoExchange() {
                   </div>
                 </div>
 
-                <div className="flex flex-row relative items-center">
+                <div className="flex flex-row relative items-start">
                   <div>
                     <Field
                       as={Input}
@@ -318,11 +322,11 @@ export function CryptoExchange() {
                     </div>
                   </div>
 
-                  <ErrorMessage name="value" component="div" className="text-red-500 text-sm absolute -bottom-6" />
+                  <FormError name="value" className="absolute -bottom-6" />
 
                   <div className="flex flex-1 items-center">
                     <TokenSelect
-                      className="bg-purple-200 text-gray-950 border-none rounded-full p-6 pl-3 pr-4 focus:ring-0 overflow-hidden"
+                      className="bg-white text-gray-950 border-none rounded-full p-6 pl-3 pr-4 focus:ring-0 overflow-hidden"
                       name="tokenIn"
                       tokens={tokens}
                       onChange={(tokenSymbol: TokenMapKey) => {
@@ -422,6 +426,94 @@ export function CryptoExchange() {
           );
         }}
       </Formik>
+
+      <TransactionStatusDialog
+        open={dialogOpen && txStatus !== 'idle'}
+        status={txStatus}
+        onClose={() => {
+          setDialogOpen(false);
+          setTxStatus('idle');
+        }}
+        onNewSwap={() => {
+          setDialogOpen(false);
+          setTxStatus('idle');
+        }}
+      />
     </ContentLayout>
   );
 }
+
+type TransacrionStatusDialogProps = {
+  open: boolean;
+  status: TransactionStatus;
+  onClose: () => void;
+  onNewSwap?: () => void;
+};
+
+type TransactionStatus = 'idle' | 'waiting-approve' | 'pending' | 'confirmed' | 'error';
+
+const TransactionStatusDialog = ({ open, status, onClose, onNewSwap }: TransacrionStatusDialogProps) => {
+  return (
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>
+            {status === 'waiting-approve'
+              ? 'Awaiting wallet confirmation'
+              : status === 'pending'
+                ? 'Transaction Pending'
+                : status === 'confirmed'
+                  ? 'Swap Confirmed!'
+                  : status === 'error'
+                    ? 'Transaction Failed'
+                    : 'Swap'}
+          </DialogTitle>
+        </DialogHeader>
+        <div className="py-4">
+          {status === 'waiting-approve' && (
+            <div className="flex flex-col items-center gap-2">
+              <span className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-400 mb-2" />
+              <p className="text-gray-400 text-center">Please confirm the transaction in your wallet.</p>
+            </div>
+          )}
+          {status === 'pending' && (
+            <div className="flex flex-col items-center gap-2">
+              <span className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-400 mb-2" />
+              <p className="text-gray-400 text-center">Waiting for confirmation on the blockchain...</p>
+            </div>
+          )}
+          {status === 'confirmed' && (
+            <div className="flex flex-col items-center gap-2">
+              <span className="text-green-400 text-3xl">✓</span>
+              <p className="text-gray-400 text-center">
+                Swap confirmed! You can send another transaction or return to the dashboard.
+              </p>
+            </div>
+          )}
+          {status === 'error' && (
+            <div className="flex flex-col items-center gap-2">
+              <span className="text-red-400 text-3xl">✗</span>
+              <p className="text-gray-400 text-center">Transaction failed. Please try again.</p>
+            </div>
+          )}
+        </div>
+        <DialogFooter>
+          {status === 'confirmed' ? (
+            <>
+              <Button variant="secondary" onClick={onNewSwap}>
+                New Swap
+              </Button>
+              <Button variant="outline" onClick={onClose}>
+                Go to Dashboard
+              </Button>
+            </>
+          ) : status === 'error' ? (
+            <Button variant="outline" onClick={onClose}>
+              Close
+            </Button>
+          ) : null}
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+};

@@ -37,15 +37,15 @@ export function WalletDashboard({ children }: PropsWithChildren) {
         </p>
       }
     >
-      <div className="grid w-full grid-cols-3 mb-4">
+      <div className="flex flex-row mb-4 w-full border-b">
         {tabLinks.map((tab) => {
           const isActive = pathname.startsWith(tab.href);
           return (
             <Link
               key={tab.href}
               href={tab.href}
-              className={`text-center py-2 rounded-t-md font-medium transition-all border-b ${
-                isActive ? 'bg-purple-900 text-white' : 'text-gray-500 hover:text-gray-800'
+              className={`text-center px-8 py-3 rounded-t-md font-medium transition-all ${
+                isActive ? 'bg-gray-800 text-white' : 'text-gray-500 hover:text-gray-800'
               }`}
               aria-current={isActive ? 'page' : undefined}
             >

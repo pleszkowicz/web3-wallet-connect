@@ -98,7 +98,7 @@ export function TokenTransferForm() {
   });
 
   return (
-    <ContentLayout title="Send" showBackButton>
+    <ContentLayout title="Send" goBackUrl="/dashboard/tokens">
       <Formik
         validationSchema={validationSchema}
         initialValues={initialValues}

@@ -43,7 +43,7 @@ const TransactionHistory = () => {
     <div className="overflow-x-auto max-h-[400px]">
       {showTransactions && transactions && transactions.length > 0 ? (
         <table className="text-sm min-w-full bg-white border border-gray-200">
-          <thead className="sticky top-[0] z-10 bg-gray-100 shadow-md">
+          <thead className="sticky top-[0] z-10 bg-gray-50 shadow-md">
             <tr>
               <th className="py-2 px-2 border-b">Txn Hash</th>
               <th className="py-2 px-2 border-b">From</th>
