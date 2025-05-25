@@ -1,5 +1,5 @@
 'use client';
-import { WalletConnect } from '@/components/WalletConnect';
+import { WalletConnect } from '@/components/wallet/ConnectWallet';
 import { withMounted } from '@/lib/hoc/withMounted';
 
 function HomePage() {
