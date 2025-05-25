@@ -1,4 +1,5 @@
 'use client';
+import { Loader } from '@/components/ui/loader';
 import { usePathname, useRouter } from 'next/navigation';
 import { PropsWithChildren, useEffect, useRef } from 'react';
 import { useAccount } from 'wagmi';
@@ -28,7 +29,7 @@ export const AuthManager = ({ children }: PropsWithChildren) => {
   if (status === 'connecting' || status === 'reconnecting') {
     return (
       <div className="flex items-center justify-center h-screen">
-        <span className="text-gray-500">Loading...</span>
+        <Loader />
       </div>
     );
   }

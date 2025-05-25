@@ -177,11 +177,11 @@ export function CreateNFT() {
 
                 <div>
                   <div className="text-gray-400 bg-black bg-opacity-30 rounded-lg p-4 flex items-center justify-between">
-                    <p className="">
-                      NFT creation fee{' '}
+                    <p className="">NFT creation fee </p>
+                    <span className="flex gap-1">
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <InfoIcon className="inline-block" width={20} />
+                          <InfoIcon className="inline-block" width={18} />
                         </TooltipTrigger>
                         <TooltipContent>
                           <p>
@@ -189,9 +189,9 @@ export function CreateNFT() {
                             price.
                           </p>
                         </TooltipContent>
-                      </Tooltip>
-                    </p>
-                    <span>{listingPrice && formatEther(listingPrice)} ETH</span>
+                      </Tooltip>{' '}
+                      {listingPrice && formatEther(listingPrice)} ETH
+                    </span>
                   </div>
                 </div>
 
