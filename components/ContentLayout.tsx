@@ -1,13 +1,9 @@
 'use client';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { DisconnectWallet } from '@/components/wallet/DisconnectWallet';
-import { NetworkSwitch } from '@/components/wallet/NetworkSwitch';
 import { useMounted } from '@/hooks/useMounted';
-import { OpenInNewWindowIcon } from '@radix-ui/react-icons';
-import { ArrowLeftIcon, CheckIcon, CopyIcon } from 'lucide-react';
-import Link from 'next/link';
+import { ArrowLeft, CheckIcon, CopyIcon, ExternalLink, Wallet } from 'lucide-react';
 import { ReactElement, ReactNode, useEffect, useState } from 'react';
 import { useAccount, useEnsName } from 'wagmi';
 
@@ -40,90 +36,85 @@ export const ContentLayout = ({ title, description, headerContent, goBackUrl, ch
   }
 
   return (
-    <Card className="max-w-3xl w-full min-h-screen sm:min-h-[80vh]">
-      <CardHeader>
-        <div className="flex flex-row justify-between items-center relative">
-          {goBackUrl ? (
-            <div className="flex items-center space-x-2 absolute left-0">
-              <Button asChild variant="ghost" size="icon" aria-label="Go back" className="p-1">
-                <Link href={goBackUrl}>
-                  <ArrowLeftIcon className="h-4 w-4" />
-                </Link>
-              </Button>
-            </div>
-          ) : (
-            isConnected && (
-              <div className="absolute left-0">
-                <NetworkSwitch />
-              </div>
-            )
-          )}
-
-          <CardTitle className="flex-grow text-center text-lg">{title}</CardTitle>
-
-          {isConnected && (
-            <div className="absolute right-0">
-              <DisconnectWallet />
-            </div>
-          )}
-        </div>
-
-        {isConnected && (
-          <div className="text-sm font-medium flex flex-row items-center justify-center">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  className="text-muted-foreground bg-transparent hover:bg-transparent focus:bg-transparent focus-visible:ring-0 focus-visible:outline-none"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => {
-                    navigator.clipboard.writeText(address as string);
-                    setIsAddressCopiedIconVisible(true);
-                  }}
-                >
-                  {isAddressCopiedIconVisible ? (
-                    <>
-                      <span>Address copied</span>
-                      <CheckIcon className="ml-2 w-4 h-4" />
-                    </>
-                  ) : (
-                    <>
-                      <span>{formattedAddress}</span>
-                      <CopyIcon className="ml-2 w-4 h-4" />
-                    </>
-                  )}
+    <div className="min-h-screen w-full">
+      <header className="sticky top-0 z-50 border-b border-gray-800 bg-gray-950/95 backdrop-blur supports-[backdrop-filter]:bg-gray-950/80">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="flex h-16 items-center justify-between">
+            <div className="flex items-center gap-4">
+              {goBackUrl ? (
+                <Button variant="ghost" size="icon" className="text-gray-400 hover:text-white hover:bg-gray-800">
+                  <ArrowLeft className="h-5 w-5" />
                 </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>{isAddressCopiedIconVisible ? 'Copied!' : 'Copy to clipboard'}</p>
-              </TooltipContent>
-            </Tooltip>
+              ) : (
+                <div className="w-5 h-5" /> // Placeholder for consistent spacing
+              )}
+              <div>
+                <h1 className="text-xl font-semibold text-white">{title}</h1>
+                <p className="text-sm text-gray-400">{description}</p>
+              </div>
+            </div>
 
-            {currentChain?.blockExplorers?.default.url ? (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <a
-                    href={`${currentChain?.blockExplorers?.default.url}/address/${address}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-500 hover:underline"
-                  >
-                    <OpenInNewWindowIcon />
-                  </a>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Open in blockchain explorer</p>
-                </TooltipContent>
-              </Tooltip>
-            ) : null}
+            {isConnected && (
+              <div className="flex items-center gap-3">
+                <div className="hidden sm:flex items-center gap-2 rounded-full bg-gray-800 border border-gray-700 px-3 py-1.5">
+                  <Wallet className="h-4 w-4 text-orange-400" />
+                  <span className="text-sm font-mono text-gray-300">{formattedAddress}</span>
+
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6 text-gray-400 hover:text-gray-600"
+                        onClick={() => {
+                          navigator.clipboard.writeText(address as string);
+                          setIsAddressCopiedIconVisible(true);
+                        }}
+                      >
+                        {isAddressCopiedIconVisible ? (
+                          <CheckIcon className="h-4 w-4 text-green-500" />
+                        ) : (
+                          <CopyIcon className="h-4 w-4 text-gray-400" />
+                        )}
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{isAddressCopiedIconVisible ? 'Copied!' : 'Copy to clipboard'}</p>
+                    </TooltipContent>
+                  </Tooltip>
+
+                  {currentChain?.blockExplorers?.default.url && (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6 text-gray-400 hover:text-gray-600"
+                          onClick={() =>
+                            window.open(`${currentChain?.blockExplorers?.default.url}/address/${address}`, '_blank')
+                          }
+                        >
+                          <ExternalLink className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Open in blockchain explorer</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  )}
+                </div>
+                <DisconnectWallet className="text-gray-400 hover:text-white hover:bg-gray-800" />
+              </div>
+            )}
           </div>
-        )}
+        </div>
+      </header>
 
-        {description && <CardDescription className="mt-12 text-muted-foreground">{description}</CardDescription>}
-        {headerContent}
-      </CardHeader>
-      <CardContent className="space-y-4">{children}</CardContent>
-      <CardFooter className="flex justify-end"></CardFooter>
-    </Card>
+      <main className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">{children}</main>
+
+      {/* <Card className="bg-gray-900 max-w-3xl w-full min-h-screen sm:min-h-[80vh]">
+        <CardContent className="space-y-4">{children}</CardContent>
+      </Card> */}
+    </div>
   );
 };

@@ -27,16 +27,13 @@ export function WalletDashboard({ children }: PropsWithChildren) {
   ];
 
   return (
-    <ContentLayout
-      title="Wallet Dashboard"
-      headerContent={
-        <p className="flex flex-row gap-6 justify-center pt-3">
-          <ActionLink href="/nft/create" text="Mint NFT" Icon={ImagePlusIcon} />
-          <ActionLink href="/exchange" text="Swap" Icon={RefreshCw} />
-          <ActionLink href="/transfer" text="Send" Icon={SendIcon} />
-        </p>
-      }
-    >
+    <ContentLayout title="Wallet Dashboard">
+      <div className="flex flex-row gap-6 justify-center pt-3">
+        <ActionLink href="/nft/create" text="Mint NFT" Icon={ImagePlusIcon} />
+        <ActionLink href="/exchange" text="Swap" Icon={RefreshCw} />
+        <ActionLink href="/transfer" text="Send" Icon={SendIcon} />
+      </div>
+
       <div className="flex flex-row mb-4 w-full border-b">
         {tabLinks.map((tab) => {
           const isActive = pathname.startsWith(tab.href);

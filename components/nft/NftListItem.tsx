@@ -5,6 +5,7 @@ import { NFT_MARKETPLACE_ADDRESS } from '@/const/nft-marketplace/nft-marketplace
 import { Prisma } from '@/lib/generated/prisma';
 import { Nft, NftMeta } from '@/types/NFT';
 import { useQuery } from '@tanstack/react-query';
+import { ImageIcon } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
@@ -89,11 +90,16 @@ export const NftListItemUI = ({
   return (
     <div className="flex flex-col w-full animate-fade-in opacity-0">
       <Link href={`/nft/view/${tokenId}`}>
-        <div className="flex items-center rounded-lg overflow-hidden flex-col gap-2 relative group">
+        <div className="aspect-square rounded-lg border-2 border-dashed border-gray-700 bg-gray-800/50 overflow-hidden">
           {tokenDetailsError ? (
             <span className="text-red-500 text-sm text-center">Failed to load metadata</span>
           ) : isLoading ? (
-            <div className="w-full aspect-square animate-pulse rounded-lg bg-muted" />
+            <div className="flex h-full items-center justify-center">
+              <div className="text-center">
+                <ImageIcon className="mx-auto h-8 w-8 text-gray-600 mb-2" />
+                <p className="text-sm text-gray-500">Image preview</p>
+              </div>
+            </div>
           ) : !tokenDetails ? null : (
             <>
               <div className="relative w-full h-full">

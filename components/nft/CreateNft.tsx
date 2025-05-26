@@ -2,45 +2,84 @@
 import { createNftTokenUri } from '@/app/actions/createNftTokenUri';
 import { deleteNftTokenUri } from '@/app/actions/deleteNftTokenUri';
 import { validateImageUrl } from '@/app/actions/validateImageUrl';
+import { ContentCard } from '@/components/ContentCard';
 import { ContentLayout } from '@/components/ContentLayout';
 import { NftListItemUI } from '@/components/nft/NftListItem';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { FormError } from '@/components/ui/form/FormError';
 import { FormInput } from '@/components/ui/form/FormInput';
 import { useToast } from '@/components/ui/hooks/use-toast';
 import { Label } from '@/components/ui/label';
+import { Separator } from '@/components/ui/separator';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { NFT_MARKET_CONTRACT_ABI } from '@/const/nft-marketplace/nft-marketplace-abi';
 import { NFT_MARKETPLACE_ADDRESS } from '@/const/nft-marketplace/nft-marketplace-address';
 import { useMounted } from '@/hooks/useMounted';
 import { Prisma } from '@/lib/generated/prisma';
+import { shrotenAddress } from '@/lib/shortenAddress';
 import { NftMeta } from '@/types/NFT';
 import { Form, Formik } from 'formik';
-import { InfoIcon } from 'lucide-react';
+import { AlertCircle, CheckCircle, Info, InfoIcon, Sparkles } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import invariant from 'tiny-invariant';
 import { formatEther } from 'viem';
-import { usePublicClient, useReadContract, useWriteContract } from 'wagmi';
+import { sepolia } from 'viem/chains';
+import { useAccount, usePublicClient, useReadContract, useWriteContract } from 'wagmi';
 import * as Yup from 'yup';
 
 export function CreateNFT() {
   const { toast } = useToast();
   const router = useRouter();
+  const [gasPrice, setGasPrice] = useState<bigint | undefined>(undefined);
+  const { address, chain } = useAccount();
   const { data: listingPrice } = useReadContract({
     address: NFT_MARKETPLACE_ADDRESS,
     abi: NFT_MARKET_CONTRACT_ABI,
     functionName: 'listingPrice',
   });
 
+  const client = usePublicClient();
+
+  useEffect(() => {
+    async function fetchGas() {
+      const createNftPrice = await client?.estimateContractGas({
+        account: address,
+        address: NFT_MARKETPLACE_ADDRESS, // Quoter V2 on Sepolia
+        abi: NFT_MARKET_CONTRACT_ABI,
+        functionName: 'createNft',
+        args: ['https://picsum.photos/536/354', listingPrice as bigint],
+        value: listingPrice as bigint,
+      });
+
+      setGasPrice(createNftPrice);
+    }
+    fetchGas();
+  }, [address, client, listingPrice]);
+
+  const fakeTokenURI = 'https://picsum.photos/536/354';
+  const price = listingPrice as bigint;
+
+  // const { data: createNftPrice, isLoading } = useEstimateGas({
+  //   to: NFT_MARKETPLACE_ADDRESS, // Quoter V2 on Sepolia
+  //   abi: NFT_MARKET_CONTRACT_ABI,
+  //   functionName: 'createNft',
+  //   args: ['https://picsum.photos/536/354', listingPrice as bigint],
+  //   value: listingPrice as bigint,
+  //   query: {
+  //     enabled: !!listingPrice,
+  //     retry: 2,
+  //   },
+  // });
+
   // Local image state to avoid unnecessary computations when any of the form fields change
   const [imageUrl, setImageUrl] = useState('');
 
   const { writeContractAsync, isPending: isTransactionPending } = useWriteContract();
-  const client = usePublicClient();
   const validationSchema: Yup.ObjectSchema<Pick<NftMeta, 'name' | 'description' | 'image'>> = Yup.object().shape({
-    name: Yup.string().required('Name is required'),
-    description: Yup.string().required('Description is required'),
+    name: Yup.string().required('Name is required').max(64),
+    description: Yup.string().required('Description is required').max(128),
     image: Yup.lazy((value: unknown) =>
       Yup.string()
         .required('Image URL is required')
@@ -119,7 +158,7 @@ export function CreateNFT() {
   };
 
   return (
-    <ContentLayout title="Mint NFT" goBackUrl="/dashboard/nfts">
+    <ContentLayout title="Create NFT" description="Mint your digital asset" goBackUrl="/dashboard/nfts">
       <Formik<Prisma.NftCreateInput>
         initialValues={{ name: '', description: '', image: '' }}
         onSubmit={handleSubmit}
@@ -129,81 +168,175 @@ export function CreateNFT() {
           const isImageLoading = values.image == '' || !isValidUrl(values.image) || !!errors['image'];
 
           return (
-            <div className="flex flex-col md:flex-row-reverse gap-8 w-full bg-black bg-gradient-to-br from-gray-900 via-indigo-950 to-purple-900 rounded-xl p-6 space-y-4">
-              <div className="flex items-center opacity-90 relative w-2/5">
-                <div className="absolute inset-0 z-10 cursor-default"></div>
+            <div className="grid gap-8 lg:grid-cols-3">
+              <div className="lg:col-span-2">
+                <ContentCard
+                  title="NFT Details"
+                  description="Provide information about your NFT"
+                  badge={
+                    <Badge className=" bg-amber-500/10 text-amber-600 border-amber-500/20 hover:bg-amber-500/20">
+                      ERC-721
+                    </Badge>
+                  }
+                >
+                  <Form className="space-y-6" aria-disabled={isSubmitting || isTransactionPending}>
+                    <div className="space-y-2">
+                      <Label htmlFor="image" className="flex-1 text-gray-400 text-lg font-medium">
+                        Image URL
+                      </Label>
+                      <div className="relative">
+                        <FormInput className="pr-10" id="image" name="image" placeholder="https://" />
+                        <div className="absolute top-0 bottom-0 h-full inset-y-0 right-0 flex items-center pr-3">
+                          {imageUrl &&
+                            (errors.image ? (
+                              <AlertCircle className="h-4 w-4 text-red-400" />
+                            ) : (
+                              <CheckCircle className="h-4 w-4 text-green-400" />
+                            ))}
+                        </div>
+                      </div>
+                      <p className="text-xs text-gray-500">Supported formats: JPG, PNG, GIF, WebP. Max size: 10MB</p>
+                    </div>
 
-                <NftListItemUI
-                  tokenId={0n}
-                  tokenDetailsError={null}
-                  isLoading={isImageLoading}
-                  tokenDetails={{
-                    image: isValidUrl(values.image) ? values.image : '',
-                    id: 'fake',
-                    description: values.description,
-                    createdAt: null,
-                    name: values.name,
-                  }}
-                  isOwned={true}
-                  isSaleApproved={false}
-                  price={listingPrice}
-                />
+                    <div className="space-y-2">
+                      <Label htmlFor="name" className="flex-1 text-gray-400 text-lg font-medium">
+                        Name *
+                      </Label>
+                      <FormInput id="name" name="name" />
+                      <FormError name="name" />
+                      <div className="flex justify-between text-xs text-gray-500">
+                        <span>Choose a memorable name for your NFT</span>
+                        <span className={values.name.length > 64 ? 'text-amber-400' : ''}>{values.name.length}/64</span>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="description" className="flex-1 text-gray-400 text-lg font-medium">
+                        Description
+                      </Label>
+                      <FormInput id="description" name="description" />
+                      <FormError name="description" />
+                      <div className="flex justify-between text-xs text-gray-500">
+                        <span>Provide a detailed description to attract collectors</span>
+                        <span className={values.description.length > 128 ? 'text-amber-400' : ''}>
+                          {values.description.length}/128
+                        </span>
+                      </div>
+                    </div>
+
+                    <Separator className="bg-gray-800" />
+
+                    {/* Blockchain Info */}
+                    <div className="rounded-lg border border-gray-800 bg-gray-800/50 p-4">
+                      <h3 className="text-sm font-medium text-white mb-3 flex items-center gap-2">
+                        <Sparkles className="h-4 w-4 text-amber-400" />
+                        Blockchain Details
+                      </h3>
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        <div className="flex justify-between">
+                          <span className="text-sm text-gray-400">Network</span>
+                          <span className="text-sm font-medium text-amber-600">{chain?.name}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-sm text-gray-400">Gas Fee</span>
+                          <span className={`text-sm font-medium text-amber-600`}>
+                            {gasPrice && `${formatEther(gasPrice, 'gwei')} Gwei`}
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-sm text-gray-400">Estimated confirmation</span>
+                          <span className="text-sm font-medium text-amber-600">
+                            {chain?.id === sepolia.id ? '~30 seconds' : '~5 seconds'}
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-sm text-gray-400">Platform Fee</span>
+                          <span className="flex items-center gap-1 text-sm font-medium text-amber-600">
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <InfoIcon className="inline-block w-4 h-4" />
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>
+                                  There's a <b>{listingPrice && formatEther(listingPrice, 'wei')} ETH fee</b> to mint an
+                                  NFT. Once it's created, you can set your own sale price.
+                                </p>
+                              </TooltipContent>
+                            </Tooltip>{' '}
+                            {listingPrice && formatEther(listingPrice)} ETH
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <Button
+                      variant="default"
+                      className="w-full"
+                      type="submit"
+                      disabled={isSubmitting || isTransactionPending || !isValid}
+                    >
+                      <div className="flex items-center gap-2">
+                        <Sparkles className="h-4 w-4" /> Mint NFT
+                      </div>
+                    </Button>
+                  </Form>
+                </ContentCard>
               </div>
 
-              <Form className="flex flex-col gap-4 w-3/5" aria-disabled={isSubmitting || isTransactionPending}>
-                <div>
-                  <Label htmlFor="image" className="flex-1 text-gray-400 text-lg font-medium">
-                    Image URL
-                  </Label>
-                  <FormInput id="image" name="image" placeholder="https://" />
-                  <FormError name="image" />
-                </div>
+              <div className="lg:col-span-1">
+                <div className="sticky top-24">
+                  <ContentCard className="space-y-4" title="Preview" description="How your NFT will appear">
+                    <div className="relative">
+                      <div className="absolute inset-0 z-10 cursor-default"></div>
 
-                <div>
-                  <Label htmlFor="name" className="flex-1 text-gray-400 text-lg font-medium">
-                    Name
-                  </Label>
-                  <FormInput id="name" name="name" />
-                  <FormError name="name" />
-                </div>
+                      <NftListItemUI
+                        tokenId={0n}
+                        tokenDetailsError={null}
+                        isLoading={isImageLoading}
+                        tokenDetails={{
+                          image: isValidUrl(values.image) ? values.image : '',
+                          id: 'fake',
+                          description: values.description,
+                          createdAt: null,
+                          name: values.name,
+                        }}
+                        isOwned={true}
+                        isSaleApproved={false}
+                        price={listingPrice}
+                      />
+                    </div>
+                    {/* NFT Card Preview */}
+                    <div className="rounded-lg border border-gray-800 bg-gray-800/50 p-4">
+                      <div className="space-y-3">
+                        <div>
+                          <h4 className="font-medium text-white truncate">{values.name || 'Untitled NFT'}</h4>
+                          <p className="text-sm text-gray-400">by {shrotenAddress(address)}</p>
+                        </div>
 
-                <div>
-                  <Label htmlFor="description" className="flex-1 text-gray-400 text-lg font-medium">
-                    Description
-                  </Label>
-                  <FormInput id="description" name="description" />
-                  <FormError name="description" />
-                </div>
+                        {values.description && (
+                          <p className="text-sm text-gray-300 line-clamp-3 leading-relaxed">{values.description}</p>
+                        )}
 
-                <div>
-                  <div className="text-gray-400 bg-black bg-opacity-30 rounded-lg p-4 flex items-center justify-between">
-                    <p className="">NFT creation fee </p>
-                    <span className="flex gap-1">
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <InfoIcon className="inline-block" width={18} />
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>
-                            There's a <b>0.001 ETH fee</b> to mint an NFT. Once it's created, you can set your own sale
-                            price.
-                          </p>
-                        </TooltipContent>
-                      </Tooltip>{' '}
-                      {listingPrice && formatEther(listingPrice)} ETH
-                    </span>
-                  </div>
-                </div>
+                        <div className="flex items-center justify-between pt-2 border-t border-gray-700">
+                          <span className="text-xs text-gray-500">Token ID</span>
+                          <span className="text-xs font-mono text-gray-400">#TBD</span>
+                        </div>
+                      </div>
+                    </div>
 
-                <Button
-                  variant="default"
-                  className="w-full"
-                  type="submit"
-                  disabled={isSubmitting || isTransactionPending || !isValid}
-                >
-                  Mint
-                </Button>
-              </Form>
+                    {/* Status */}
+                    <div className="rounded-lg bg-amber-500/10 border border-amber-500/20 p-3">
+                      <div className="flex items-center gap-2">
+                        <Info className="h-4 w-4 text-amber-400" />
+                        <span className="text-sm font-medium text-amber-300">Ready to mint</span>
+                      </div>
+                      <p className="text-xs text-amber-400/80 mt-1">
+                        Your NFT will be permanently stored on the blockchain
+                      </p>
+                    </div>
+                  </ContentCard>
+                </div>
+              </div>
             </div>
           );
         }}
