@@ -1,4 +1,5 @@
 'use client';
+import { ContentCard } from '@/components/ContentCard';
 import { ContentLayout } from '@/components/ContentLayout';
 import { Button } from '@/components/ui/button';
 import { FormError } from '@/components/ui/form/FormError';
@@ -99,43 +100,46 @@ export function TokenTransferForm() {
 
   return (
     <ContentLayout title="Send" goBackUrl="/dashboard/tokens">
-      <Formik
-        validationSchema={validationSchema}
-        initialValues={initialValues}
-        onSubmit={async (values, { resetForm }) => {
-          try {
-            const txHash =
-              selectedToken === tokenMap.eth.symbol
-                ? await sendTransactionAsync({ to: values.to as Address, value: parseEther(String(values.value)) })
-                : await writeContractAsync({
-                    address: tokenMap[selectedToken].address,
-                    abi: tokenMap[selectedToken].abi as Abi,
-                    functionName: 'transfer',
-                    args: [
-                      values.to as Address, // Recipient address
-                      parseUnits(values.value.toString(), tokenMap[selectedToken].decimals), // Amount to transfer
-                    ],
-                  });
+      <div className="space-y-4">
+        <h3 className="text-xl font-semibold text-white">Token transfer</h3>
+      </div>
+      <ContentCard className="p-8">
+        <Formik
+          validationSchema={validationSchema}
+          initialValues={initialValues}
+          onSubmit={async (values, { resetForm }) => {
+            try {
+              const txHash =
+                selectedToken === tokenMap.eth.symbol
+                  ? await sendTransactionAsync({ to: values.to as Address, value: parseEther(String(values.value)) })
+                  : await writeContractAsync({
+                      address: tokenMap[selectedToken].address,
+                      abi: tokenMap[selectedToken].abi as Abi,
+                      functionName: 'transfer',
+                      args: [
+                        values.to as Address, // Recipient address
+                        parseUnits(values.value.toString(), tokenMap[selectedToken].decimals), // Amount to transfer
+                      ],
+                    });
 
-            toast({ title: 'Transaction sent', description: 'Waiting for confirmation.' });
-            await client?.waitForTransactionReceipt({ hash: txHash });
-            toast({ title: 'Confirmed on-chain!' });
-            resetForm();
-          } catch (error) {
-            if ((error as Error)?.message?.includes('User rejected the request')) {
-              return;
+              toast({ title: 'Transaction sent', description: 'Waiting for confirmation.' });
+              await client?.waitForTransactionReceipt({ hash: txHash });
+              toast({ title: 'Confirmed on-chain!' });
+              resetForm();
+            } catch (error) {
+              if ((error as Error)?.message?.includes('User rejected the request')) {
+                return;
+              }
+              toast({
+                title: 'Transaction failed',
+                description: 'An error occurred during transfer',
+                variant: 'destructive',
+              });
             }
-            toast({
-              title: 'Transaction failed',
-              description: 'An error occurred during transfer',
-              variant: 'destructive',
-            });
-          }
-        }}
-      >
-        {({ setFieldError, setFieldValue }) => (
-          <Form className="space-y-2">
-            <div className="bg-black bg-gradient-to-br from-gray-900 via-indigo-950 to-purple-900 rounded-xl p-6 space-y-4">
+          }}
+        >
+          {({ setFieldError, setFieldValue }) => (
+            <Form className="space-y-2 flex flex-col gap-4">
               <div>
                 <Label htmlFor="to" className="flex-1 text-gray-400 text-lg font-medium">
                   To
@@ -158,7 +162,7 @@ export function TokenTransferForm() {
                 /> */}
                 <FormError name="to" className="text-yellow-300 text-sm mt-1" />
               </div>
-              <div className="flex flex-row relative items-start">
+              <div className="flex flex-row justify-between relative items-start">
                 <div>
                   <Field
                     as={Input}
@@ -180,7 +184,7 @@ export function TokenTransferForm() {
                   <FormError name="value" />
                 </div>
 
-                <div className="flex flex-1 items-center">
+                <div className="flex items-center">
                   <TokenSelect
                     className="bg-white text-gray-950 border-none rounded-full p-6 pl-3 pr-4 focus:ring-0 overflow-hidden"
                     name="unit"
@@ -205,10 +209,10 @@ export function TokenTransferForm() {
               <Button type="submit" className="w-full bg-white text-black hover:bg-gray-200">
                 Send
               </Button>
-            </div>
-          </Form>
-        )}
-      </Formik>
+            </Form>
+          )}
+        </Formik>
+      </ContentCard>
     </ContentLayout>
   );
 }

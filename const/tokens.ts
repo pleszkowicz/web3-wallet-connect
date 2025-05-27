@@ -10,6 +10,7 @@ export type Token = {
   label: string;
   abi?: Abi;
   logo: string;
+  faucetUrl: string;
 };
 
 export type TokenMapKey = keyof typeof tokenMap;
@@ -22,6 +23,7 @@ export const tokenMap = {
     decimals: 18,
     abi: undefined,
     logo: 'https://token-icons.s3.amazonaws.com/eth.png',
+    faucetUrl: 'https://cloud.google.com/application/web3/faucet/ethereum/sepolia'
   },
   weth: {
     symbol: 'weth',
@@ -50,3 +52,5 @@ export const tokenMap = {
 } as const;
 
 export const tokens: Token[] = Object.values(tokenMap);
+
+export const erc20Tokens = tokens.filter((token) => token.symbol !== tokenMap.eth.symbol);

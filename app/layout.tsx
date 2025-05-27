@@ -19,8 +19,8 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: 'NFT Hub',
-  description: '',
+  title: 'Web3 Dashboard - Piotr Leszkowicz',
+  description: 'Pure ',
 };
 
 export default function RootLayout({

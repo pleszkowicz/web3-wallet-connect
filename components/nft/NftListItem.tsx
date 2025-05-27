@@ -1,5 +1,6 @@
 'use client';
 import { NftStatusHelper } from '@/components/nft/NftStatusHelper';
+import { Loader } from '@/components/ui/loader';
 import { NFT_MARKET_CONTRACT_ABI } from '@/const/nft-marketplace/nft-marketplace-abi';
 import { NFT_MARKETPLACE_ADDRESS } from '@/const/nft-marketplace/nft-marketplace-address';
 import { Prisma } from '@/lib/generated/prisma';
@@ -76,6 +77,7 @@ type NftListItemUIProps = {
   isOwned: boolean;
   isSaleApproved: boolean;
   price?: bigint;
+  isPreview?: boolean;
 };
 
 export const NftListItemUI = ({
@@ -86,18 +88,21 @@ export const NftListItemUI = ({
   isOwned,
   isSaleApproved,
   price,
+  isPreview = false,
 }: NftListItemUIProps) => {
   return (
-    <div className="flex flex-col w-full animate-fade-in opacity-0">
-      <Link href={`/nft/view/${tokenId}`}>
-        <div className="aspect-square rounded-lg border-2 border-dashed border-gray-700 bg-gray-800/50 overflow-hidden">
+    <div className="flex flex-col w-full animate-fade-in opacity-0 hover:scale-[1.02] overflow-hidden transition-all duration-200 shadow-lg">
+      <Link href={`/dashboard/nfts/view/${tokenId}`}>
+        <div
+          className={`relative aspect-square rounded-xl border-2 ${isPreview && 'border-dashed'} border-gray-700 bg-gray-800/50 overflow-hidden`}
+        >
           {tokenDetailsError ? (
             <span className="text-red-500 text-sm text-center">Failed to load metadata</span>
           ) : isLoading ? (
             <div className="flex h-full items-center justify-center">
               <div className="text-center">
-                <ImageIcon className="mx-auto h-8 w-8 text-gray-600 mb-2" />
-                <p className="text-sm text-gray-500">Image preview</p>
+                {isPreview && <ImageIcon className="mx-auto h-8 w-8 text-gray-600 mb-2" />}
+                <p className="text-sm text-gray-500">{isPreview ? 'Image preview' : <Loader />}</p>
               </div>
             </div>
           ) : !tokenDetails ? null : (
@@ -108,7 +113,7 @@ export const NftListItemUI = ({
                   priority={false}
                   src={tokenDetails.image}
                   alt={tokenDetails.name || 'NFT Image'}
-                  className="pointer w-full aspect-square object-cover transform transition-transform duration-1000 group-hover:scale-110"
+                  className="pointer w-full aspect-square object-cover transform transition-transform duration-1000 group-hover:scale-[1.02]"
                   width={192}
                   height={192}
                 />

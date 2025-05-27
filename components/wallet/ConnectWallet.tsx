@@ -161,7 +161,7 @@ function WalletOption({
     <Button
       variant="outline"
       size="lg"
-      className="flex w-full transform content-between justify-start text-lg transition-transform duration-500 hover:scale-105 hover:bg-accent"
+      className="flex w-full transform content-between justify-start text-lg transition-transform duration-500 hover:scale-[1.02] hover:bg-accent"
       disabled={!ready || pending}
       onClick={onClick}
     >

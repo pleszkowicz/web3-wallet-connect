@@ -42,20 +42,20 @@ const TransactionHistory = () => {
   return (
     <div className="overflow-x-auto max-h-[400px]">
       {showTransactions && transactions && transactions.length > 0 ? (
-        <table className="text-sm min-w-full bg-white border border-gray-200">
-          <thead className="sticky top-[0] z-10 bg-gray-50 shadow-md">
+        <table className="text-sm min-w-full bg-gray-800">
+          <thead className="sticky top-[0] z-10 text-left text-md bg-gray-700 text-slate-300 shadow-md">
             <tr>
-              <th className="py-2 px-2 border-b">Txn Hash</th>
-              <th className="py-2 px-2 border-b">From</th>
-              <th className="py-2 px-2 border-b">To</th>
-              <th className="py-2 px-2 border-b">Time</th>
-              <th className="py-2 px-2 border-b text-right">Value</th>
+              <th className="py-2 px-2">Txn Hash</th>
+              <th className="py-2 px-2">From</th>
+              <th className="py-2 px-2">To</th>
+              <th className="py-2 px-2">Time</th>
+              <th className="py-2 px-2 text-right">Value</th>
             </tr>
           </thead>
-          <tbody className="text-slate-600">
+          <tbody className="text-slate-200">
             {transactions.map((tx) => (
-              <tr key={tx.hash} className="hover:bg-gray-100">
-                <td className="py-2 px-2 border-b">
+              <tr key={tx.hash} className="hover:bg-gray-700 border-b-gray-600">
+                <td className="py-2 px-2">
                   {currentChain?.blockExplorers?.default.url ? (
                     <a
                       href={`${currentChain?.blockExplorers?.default.url}/tx/${tx.hash}`}
@@ -69,7 +69,7 @@ const TransactionHistory = () => {
                     <span>{shrotenAddress(tx.hash)}</span>
                   )}
                 </td>
-                <td className="py-2 px-2 border-b">
+                <td className="py-2 px-2">
                   {tx.category === 'erc721' && tx.from === zeroAddress ? (
                     <Badge className="bg-blue-500/80 backdrop-blur-sm text-xs text-white px-2.5 py-0">
                       NFT&nbsp;Minted
@@ -78,12 +78,12 @@ const TransactionHistory = () => {
                     shrotenAddress(tx.from)
                   )}
                 </td>
-                <td className="py-2 px-2 border-b">
+                <td className="py-2 px-2">
                   {tx.to === null ? <span className="text-xs">Smart contract deployment</span> : null}
                   {shrotenAddress(tx.to)}
                 </td>
-                <td className="py-2 px-2 border-b">{new Date(tx.metadata.blockTimestamp).toLocaleString()}</td>
-                <td className="py-2 px-2 border-b text-right whitespace-nowrap">
+                <td className="py-2 px-2">{new Date(tx.metadata.blockTimestamp).toLocaleString()}</td>
+                <td className="py-2 px-2 text-right">
                   {tx.to && !!(Number(tx.value) > 0) && (tx.to.toLowerCase() === address?.toLowerCase() ? '+' : '-')}
                   {tx.asset?.toLocaleLowerCase() === 'eth'
                     ? tx.value &&

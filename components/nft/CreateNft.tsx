@@ -55,23 +55,14 @@ export function CreateNFT() {
 
       setGasPrice(createNftPrice);
     }
-    fetchGas();
+
+    if (listingPrice) {
+      fetchGas();
+    }
   }, [address, client, listingPrice]);
 
   const fakeTokenURI = 'https://picsum.photos/536/354';
   const price = listingPrice as bigint;
-
-  // const { data: createNftPrice, isLoading } = useEstimateGas({
-  //   to: NFT_MARKETPLACE_ADDRESS, // Quoter V2 on Sepolia
-  //   abi: NFT_MARKET_CONTRACT_ABI,
-  //   functionName: 'createNft',
-  //   args: ['https://picsum.photos/536/354', listingPrice as bigint],
-  //   value: listingPrice as bigint,
-  //   query: {
-  //     enabled: !!listingPrice,
-  //     retry: 2,
-  //   },
-  // });
 
   // Local image state to avoid unnecessary computations when any of the form fields change
   const [imageUrl, setImageUrl] = useState('');
@@ -290,6 +281,7 @@ export function CreateNFT() {
                       <div className="absolute inset-0 z-10 cursor-default"></div>
 
                       <NftListItemUI
+                        isPreview
                         tokenId={0n}
                         tokenDetailsError={null}
                         isLoading={isImageLoading}

@@ -169,7 +169,7 @@ const NftItem = ({ tokenId, owner, price }: NftItemProps) => {
                 priority={true}
                 src={tokenDetails.image}
                 alt={tokenDetails.name || 'NFT Image'}
-                className="pointer aspect-square w-full transform object-cover transition-transform duration-1000 group-hover:scale-110"
+                className="pointer aspect-square w-full transform object-cover transition-transform duration-1000 group-hover:scale-[1.02]"
                 width={622}
                 height={622}
               />

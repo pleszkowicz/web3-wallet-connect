@@ -1,5 +1,4 @@
 import { cn } from '@/lib/cn';
-import { Loader2 } from 'lucide-react';
 
 type LoaderProps = {
   iconOnly?: boolean;
@@ -12,9 +11,9 @@ export const Loader = ({ iconOnly = false, size }: LoaderProps) => {
   }
 
   return (
-    <div className="flex justify-center">
+    <span className="flex w-full justify-center">
       <LoaderIcon size={size} />
-    </div>
+    </span>
   );
 };
 
@@ -31,5 +30,5 @@ const LoaderIcon = ({ size = 'md' }: Pick<LoaderProps, 'size'>) => {
       sizeClass = 'w-8 h-8';
   }
 
-  return <Loader2 className={cn('animate-spin text-gray-400 inline-block', sizeClass)} />;
+  return <span className={cn('animate-spin rounded-full border-b-2 border-orange-400 mb-2', sizeClass)} />;
 };

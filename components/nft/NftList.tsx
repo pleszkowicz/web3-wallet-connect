@@ -22,22 +22,23 @@ export const NftList = () => {
   });
 
   return (
-    <>
-      <div className="flex flex-wrap">
-        {isLoading ? (
-          <Loader />
-        ) : error ? (
-          <p className="text-red-500">Error fetching NFTs: Please check your connection or try again later.</p>
-        ) : nfts && nfts.length > 0 ? (
-          nfts.map((nft: Nft) => (
-            <div key={nft.tokenId} className="flex flex-col justify-between p-2 text-center w-1/3 min-w-[180px]">
+    <div className="space-y-6">
+      <h3 className="text-xl font-semibold text-white">NFT Collection</h3>
+      {isLoading ? (
+        <Loader />
+      ) : error ? (
+        <p className="text-red-500">Unable to show NFTs, please check your connection or try again later.</p>
+      ) : nfts && nfts.length > 0 ? (
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-8">
+          {nfts.map((nft: Nft) => (
+            <div key={nft.tokenId} className="flex flex-col justify-between text-center">
               <NftListItem tokenId={nft.tokenId} price={nft.price} owner={nft.owner} />
             </div>
-          ))
-        ) : (
-          <p className="w-full text-gray-400 mt-4">You don't own any NFTs yet.</p>
-        )}
-      </div>
+          ))}
+        </div>
+      ) : (
+        <p className="w-full text-gray-400 mt-4">No NFTs created.</p>
+      )}
       {isFetched && (
         <Button asChild variant="default" className="w-full mt-5">
           <Link href="/nft/create">
@@ -45,6 +46,6 @@ export const NftList = () => {
           </Link>
         </Button>
       )}
-    </>
+    </div>
   );
 };
