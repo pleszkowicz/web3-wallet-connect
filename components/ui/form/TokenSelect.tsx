@@ -28,7 +28,13 @@ export const TokenSelect = ({ label, name, onChange, tokens, className }: Crypto
           onChange(value as TokenMapKey);
         }}
       >
-        <SelectTrigger id={name} className={cn(className, 'overflow-hidden')}>
+        <SelectTrigger
+          id={name}
+          className={cn(
+            className,
+            'rounded-full p-5 pl-3 pr-4 bg-gray-700 border-gray-600 text-white hover:bg-gray-600 focus:ring-0 overflow-hidden'
+          )}
+        >
           <SelectValue placeholder="Select token" />
         </SelectTrigger>
 
@@ -40,8 +46,8 @@ export const TokenSelect = ({ label, name, onChange, tokens, className }: Crypto
                   <Image
                     className="mr-2 inline-block shrink-0"
                     src={token.logo}
-                    width={24}
-                    height={24}
+                    width={20}
+                    height={20}
                     alt={token.label}
                   />
                   {token.label} ({token.symbol.toUpperCase()}){' '}

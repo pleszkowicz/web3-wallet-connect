@@ -4,14 +4,30 @@ import { cn } from '@/lib/cn';
 import { ComponentProps, ReactNode } from 'react';
 
 type ContentCardProps = ComponentProps<typeof Card> & {
+  variant?: 'default' | 'light';
   title?: string;
   description?: string;
   badge?: ReactNode;
 };
 
-export const ContentCard = ({ className, description, children, title, badge }: ContentCardProps) => {
+export const ContentCard = ({
+  className,
+  description,
+  children,
+  title,
+  badge,
+  variant = 'default',
+}: ContentCardProps) => {
+  let variantClasses;
+  switch (variant) {
+    case 'light':
+      variantClasses = 'border-gray-700 bg-gray-800';
+      break;
+    default:
+      variantClasses = 'border-gray-800 bg-gray-900';
+  }
   return (
-    <Card className="border-gray-800 bg-gray-900 shadow-2xl">
+    <Card className={cn('shadow-2xl', variantClasses)}>
       {(title || description || badge) && (
         <CardHeader className="pb-6">
           <div className="flex items-center justify-between">

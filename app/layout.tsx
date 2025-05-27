@@ -31,7 +31,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} v0-c bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 !opacity-100 transition-opacity duration-300`}
+        className={`${geistSans.variable} ${geistMono.variable} v0-c bg-slate-950 !opacity-100 transition-opacity duration-300`}
       >
         <StrictMode>
           <WagmiProviderWrapper>
