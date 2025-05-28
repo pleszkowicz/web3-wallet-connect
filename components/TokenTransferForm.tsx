@@ -51,22 +51,22 @@ export function TokenTransferForm() {
           // Native ETH transfer
           gasPrice = await client?.estimateGas({
             to: address as Address,
-            value: parseEther('0.01'),
+            value: 0n,
           });
         } else {
           // ERC20 transfer
-          const erc20 = tokenMap[selectedToken];
+          const erc20Token = tokenMap[selectedToken];
           // Try-catch to handle tokens that revert on estimation (e.g. paused, blacklisted, etc.)
           try {
-            const dummyRecipient = '0x000000000000000000000000000000000000dead';
+            const dummyRecipient = address;
             const data = encodeFunctionData({
-              abi: erc20.abi as Abi,
+              abi: erc20Token.abi as Abi,
               functionName: 'transfer',
-              args: [dummyRecipient, parseUnits('0.01', erc20.decimals)],
+              args: [dummyRecipient, parseUnits('0.0000001', erc20Token.decimals)],
             });
             gasPrice = await client?.estimateGas({
               account: address as Address,
-              to: erc20.address as Address,
+              to: erc20Token.address as Address,
               data,
               value: 0n,
             });
