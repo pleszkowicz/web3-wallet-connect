@@ -15,7 +15,7 @@ import { shrotenAddress } from '@/lib/shortenAddress';
 import { Nft, NftMeta } from '@/types/NFT';
 import { useQuery } from '@tanstack/react-query';
 import { Field, Form, Formik } from 'formik';
-import { CheckIcon, CopyIcon, EditIcon } from 'lucide-react';
+import { Check, CheckIcon, CopyIcon, EditIcon, ShoppingCart, Undo2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import invariant from 'tiny-invariant';
 import { formatEther, parseEther } from 'viem';
@@ -224,6 +224,24 @@ const NftItem = ({ tokenId, owner, price }: NftItemProps) => {
             <span className="text-gray-400">Blockchain</span>
             <span className="text-white">{chain?.name}</span>
           </div>
+
+          {isOwned && (
+            <Button
+              variant={isSaleApproved ? 'destructive' : 'default'}
+              className="w-full"
+              type="button"
+              onClick={toggleApprove}
+              disabled={isPending}
+            >
+              {isSaleApproved ? <Undo2 className="mr-2" /> : <Check className="mr-2" />}
+              {isSaleApproved ? 'Revoke from Sale' : 'Approve to Sell'}
+            </Button>
+          )}
+          {!isOwned && isSaleApproved && (
+            <Button variant="default" className="w-full" type="button" disabled={isPending} onClick={handleBuyNft}>
+              <ShoppingCart className="mr-2" /> Buy
+            </Button>
+          )}
         </ContentCard>
       </div>
     </div>
