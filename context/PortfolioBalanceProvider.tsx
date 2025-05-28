@@ -62,7 +62,7 @@ export const PortfolioBalanceProvider = ({ children }: PropsWithChildren) => {
       // flatten to Record<string,number>
       return Object.fromEntries(Object.entries(json).map(([id, { usd }]) => [id, usd])) as Record<string, number>;
     },
-    retry: 3,
+    retry: 0,
   });
 
   // 2) batch all ERC-20 balanceOf calls
