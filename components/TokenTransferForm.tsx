@@ -95,8 +95,8 @@ export function TokenTransferForm() {
     value: Yup.number()
       .required('Value is required')
       .test('balance', 'Insufficient funds', (v) => {
-        const available = Number(formatUnits(currentBalance, tokenMap[selectedToken].decimals));
-        return typeof v === 'number' && v > 0 && v <= available;
+        const availableBalance = Number(formatUnits(currentBalance, tokenMap[selectedToken].decimals));
+        return typeof v === 'number' && v > 0 && v <= availableBalance;
       }),
   });
 
@@ -156,7 +156,7 @@ export function TokenTransferForm() {
                 </div>
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <Label className="text-sm font-medium text-white">You Pay</Label>
+                    <Label className="text-sm font-medium text-white">Provide value</Label>
                     <div className="flex items-center gap-2 text-sm text-gray-400">
                       <span>
                         Balance: {balances.get(values.unit)?.formattedValue.toFixed(8) ?? 0}{' '}

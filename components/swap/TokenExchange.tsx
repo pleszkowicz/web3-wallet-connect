@@ -96,7 +96,7 @@ export function TokenExchange() {
     abi: tokenIn.abi,
     functionName: 'balanceOf',
     args: [address],
-    query: { enabled: !!tokenIn.abi && !!tokenIn.address && !!address },
+    query: { enabled: !!amount && !!tokenIn.abi && !!tokenIn.address && !!address },
   });
 
   const { writeContractAsync, isPending: isWriteContractPending } = useWriteContract();
@@ -110,30 +110,11 @@ export function TokenExchange() {
     tokenOut: Yup.string()
       .oneOf(Object.keys(tokenMap) as TokenMapKey[])
       .required('Token is required'),
-    value: Yup.string()
+    value: Yup.number()
       .required('Value is required')
-      .test('is-positive', 'Value must be greater than 0', function (value) {
-        const { path, createError } = this;
-        if (parseFloat(value) <= 0) {
-          return createError({ path, message: 'Value must be greater than 0' });
-        }
-        return true;
-      })
-      .test('is-valid-value', 'Insufficient balance', function (value) {
-        const { path, createError } = this;
+      .test('balance', 'Insufficient funds', (v) => {
         const availableBalance = tokenInBalance ? Number(formatUnits(tokenInBalance, tokenIn.decimals)) : 0;
-
-        if (availableBalance === 0) {
-          return createError({ path, message: 'Insufficient balance' });
-        }
-
-        if (parseFloat(value) > availableBalance) {
-          return createError({
-            path,
-            message: `Exceeds available balance of ${availableBalance} and gas fee.`,
-          });
-        }
-        return true;
+        return typeof v === 'number' && v > 0 && v <= availableBalance;
       }),
   });
 
@@ -253,7 +234,7 @@ export function TokenExchange() {
               try {
                 let txHash: Hash;
 
-                if (tokenIn === tokenMap.eth && tokenOut === tokenMap.weth) {
+                if (tokenIn === tokenMap.eth && tokenOut === tokenMap.weth && !tokenIn.address) {
                   txHash = await writeContractAsync({
                     address: tokenMap.weth.address,
                     abi: tokenMap.weth.abi,
@@ -263,64 +244,63 @@ export function TokenExchange() {
                   });
                   setTxStatus('pending');
                 } else {
-                  // Approve
-
-                  const { capabilities, id } = await sendCallsAsync({
-                    account: address as Address,
-                    calls: [
-                      {
-                        address: tokenIn.address as Address,
-                        abi: tokenIn.abi as Abi,
-                        functionName: 'approve',
-                        args: [swapRouterAddress, parseEther(values.value.toString())],
-                      },
-                      {
-                        address: swapRouterAddress as Address,
-                        abi: UNISWAP_V3_ROUTER_ABI,
-                        functionName: 'exactInputSingle',
-                        args: [
-                          {
-                            tokenIn: tokenIn.address as Address,
-                            tokenOut: tokenOut.address as Address,
-                            fee: poolFee.fee,
-                            recipient: address as Address,
-                            amountIn: parseUnits(amount, tokenIn.decimals),
-                            amountOutMinimum, // Minimum amount of output tokens to receive
-                            sqrtPriceLimitX96: BigInt(0), // No price limit
-                          },
-                        ],
-                      },
-                    ],
-                  });
-                  console.log(capabilities, id);
-                  debugger;
-                  txHash = id as Address;
-                  // await writeContractAsync({
-                  //   address: tokenIn.address as Address,
-                  //   abi: tokenIn.abi as Abi,
-                  //   functionName: 'approve',
-                  //   args: [swapRouterAddress, parseEther(values.value.toString())],
+                  // const { capabilities, id } = await sendCallsAsync({
+                  //   account: address as Address,
+                  //   calls: [
+                  //     {
+                  //       address: tokenIn.address as Address,
+                  //       abi: tokenIn.abi as Abi,
+                  //       functionName: 'approve',
+                  //       args: [swapRouterAddress, parseEther(values.value.toString())],
+                  //     },
+                  //     {
+                  //       address: swapRouterAddress as Address,
+                  //       abi: UNISWAP_V3_ROUTER_ABI,
+                  //       functionName: 'exactInputSingle',
+                  //       args: [
+                  //         {
+                  //           tokenIn: tokenIn.address as Address,
+                  //           tokenOut: tokenOut.address as Address,
+                  //           fee: poolFee.fee,
+                  //           recipient: address as Address,
+                  //           amountIn: parseUnits(amount, tokenIn.decimals),
+                  //           amountOutMinimum, // Minimum amount of output tokens to receive
+                  //           sqrtPriceLimitX96: BigInt(0), // No price limit
+                  //         },
+                  //       ],
+                  //     },
+                  //   ],
                   // });
+                  // console.log(capabilities, id);
+                  // txHash = id as Address;
+
+                  // Approve
+                  await writeContractAsync({
+                    address: tokenIn.address as Address,
+                    abi: tokenIn.abi as Abi,
+                    functionName: 'approve',
+                    args: [swapRouterAddress, parseEther(values.value.toString())],
+                  });
 
                   setTxStatus('pending');
 
                   // Swap
-                  // txHash = await writeContractAsync({
-                  //   address: swapRouterAddress as Address,
-                  //   abi: UNISWAP_V3_ROUTER_ABI,
-                  //   functionName: 'exactInputSingle',
-                  //   args: [
-                  //     {
-                  //       tokenIn: tokenIn.address as Address,
-                  //       tokenOut: tokenOut.address as Address,
-                  //       fee: poolFee.fee,
-                  //       recipient: address as Address,
-                  //       amountIn: parseUnits(amount, tokenIn.decimals),
-                  //       amountOutMinimum, // Minimum amount of output tokens to receive
-                  //       sqrtPriceLimitX96: 0n, // No price limit
-                  //     },
-                  //   ],
-                  // });
+                  txHash = await writeContractAsync({
+                    address: swapRouterAddress as Address,
+                    abi: UNISWAP_V3_ROUTER_ABI,
+                    functionName: 'exactInputSingle',
+                    args: [
+                      {
+                        tokenIn: tokenIn.address as Address,
+                        tokenOut: tokenOut.address as Address,
+                        fee: poolFee.fee,
+                        recipient: address as Address,
+                        amountIn: parseUnits(amount, tokenIn.decimals),
+                        amountOutMinimum, // Minimum amount of output tokens to receive
+                        sqrtPriceLimitX96: 0n, // No price limit
+                      },
+                    ],
+                  });
                 }
 
                 await client?.waitForTransactionReceipt({ hash: txHash });
@@ -339,7 +319,7 @@ export function TokenExchange() {
             }}
             validationSchema={validationSchema}
           >
-            {({ setFieldValue, values, setFieldError }) => {
+            {({ setFieldValue, values, setFieldError, isValid: isFormValid }) => {
               const handleSwapTokens = () => {
                 const { tokenIn, tokenOut } = values;
                 setFieldValue('tokenIn', tokenOut);
@@ -478,7 +458,7 @@ export function TokenExchange() {
                   <div
                     className={cn(
                       'overflow-hidden transition-all duration-300 ease-out',
-                      values.value
+                      Number(values.value) > 0
                         ? 'max-h-[500px] mt-4' // “open” state: enough max-height + some top margin
                         : 'max-h-0 mt-0' // “closed” state: zero height + no margin
                     )}
