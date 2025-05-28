@@ -3,25 +3,28 @@ import { LINK_TOKEN_ABI } from './abi/link-token-abi';
 import { USDC_ABI } from './abi/usdc-abi';
 import { WETH_ABI } from './abi/weth-abi';
 
-export type Token = {
+type NativeToken = {
   symbol: string;
-  address?: Address;
   decimals: number;
   label: string;
-  abi?: Abi;
   logo: string;
-  faucetUrl: string;
-};
+  faucetUrl?: string;
+}
+
+export type ERC20Token = NativeToken & {
+  abi: Abi;
+  address: Address;
+}
+
+export type Token = NativeToken | ERC20Token;
 
 export type TokenMapKey = keyof typeof tokenMap;
 
-export const tokenMap = {
+export const tokenMap: Record<Token['symbol'], Token> = {
   eth: {
     symbol: 'eth',
     label: 'Sepolia ETH',
-    address: undefined,
     decimals: 18,
-    abi: undefined,
     logo: 'https://token-icons.s3.amazonaws.com/eth.png',
     faucetUrl: 'https://cloud.google.com/application/web3/faucet/ethereum/sepolia'
   },
@@ -49,8 +52,12 @@ export const tokenMap = {
     abi: USDC_ABI,
     logo: 'https://coin-images.coingecko.com/coins/images/6319/large/usdc.png',
   },
-} as const;
+};
 
 export const tokens: Token[] = Object.values(tokenMap);
 
-export const erc20Tokens = tokens.filter((token) => token.symbol !== tokenMap.eth.symbol);
+export const erc20Tokens = tokens.filter((token) => token.symbol !== tokenMap.eth.symbol) as ERC20Token[];
+
+export const isErc20 = (token: Token): token is ERC20Token => 'address' in token && 'abi' in token;
+
+export const isNativeToken = (token: Token): token is NativeToken => !('address' in token);

@@ -1,5 +1,5 @@
 'use client';
-import { erc20Tokens, Token, tokenMap, TokenMapKey, tokens } from '@/const/tokens';
+import { ERC20Token, erc20Tokens, tokenMap, TokenMapKey, tokens } from '@/const/tokens';
 import { useQuery } from '@tanstack/react-query';
 import { createContext, PropsWithChildren, useContext, useEffect, useRef, useState } from 'react';
 import { formatUnits } from 'viem';
@@ -58,7 +58,7 @@ export const PortfolioBalanceProvider = ({ children }: PropsWithChildren) => {
       const currentDomain = globalThis?.location?.origin || '';
       const internalTokenPricesUrl = `${currentDomain}/api/token-prices`;
       const res = await fetch(internalTokenPricesUrl);
-      const json: Record<string, { usd: number }> = await res.json();
+      const json: Record<string, number> = await res.json();
       return json;
     },
     retry: 0,
@@ -71,7 +71,7 @@ export const PortfolioBalanceProvider = ({ children }: PropsWithChildren) => {
     error: erc20onChainError,
     refetch: refetchErc20onChainBalances,
   } = useReadContracts({
-    contracts: erc20Tokens.map((token: Token) => ({
+    contracts: erc20Tokens.map((token: ERC20Token) => ({
       address: token.address,
       abi: token.abi,
       functionName: 'balanceOf',

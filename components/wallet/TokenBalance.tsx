@@ -3,7 +3,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Token } from '@/const/tokens';
 import { usePortfolio } from '@/context/PortfolioBalanceProvider';
-import { Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -55,40 +54,5 @@ export const TokenBalance = ({ token }: WalletBalanceItemProps) => {
         </div>
       </CardContent>
     </Card>
-  );
-
-  return (
-    <div className="flex items-center space-x-4 bg-gray-100 rounded-xl p-4">
-      <div className="flex flex-row flex-1 items-center justify-between">
-        <div className="flex flex-row items-center gap-2">
-          <Image src={token.logo} width={40} height={40} alt={token.label} />
-          <div className="flex flex-col">
-            <span className="text-gray-700">{token.label}</span>
-            <h4 className="text-gray-600">
-              <span className="">
-                {isLoading ? (
-                  <Loader2 className="animate-spin w-4 h-4 text-gray-400 inline-block" />
-                ) : (
-                  balances.get(token.symbol)?.balance
-                )}
-              </span>{' '}
-              <span className="text-xs">{token.symbol.toUpperCase()}</span>
-            </h4>
-          </div>
-        </div>
-        {token?.faucetUrl && (
-          <div className="flex">
-            <Link
-              className="text-xs flex hover:underline"
-              href={token.faucetUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Get tokens
-            </Link>
-          </div>
-        )}
-      </div>
-    </div>
   );
 };

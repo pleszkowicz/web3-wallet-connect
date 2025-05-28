@@ -7,15 +7,15 @@ import { TokenSelect } from '@/components/ui/form/TokenSelect';
 import { useToast } from '@/components/ui/hooks/use-toast';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { tokenMap, TokenMapKey, tokens } from '@/const/tokens';
+import { ERC20Token, tokenMap, TokenMapKey, tokens } from '@/const/tokens';
 import { usePortfolio } from '@/context/PortfolioBalanceProvider';
 import { Field, Form, Formik } from 'formik';
 import { useEffect, useState } from 'react';
-import { Abi, Address, encodeFunctionData, formatEther, formatUnits, isAddress, parseEther, parseUnits } from 'viem';
+import { Address, encodeFunctionData, formatEther, formatUnits, isAddress, parseEther, parseUnits } from 'viem';
 import { useAccount, useBalance, usePublicClient, useReadContract, useSendTransaction, useWriteContract } from 'wagmi';
 import * as Yup from 'yup';
 
-const initialValues = { unit: tokenMap.eth.symbol, to: '', value: '' };
+const initialValues = { unit: tokenMap.eth.symbol as TokenMapKey, to: '', value: '' };
 
 export function TokenTransferForm() {
   const [selectedToken, setSelectedToken] = useState<TokenMapKey>(initialValues.unit);
@@ -24,13 +24,14 @@ export function TokenTransferForm() {
   const { data: ethBalance } = useBalance({ address });
   const { sendTransactionAsync, isPending: isTransactionPending } = useSendTransaction();
   const { toast } = useToast();
+  const erc20Token = tokenMap[selectedToken] as ERC20Token;
 
   const { data: erc20Balance } = useReadContract({
-    address: tokenMap[selectedToken].address,
-    abi: tokenMap[selectedToken].abi,
+    address: (tokenMap[selectedToken] as ERC20Token).address,
+    abi: erc20Token.abi,
     functionName: 'balanceOf',
     args: [address],
-    query: { enabled: !!tokenMap[selectedToken].abi && !!tokenMap[selectedToken].address && !!address },
+    query: { enabled: !!erc20Token?.abi && !!erc20Token.address && !!address },
   });
 
   const { writeContractAsync, isPending: isWriteContractPending } = useWriteContract();
@@ -55,12 +56,12 @@ export function TokenTransferForm() {
           });
         } else {
           // ERC20 transfer
-          const erc20Token = tokenMap[selectedToken];
+          const erc20Token = tokenMap[selectedToken] as ERC20Token;
           // Try-catch to handle tokens that revert on estimation (e.g. paused, blacklisted, etc.)
           try {
             const dummyRecipient = address;
             const data = encodeFunctionData({
-              abi: erc20Token.abi as Abi,
+              abi: erc20Token.abi,
               functionName: 'transfer',
               args: [dummyRecipient, parseUnits('0.0000001', erc20Token.decimals)],
             });
@@ -113,8 +114,8 @@ export function TokenTransferForm() {
                   selectedToken === tokenMap.eth.symbol
                     ? await sendTransactionAsync({ to: values.to as Address, value: parseEther(String(values.value)) })
                     : await writeContractAsync({
-                        address: tokenMap[selectedToken].address,
-                        abi: tokenMap[selectedToken].abi as Abi,
+                        address: erc20Token.address,
+                        abi: erc20Token.abi,
                         functionName: 'transfer',
                         args: [
                           values.to as Address, // Recipient address

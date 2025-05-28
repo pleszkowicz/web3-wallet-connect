@@ -8,7 +8,7 @@ import { FormError } from '@/components/ui/form/FormError';
 import { TokenSelect } from '@/components/ui/form/TokenSelect';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { tokenMap, TokenMapKey, tokens } from '@/const/tokens';
+import { ERC20Token, isErc20, isNativeToken, tokenMap, TokenMapKey, tokens } from '@/const/tokens';
 import { UNISWAP_V3_QUOTER_ABI } from '@/const/uniswap/uniswap-v3-quoter-abi';
 import { UNISWAP_V3_ROUTER_ABI } from '@/const/uniswap/uniswap-v3-router-abi';
 import { usePortfolio } from '@/context/PortfolioBalanceProvider';
@@ -17,7 +17,7 @@ import { CHAIN_TO_ADDRESSES_MAP } from '@uniswap/sdk-core';
 import { Field, Form, Formik } from 'formik';
 import { ArrowUpDown } from 'lucide-react';
 import { ChangeEvent, useState } from 'react';
-import { Abi, Address, formatUnits, Hash, parseEther, parseUnits } from 'viem';
+import { Address, formatUnits, Hash, parseEther, parseUnits } from 'viem';
 import { sepolia } from 'viem/chains';
 import { useAccount, useBalance, usePublicClient, useReadContract, useSimulateContract, useWriteContract } from 'wagmi';
 import { useSendCalls } from 'wagmi/experimental';
@@ -92,11 +92,11 @@ export function TokenExchange() {
   const tokenOut = tokenMap[tokenOutSymbol];
 
   const { data: erc20Balance } = useReadContract({
-    address: tokenIn.address!,
-    abi: tokenIn.abi,
+    address: isErc20(tokenIn) ? tokenIn.address : undefined,
+    abi: isErc20(tokenIn) ? tokenIn.abi : undefined,
     functionName: 'balanceOf',
-    args: [address],
-    query: { enabled: !!amount && !!tokenIn.abi && !!tokenIn.address && !!address },
+    args: isErc20(tokenIn) ? [address] : undefined,
+    query: { enabled: !!amount && !!isErc20(tokenIn) && !!address },
   });
 
   const { writeContractAsync, isPending: isWriteContractPending } = useWriteContract();
@@ -124,8 +124,8 @@ export function TokenExchange() {
     functionName: 'quoteExactInputSingle',
     args: [
       {
-        tokenIn: tokenIn?.address as Address, // Input token address
-        tokenOut: tokenOut?.address as Address, // Output token address
+        tokenIn: (tokenIn as ERC20Token).address, // Input token address
+        tokenOut: (tokenOut as ERC20Token).address, // Output token address
         amountIn: parseUnits(amount, tokenIn.decimals), // Amount of input token
         amountOutMinimum: 0n, // Minimum amount of output tokens to receive
         fee: poolFee.fee, // Pool fee (e.g., 0.5%)
@@ -133,7 +133,7 @@ export function TokenExchange() {
       },
     ],
     query: {
-      enabled: !!address && amount !== '0' && !!tokenIn?.address && !!tokenOut?.address,
+      enabled: !!address && amount !== '0' && !!isErc20(tokenIn) && !!isErc20(tokenOut),
       retry: 0,
     },
   });
@@ -146,10 +146,7 @@ export function TokenExchange() {
   const amountOutMinimum = (expectedAmountOut * (SLIPPAGE_DENOMINATOR - slippageTolerance)) / SLIPPAGE_DENOMINATOR;
 
   const isSubmitDisabled =
-    tokenInBalance === 0n ||
-    tokenIn.symbol === tokenOut.symbol ||
-    !quoteExactInputSingle?.result?.[0] ||
-    isWriteContractPending;
+    tokenIn.symbol === tokenOut.symbol || !quoteExactInputSingle?.result?.[0] || isWriteContractPending;
 
   // const handleExchange = async () => {
   //   // approve
@@ -234,10 +231,10 @@ export function TokenExchange() {
               try {
                 let txHash: Hash;
 
-                if (tokenIn === tokenMap.eth && tokenOut === tokenMap.weth && !tokenIn.address) {
+                if (isNativeToken(tokenIn) && tokenOut === tokenMap.weth) {
                   txHash = await writeContractAsync({
-                    address: tokenMap.weth.address,
-                    abi: tokenMap.weth.abi,
+                    address: (tokenMap.weth as ERC20Token).address,
+                    abi: (tokenMap.weth as ERC20Token).abi,
                     functionName: 'deposit',
                     args: [],
                     value: parseEther(amount), // Amount of WETH to deposit
@@ -276,8 +273,8 @@ export function TokenExchange() {
 
                   // Approve
                   await writeContractAsync({
-                    address: tokenIn.address as Address,
-                    abi: tokenIn.abi as Abi,
+                    address: (tokenIn as ERC20Token).address,
+                    abi: (tokenIn as ERC20Token).abi,
                     functionName: 'approve',
                     args: [swapRouterAddress, parseEther(values.value.toString())],
                   });
@@ -291,10 +288,10 @@ export function TokenExchange() {
                     functionName: 'exactInputSingle',
                     args: [
                       {
-                        tokenIn: tokenIn.address as Address,
-                        tokenOut: tokenOut.address as Address,
+                        tokenIn: (tokenIn as ERC20Token).address,
+                        tokenOut: (tokenOut as ERC20Token).address,
                         fee: poolFee.fee,
-                        recipient: address as Address,
+                        recipient: address!,
                         amountIn: parseUnits(amount, tokenIn.decimals),
                         amountOutMinimum, // Minimum amount of output tokens to receive
                         sqrtPriceLimitX96: 0n, // No price limit
@@ -528,7 +525,7 @@ export function TokenExchange() {
                   </div>
 
                   <div className="mt-4 flex w-full justify-center text-">
-                    <Button type="submit" className="mt-4" size="xl" disabled={isSubmitDisabled}>
+                    <Button type="submit" className="mt-4" size="xl" disabled={isSubmitDisabled || !isFormValid}>
                       Swap
                     </Button>
                   </div>
