@@ -55,12 +55,11 @@ export const PortfolioBalanceProvider = ({ children }: PropsWithChildren) => {
   } = useQuery({
     queryKey: ['prices', tokenSymbols],
     queryFn: async () => {
-      const res = await fetch(
-        `https://api.coingecko.com/api/v3/simple/price?symbols=${tokenSymbols}&vs_currencies=usd`
-      );
+      const currentDomain = globalThis?.location?.origin || '';
+      const internalTokenPricesUrl = `${currentDomain}/api/token-prices`;
+      const res = await fetch(internalTokenPricesUrl);
       const json: Record<string, { usd: number }> = await res.json();
-      // flatten to Record<string,number>
-      return Object.fromEntries(Object.entries(json).map(([id, { usd }]) => [id, usd])) as Record<string, number>;
+      return json;
     },
     retry: 0,
   });

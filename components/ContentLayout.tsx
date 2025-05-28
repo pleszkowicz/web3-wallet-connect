@@ -117,7 +117,7 @@ export const ContentLayout = ({ title, description, goBackUrl, children }: CardL
         </div>
       </header>
 
-      <main className="mx-auto max-w-7xl px-4 py-4 lg:py-12 lg:px-8 space-y-4">{children}</main>
+      <main className="mx-auto max-w-7xl px-4 py-4 lg:py-12 lg:px-8 space-y-8">{children}</main>
 
       {/* <Card className="bg-gray-900 max-w-3xl w-full min-h-screen sm:min-h-[80vh]">
         <CardContent className="space-y-4">{children}</CardContent>

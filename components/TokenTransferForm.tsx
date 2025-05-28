@@ -8,6 +8,7 @@ import { useToast } from '@/components/ui/hooks/use-toast';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { tokenMap, TokenMapKey, tokens } from '@/const/tokens';
+import { usePortfolio } from '@/context/PortfolioBalanceProvider';
 import { Field, Form, Formik } from 'formik';
 import { useEffect, useState } from 'react';
 import { Abi, Address, encodeFunctionData, formatEther, formatUnits, isAddress, parseEther, parseUnits } from 'viem';
@@ -19,6 +20,7 @@ const initialValues = { unit: tokenMap.eth.symbol, to: '', value: '' };
 export function TokenTransferForm() {
   const [selectedToken, setSelectedToken] = useState<TokenMapKey>(initialValues.unit);
   const { address, chain } = useAccount();
+  const { balances } = usePortfolio();
   const { data: ethBalance } = useBalance({ address });
   const { sendTransactionAsync, isPending: isTransactionPending } = useSendTransaction();
   const { toast } = useToast();
@@ -92,7 +94,7 @@ export function TokenTransferForm() {
       .test('is-valid-address', 'Invalid wallet address', (v) => !!v && isAddress(v)),
     value: Yup.number()
       .required('Value is required')
-      .test('balance', 'Insufficient balance', (v) => {
+      .test('balance', 'Insufficient funds', (v) => {
         const available = Number(formatUnits(currentBalance, tokenMap[selectedToken].decimals));
         return typeof v === 'number' && v > 0 && v <= available;
       }),
@@ -100,119 +102,119 @@ export function TokenTransferForm() {
 
   return (
     <ContentLayout title="Send" goBackUrl="/dashboard/tokens">
-      <div className="space-y-4">
-        <h3 className="text-xl font-semibold text-white">Token transfer</h3>
-      </div>
-      <ContentCard className="p-8">
-        <Formik
-          validationSchema={validationSchema}
-          initialValues={initialValues}
-          onSubmit={async (values, { resetForm }) => {
-            try {
-              const txHash =
-                selectedToken === tokenMap.eth.symbol
-                  ? await sendTransactionAsync({ to: values.to as Address, value: parseEther(String(values.value)) })
-                  : await writeContractAsync({
-                      address: tokenMap[selectedToken].address,
-                      abi: tokenMap[selectedToken].abi as Abi,
-                      functionName: 'transfer',
-                      args: [
-                        values.to as Address, // Recipient address
-                        parseUnits(values.value.toString(), tokenMap[selectedToken].decimals), // Amount to transfer
-                      ],
-                    });
+      <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6 lg:px-8">
+        <ContentCard title="Transfer token">
+          <Formik
+            validationSchema={validationSchema}
+            initialValues={initialValues}
+            onSubmit={async (values, { resetForm }) => {
+              try {
+                const txHash =
+                  selectedToken === tokenMap.eth.symbol
+                    ? await sendTransactionAsync({ to: values.to as Address, value: parseEther(String(values.value)) })
+                    : await writeContractAsync({
+                        address: tokenMap[selectedToken].address,
+                        abi: tokenMap[selectedToken].abi as Abi,
+                        functionName: 'transfer',
+                        args: [
+                          values.to as Address, // Recipient address
+                          parseUnits(values.value.toString(), tokenMap[selectedToken].decimals), // Amount to transfer
+                        ],
+                      });
 
-              toast({ title: 'Transaction sent', description: 'Waiting for confirmation.' });
-              await client?.waitForTransactionReceipt({ hash: txHash });
-              toast({ title: 'Confirmed on-chain!' });
-              resetForm();
-            } catch (error) {
-              if ((error as Error)?.message?.includes('User rejected the request')) {
-                return;
+                toast({ title: 'Transaction sent', description: 'Waiting for confirmation.' });
+                await client?.waitForTransactionReceipt({ hash: txHash });
+                toast({ title: 'Confirmed on-chain!' });
+                resetForm();
+              } catch (error) {
+                if ((error as Error)?.message?.includes('User rejected the request')) {
+                  return;
+                }
+                toast({
+                  title: 'Transaction failed',
+                  description: 'An error occurred during transfer',
+                  variant: 'destructive',
+                });
               }
-              toast({
-                title: 'Transaction failed',
-                description: 'An error occurred during transfer',
-                variant: 'destructive',
-              });
-            }
-          }}
-        >
-          {({ setFieldError, setFieldValue }) => (
-            <Form className="space-y-2 flex flex-col gap-4">
-              <div>
-                <Label htmlFor="to" className="flex-1 text-gray-400 text-lg font-medium">
-                  To
-                </Label>
+            }}
+          >
+            {({ setFieldValue, values }) => (
+              <Form className="space-y-4 flex flex-col gap-4">
+                <div className="space-y-4">
+                  <Label htmlFor="to" className="flex-1 text-sm font-medium text-white">
+                    To
+                  </Label>
 
-                <Field
-                  as={Input}
-                  id="to"
-                  name="to"
-                  placeholder="Enter public address 0x"
-                  className="flex w-full rounded-md border px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-indigo-900/40 border-indigo-700 text-white placeholder:text-indigo-300 h-14 pr-12"
-                />
-                {/* <Field
-                  as={Input}
-                  id="to"
-                  type="text"
-                  name="to"
-                  placeholder="Enter public address 0x"
-                  className="text-5xl text-gray-200 font-bold bg-transparent border-none shadow-none p-0 h-auto focus-visible:ring-0 focus-visible:ring-offset-0 appearance-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-inner-spin-button]:m-0"
-                /> */}
-                <FormError name="to" className="text-yellow-300 text-sm mt-1" />
-              </div>
-              <div className="flex flex-row justify-between relative items-start">
-                <div>
                   <Field
                     as={Input}
-                    id="value"
-                    type="number"
-                    name="value"
-                    placeholder="0.00"
-                    className="text-5xl text-gray-200 font-bold bg-transparent border-none shadow-none p-0 h-auto focus-visible:ring-0 focus-visible:ring-offset-0 appearance-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-inner-spin-button]:m-0"
+                    id="to"
+                    name="to"
+                    placeholder="Enter public address 0x"
+                    className="flex w-full rounded-md border px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 h-14 pr-12"
                   />
-
-                  <div className="text-sm text-gray-400 mt-1">
-                    {formatUnits(
-                      (selectedToken === tokenMap.eth.symbol ? ethBalance?.value : (erc20Balance as bigint)) ?? 0n,
-                      tokenMap[selectedToken].decimals
-                    )}{' '}
-                    {selectedToken.toUpperCase()}
+                  <FormError name="to" className="text-yellow-300 text-sm mt-1" />
+                </div>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-sm font-medium text-white">You Pay</Label>
+                    <div className="flex items-center gap-2 text-sm text-gray-400">
+                      <span>
+                        Balance: {balances.get(values.unit)?.formattedValue.toFixed(8) ?? 0}{' '}
+                        {values.unit.toLocaleUpperCase()}
+                      </span>
+                    </div>
                   </div>
+                  <ContentCard variant="light" className="pt-4">
+                    <div className="flex flex-row justify-between relative items-center">
+                      <div>
+                        <Field
+                          as={Input}
+                          id="value"
+                          type="number"
+                          name="value"
+                          placeholder="0.00"
+                          className="text-5xl text-gray-200 font-bold bg-transparent border-none shadow-none p-0 h-auto focus-visible:ring-0 focus-visible:ring-offset-0 appearance-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-inner-spin-button]:m-0"
+                        />
 
-                  <FormError name="value" />
+                        <div className="text-sm text-gray-400 mt-1">
+                          ≈$
+                          {values.unit &&
+                            ((balances.get(values.unit)?.tokenPrice ?? 0) * Number(values.value)).toFixed(2)}
+                        </div>
+                      </div>
+
+                      <FormError name="value" className="absolute -bottom-6" />
+
+                      <div className="flex items-center">
+                        <TokenSelect
+                          className="bg-white text-gray-950 border-none rounded-full p-6 pl-3 pr-4 focus:ring-0 overflow-hidden"
+                          name="unit"
+                          tokens={tokens}
+                          onChange={(tokenSymbol: TokenMapKey) => {
+                            setFieldValue('value', '');
+                            setSelectedToken(tokenSymbol);
+                          }}
+                        />{' '}
+                      </div>
+                    </div>
+                  </ContentCard>
                 </div>
 
-                <div className="flex items-center">
-                  <TokenSelect
-                    className="bg-white text-gray-950 border-none rounded-full p-6 pl-3 pr-4 focus:ring-0 overflow-hidden"
-                    name="unit"
-                    tokens={tokens}
-                    onChange={(tokenSymbol: TokenMapKey) => {
-                      setFieldValue('value', '');
-                      setSelectedToken(tokenSymbol);
-                    }}
-                  />
-                </div>
-              </div>
-
-              <div className="bg-black bg-opacity-30 rounded-lg p-4 flex items-center justify-between">
-                <span className="text-white">Estimated Gas:</span>
-                {/* {isGasPriceFetching ? (
+                <div className="bg-black bg-opacity-30 rounded-lg p-4 flex items-center justify-between">
+                  <span className="text-white">Estimated Gas:</span>
+                  {/* {isGasPriceFetching ? (
                   <Loader size="sm" />
                 ) : ( */}
-                <span className="text-white">{gasPrice ? `${formatEther(gasPrice, 'gwei')} Gwei` : 'N/A'}</span>
-                {/* )} */}
-              </div>
+                  <span className="text-white">{gasPrice ? `${formatEther(gasPrice, 'gwei')} Gwei` : 'N/A'}</span>
+                  {/* )} */}
+                </div>
 
-              <Button type="submit" className="w-full bg-white text-black hover:bg-gray-200">
-                Send
-              </Button>
-            </Form>
-          )}
-        </Formik>
-      </ContentCard>
+                <Button type="submit">Send</Button>
+              </Form>
+            )}
+          </Formik>
+        </ContentCard>
+      </div>
     </ContentLayout>
   );
 }

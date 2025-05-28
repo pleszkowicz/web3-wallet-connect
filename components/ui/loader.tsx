@@ -30,5 +30,5 @@ const LoaderIcon = ({ size = 'md' }: Pick<LoaderProps, 'size'>) => {
       sizeClass = 'w-8 h-8';
   }
 
-  return <span className={cn('animate-spin rounded-full border-b-2 border-orange-400 mb-2', sizeClass)} />;
+  return <span className={cn('inline-block animate-spin rounded-full border-b-2 border-orange-400 mb-2', sizeClass)} />;
 };

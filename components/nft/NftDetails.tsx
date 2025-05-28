@@ -168,60 +168,64 @@ const NftItem = ({ tokenId, owner, price }: NftItemProps) => {
   };
 
   return (
-    <div className="grid gap-8 md:grid-cols-2">
-      <NftListItemUI
-        tokenId={tokenId}
-        price={price}
-        tokenDetails={tokenDetails}
-        isLoading={isTokenUriLoading}
-        isOwned={isOwned}
-        isSaleApproved={isSaleApproved}
-        tokenDetailsError={tokenDetailsError}
-        isPreview
-      />
+    <div className="space-y-6">
+      <h3 className="text-xl font-semibold text-white">NFT Details</h3>
 
-      <ContentCard title="NFT Details" className="space-y-3">
-        <div className="flex justify-between">
-          <span className="text-gray-400">Contract Address</span>
-          <div className="flex items-center gap-2 wrap">
-            <span className="text-white font-mono text-sm">{shrotenAddress(NFT_MARKETPLACE_ADDRESS)}</span>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-6 w-6 text-gray-400 hover:text-gray-600"
-                  onClick={() => {
-                    navigator.clipboard.writeText(address as string);
-                    setIsAddressCopiedIconVisible(true);
-                  }}
-                >
-                  {isAddressCopiedIconVisible ? (
-                    <CheckIcon className="h-3 w-3 text-green-500" />
-                  ) : (
-                    <CopyIcon className="h-3 w-3 text-gray-400" />
-                  )}
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>{isAddressCopiedIconVisible ? 'Copied!' : 'Copy to clipboard'}</p>
-              </TooltipContent>
-            </Tooltip>
+      <div className="grid gap-8 md:grid-cols-2">
+        <NftListItemUI
+          tokenId={tokenId}
+          price={price}
+          tokenDetails={tokenDetails}
+          isLoading={isTokenUriLoading}
+          isOwned={isOwned}
+          isSaleApproved={isSaleApproved}
+          tokenDetailsError={tokenDetailsError}
+          isPreview
+        />
+
+        <ContentCard title="NFT Details" className="space-y-3">
+          <div className="flex justify-between">
+            <span className="text-gray-400">Contract Address</span>
+            <div className="flex items-center gap-2 wrap">
+              <span className="text-white font-mono text-sm">{shrotenAddress(NFT_MARKETPLACE_ADDRESS)}</span>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-6 w-6 text-gray-400 hover:text-gray-600"
+                    onClick={() => {
+                      navigator.clipboard.writeText(address as string);
+                      setIsAddressCopiedIconVisible(true);
+                    }}
+                  >
+                    {isAddressCopiedIconVisible ? (
+                      <CheckIcon className="h-3 w-3 text-green-500" />
+                    ) : (
+                      <CopyIcon className="h-3 w-3 text-gray-400" />
+                    )}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{isAddressCopiedIconVisible ? 'Copied!' : 'Copy to clipboard'}</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
           </div>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-gray-400">Token ID</span>
-          <span className="text-white">{tokenId}</span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-gray-400">Token Standard</span>
-          <span className="text-white">ERC-721</span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-gray-400">Blockchain</span>
-          <span className="text-white">{chain?.name}</span>
-        </div>
-      </ContentCard>
+          <div className="flex justify-between">
+            <span className="text-gray-400">Token ID</span>
+            <span className="text-white">{tokenId}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-gray-400">Token Standard</span>
+            <span className="text-white">ERC-721</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-gray-400">Blockchain</span>
+            <span className="text-white">{chain?.name}</span>
+          </div>
+        </ContentCard>
+      </div>
     </div>
   );
 };

@@ -12,6 +12,7 @@ import { tokenMap, TokenMapKey, tokens } from '@/const/tokens';
 import { UNISWAP_V3_QUOTER_ABI } from '@/const/uniswap/uniswap-v3-quoter-abi';
 import { UNISWAP_V3_ROUTER_ABI } from '@/const/uniswap/uniswap-v3-router-abi';
 import { usePortfolio } from '@/context/PortfolioBalanceProvider';
+import { cn } from '@/lib/cn';
 import { CHAIN_TO_ADDRESSES_MAP } from '@uniswap/sdk-core';
 import { Field, Form, Formik } from 'formik';
 import { ArrowUpDown } from 'lucide-react';
@@ -263,32 +264,63 @@ export function TokenExchange() {
                   setTxStatus('pending');
                 } else {
                   // Approve
-                  await writeContractAsync({
-                    address: tokenIn.address as Address,
-                    abi: tokenIn.abi as Abi,
-                    functionName: 'approve',
-                    args: [swapRouterAddress, parseEther(values.value.toString())],
+
+                  const { capabilities, id } = await sendCallsAsync({
+                    account: address as Address,
+                    calls: [
+                      {
+                        address: tokenIn.address as Address,
+                        abi: tokenIn.abi as Abi,
+                        functionName: 'approve',
+                        args: [swapRouterAddress, parseEther(values.value.toString())],
+                      },
+                      {
+                        address: swapRouterAddress as Address,
+                        abi: UNISWAP_V3_ROUTER_ABI,
+                        functionName: 'exactInputSingle',
+                        args: [
+                          {
+                            tokenIn: tokenIn.address as Address,
+                            tokenOut: tokenOut.address as Address,
+                            fee: poolFee.fee,
+                            recipient: address as Address,
+                            amountIn: parseUnits(amount, tokenIn.decimals),
+                            amountOutMinimum, // Minimum amount of output tokens to receive
+                            sqrtPriceLimitX96: BigInt(0), // No price limit
+                          },
+                        ],
+                      },
+                    ],
                   });
+                  console.log(capabilities, id);
+                  debugger;
+                  txHash = id as Address;
+                  // await writeContractAsync({
+                  //   address: tokenIn.address as Address,
+                  //   abi: tokenIn.abi as Abi,
+                  //   functionName: 'approve',
+                  //   args: [swapRouterAddress, parseEther(values.value.toString())],
+                  // });
 
                   setTxStatus('pending');
 
                   // Swap
-                  txHash = await writeContractAsync({
-                    address: swapRouterAddress as Address,
-                    abi: UNISWAP_V3_ROUTER_ABI,
-                    functionName: 'exactInputSingle',
-                    args: [
-                      {
-                        tokenIn: tokenIn.address as Address,
-                        tokenOut: tokenOut.address as Address,
-                        fee: poolFee.fee,
-                        recipient: address as Address,
-                        amountIn: parseUnits(amount, tokenIn.decimals),
-                        amountOutMinimum, // Minimum amount of output tokens to receive
-                        sqrtPriceLimitX96: 0n, // No price limit
-                      },
-                    ],
-                  });
+                  // txHash = await writeContractAsync({
+                  //   address: swapRouterAddress as Address,
+                  //   abi: UNISWAP_V3_ROUTER_ABI,
+                  //   functionName: 'exactInputSingle',
+                  //   args: [
+                  //     {
+                  //       tokenIn: tokenIn.address as Address,
+                  //       tokenOut: tokenOut.address as Address,
+                  //       fee: poolFee.fee,
+                  //       recipient: address as Address,
+                  //       amountIn: parseUnits(amount, tokenIn.decimals),
+                  //       amountOutMinimum, // Minimum amount of output tokens to receive
+                  //       sqrtPriceLimitX96: 0n, // No price limit
+                  //     },
+                  //   ],
+                  // });
                 }
 
                 await client?.waitForTransactionReceipt({ hash: txHash });
@@ -444,12 +476,12 @@ export function TokenExchange() {
 
                   {/* Swap Details */}
                   <div
-                    className={`overflow-hidden transition-all duration-300 ease-out ${
+                    className={cn(
+                      'overflow-hidden transition-all duration-300 ease-out',
                       values.value
                         ? 'max-h-[500px] mt-4' // “open” state: enough max-height + some top margin
                         : 'max-h-0 mt-0' // “closed” state: zero height + no margin
-                    }
-  `}
+                    )}
                   >
                     <ContentCard variant="light" className="pt-4 space-y-6">
                       <div className="flex items-center justify-between text-sm">
