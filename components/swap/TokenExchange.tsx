@@ -580,7 +580,7 @@ const TransactionStatusDialog = ({ open, status, onClose, onNewSwap }: Transacti
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent aria-describedby="dialog-content" className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>{current?.title || 'Swap'}</DialogTitle>
         </DialogHeader>

@@ -6,7 +6,7 @@ import { useMounted } from '@/hooks/useMounted';
 import { cn } from '@/lib/cn';
 import { Dialog } from '@radix-ui/react-dialog';
 import { OpenInNewWindowIcon } from '@radix-ui/react-icons';
-import { Loader2, Rocket, Wallet2 } from 'lucide-react';
+import { Code, Loader2, Rocket, Wallet2 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -35,70 +35,80 @@ export function WalletConnect() {
   return (
     <ContentLayout>
       <div>
-        <h1 className="text-center text-3xl font-bold md:text-4xl">Your All-in-One Web3 Dashboard</h1>
-        <p className="text-center text-lg text-gray-600">Swap tokens, trade NFTs, and connect your wallet</p>
-        <div className="mb-10 mt-8 rounded-xl bg-gray-50 p-2 sm:p-4">
-          <h2 className="mb-6 mt-2 text-center text-2xl font-bold">Explore & Trade NFTs</h2>{' '}
-          <div className="grid grid-cols-3 gap-4">{nftPlaceholders}</div>
+        <div className="text-center mb-16">
+          <h1 className="text-4xl md:text-6xl font-bold text-white mb-4">
+            Your All-in-One{' '}
+            <span className="bg-gradient-to-r from-orange-400 to-orange-600 bg-clip-text text-transparent">
+              Web3 Dashboard
+            </span>
+          </h1>
+          <p className="text-xl text-gray-400 max-w-2xl mx-auto">Swap tokens, trade NFTs, and connect your wallet</p>
         </div>
-        <h2 className="mb-6 mt-2 text-center text-2xl font-bold">Let's dive</h2>{' '}
-        <div className="mx-auto flex w-full flex-col items-center self-center md:max-w-[80%]">
-          <div className="mb-4 flex items-center pb-2">
-            {!isConnected ? (
-              <Dialog open={open}>
-                <DialogTrigger asChild>
-                  <div className=" flex items-center pb-2 text-purple-800">
-                    <Button variant="default" size="lg" onClick={() => setIsOpen(true)}>
-                      <Wallet2 className="mr-2 h-6 w-6" />
-                      Connect your wallet
-                    </Button>
-                  </div>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-[425px]" aria-describedby="dialog-content">
-                  <DialogHeader>
-                    <DialogTitle>Please connect your wallet</DialogTitle>
-                  </DialogHeader>
-                  <DialogDescription asChild>
-                    <div className="mt-6 grid w-full gap-2">
-                      {connectors.length ? (
-                        connectors.map((connector) => (
-                          <WalletOption
-                            key={connector.id}
-                            connector={connector}
-                            onClick={async () => {
-                              await connectAsync({ connector });
-                              setIsOpen(false);
-                              push('/dashboard');
-                            }}
-                            pending={isConnectionPending}
-                          />
-                        ))
-                      ) : (
-                        <div className="text-slate-700">
-                          <p>
-                            Unfortunately, I <b>coud not find any crypto wallet</b> enabled in your browser. Once you
-                            install, please try again.
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  </DialogDescription>
-                </DialogContent>
-              </Dialog>
-            ) : (
-              <Button asChild variant="default" size="xl">
-                <Link href="/dashboard">
-                  <Rocket className="mr-2" /> Launch Dashboard
-                </Link>
-              </Button>
-            )}
-          </div>
+        <div className="mb-16">
+          <h2 className="text-2xl md:text-3xl font-bold text-white text-center mb-8">Explore & Trade NFTs</h2>
 
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">{nftPlaceholders}</div>
+        </div>
+        <div className="text-center mb-16">
+          <h2 className="text-2xl md:text-3xl font-bold text-white mb-8">Let's dive</h2>
+
+          {!isConnected ? (
+            <Dialog open={open}>
+              <DialogTrigger asChild>
+                <Button variant="default" size="xl" onClick={() => setIsOpen(true)}>
+                  <Wallet2 className="mr-2 h-6 w-6" />
+                  Connect your wallet
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px]" aria-describedby="dialog-content">
+                <DialogHeader>
+                  <DialogTitle>Please connect your wallet</DialogTitle>
+                </DialogHeader>
+                <DialogDescription asChild>
+                  <div className="mt-6 grid w-full gap-2">
+                    {connectors.length ? (
+                      connectors.map((connector) => (
+                        <WalletOption
+                          key={connector.id}
+                          connector={connector}
+                          onClick={async () => {
+                            await connectAsync({ connector });
+                            setIsOpen(false);
+                            push('/dashboard');
+                          }}
+                          pending={isConnectionPending}
+                        />
+                      ))
+                    ) : (
+                      <div className="text-slate-700">
+                        <p>
+                          Unfortunately, I <b>coud not find any crypto wallet</b> enabled in your browser. Once you
+                          install, please try again.
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </DialogDescription>
+              </DialogContent>
+            </Dialog>
+          ) : (
+            <Button asChild variant="default" size="xl">
+              <Link href="/dashboard">
+                <Rocket className="mr-2" /> Launch Dashboard
+              </Link>
+            </Button>
+          )}
+        </div>
+
+        <div className="text-center">
           <Dialog>
             <DialogTrigger asChild>
-              <span className="text-slate-500 underline cursor-pointer">🔧 Local Setup Guide for Developers</span>
+              <Button variant="link" className="text-gray-400 hover:text-white transition-colors duration-200">
+                <Code className="mr-2 h-4 w-4" />
+                Local Setup Guide for Developers
+              </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent aria-describedby="dialog-content" className="sm:max-w-[425px]">
               <DialogHeader>
                 <DialogTitle>Local Setup Guide for Developers</DialogTitle>
               </DialogHeader>

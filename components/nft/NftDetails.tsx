@@ -301,7 +301,7 @@ const NftPrice = ({ tokenId, price, isOwned }: NftPriceProps) => {
                 </span>
               </DialogTrigger>
               <Form aria-disabled={isSubmitting || isWriteContractPending}>
-                <DialogContent className="sm:max-w-[425px]">
+                <DialogContent aria-describedby="dialog-content" className="sm:max-w-[425px]">
                   <DialogHeader>
                     <DialogTitle>Set Your NFT Price</DialogTitle>
                   </DialogHeader>
