@@ -37,7 +37,7 @@ export function WalletDashboard({ children }: PropsWithChildren) {
           <div className="flex flex-col justify-center text-center sm:text-left">
             <p className="text-sm text-gray-400 mb-2">Total Portfolio Value</p>
             <h2 className="text-4xl font-bold text-white">
-              {isLoading ? <Loader iconOnly /> : `≈$${totalUsd.toFixed(2)}`}
+              ≈{isLoading ? <Loader iconOnly /> : <span>${totalUsd.toFixed(2)}</span>}
             </h2>
             {/* <div className="flex items-center gap-2"> */}
             {/* <TrendingUp className="h-4 w-4 text-green-400" /> */}

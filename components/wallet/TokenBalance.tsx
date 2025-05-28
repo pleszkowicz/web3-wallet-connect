@@ -42,7 +42,7 @@ export const TokenBalance = ({ token }: WalletBalanceItemProps) => {
           </div>
           <div className="flex gap-4 justify-end text-right opacity-0 group-hover:opacity-100 transition-opacity duration-200 ml-4">
             {token?.faucetUrl && (
-              <Button asChild size="sm" className="bg-orange-600 hover:bg-orange-700">
+              <Button asChild size="sm" variant="secondary">
                 <Link href={token.faucetUrl} target="_blank" rel="noopener noreferrer">
                   Get test tokens
                 </Link>

@@ -9,7 +9,7 @@ import { useQuery } from '@tanstack/react-query';
 import { ImageIcon } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { Fragment, ReactNode, useEffect, useState } from 'react';
 import { formatEther } from 'viem';
 import { useAccount, useReadContract } from 'wagmi';
 
@@ -90,9 +90,10 @@ export const NftListItemUI = ({
   price,
   isPreview = false,
 }: NftListItemUIProps) => {
+  const Wrapper = isPreview ? Fragment : Link;
   return (
-    <div className="flex flex-col w-full animate-fade-in opacity-0 hover:scale-[1.02] overflow-hidden transition-all duration-200 shadow-lg">
-      <Link href={`/dashboard/nfts/view/${tokenId}`}>
+    <div className="flex flex-col w-full animate-fade-in opacity-0 overflow-hidden transition-all duration-200 shadow-lg">
+      <ConditionalLink href={isPreview ? undefined : `/dashboard/nfts/view/${tokenId}`}>
         <div
           className={`relative aspect-square rounded-xl border-2 ${isPreview && 'border-dashed'} border-gray-700 bg-gray-800/50 overflow-hidden`}
         >
@@ -113,7 +114,7 @@ export const NftListItemUI = ({
                   priority={false}
                   src={tokenDetails.image}
                   alt={tokenDetails.name || 'NFT Image'}
-                  className="pointer w-full aspect-square object-cover transform transition-transform duration-1000 group-hover:scale-[1.02]"
+                  className="pointer w-full aspect-square object-cover transform transition-transform duration-1000 hover:scale-[1.02]"
                   width={192}
                   height={192}
                 />
@@ -141,7 +142,19 @@ export const NftListItemUI = ({
             </>
           )}
         </div>
-      </Link>
+      </ConditionalLink>
     </div>
   );
+};
+
+type ConditionalLinkProps = {
+  href?: string;
+  children: ReactNode;
+};
+
+const ConditionalLink = ({ href, children }: ConditionalLinkProps) => {
+  if (!href) {
+    return <Fragment>{children}</Fragment>;
+  }
+  return <Link href={href}>{children}</Link>;
 };
