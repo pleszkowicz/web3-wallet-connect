@@ -217,7 +217,7 @@ export function TokenExchange() {
         <ContentCard
           title="Swap Tokens"
           description="Trade tokens in an instant"
-          badge={<Badge className="bg-blue-500/10 text-blue-400 border-blue-500/20">Uniswap V3</Badge>}
+          badge={<Badge className="border-blue-500/20 bg-blue-500/10 text-blue-400">Uniswap V3</Badge>}
         >
           <Formik
             initialValues={{
@@ -376,7 +376,7 @@ export function TokenExchange() {
                   </div> */}
 
                   <ContentCard variant="light" className="pt-4">
-                    <div className="flex flex-row justify-between relative items-center">
+                    <div className="relative flex flex-row items-center justify-between">
                       <div>
                         <Field
                           as={Input}
@@ -388,10 +388,10 @@ export function TokenExchange() {
                           type="number"
                           name="value"
                           placeholder="0.00"
-                          className="text-5xl text-gray-200 font-bold bg-transparent border-none shadow-none p-0 h-auto focus-visible:ring-0 focus-visible:ring-offset-0 appearance-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-inner-spin-button]:m-0"
+                          className="h-auto appearance-none border-none bg-transparent p-0 text-5xl font-bold text-gray-200 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none"
                         />
 
-                        <div className="text-sm text-gray-400 mt-1">
+                        <div className="mt-1 text-sm text-gray-400">
                           ≈$
                           {tokenIn.symbol &&
                             ((balances.get(values.tokenIn)?.tokenPrice ?? 0) * Number(amount)).toFixed(2)}
@@ -419,7 +419,7 @@ export function TokenExchange() {
                       type="button"
                       onClick={handleSwapTokens}
                       size="icon"
-                      className="w-12 h-12 rounded-full bg-linear-to-br from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white shadow-lg hover:shadow-blue-500/25 transition-all duration-200"
+                      className="h-12 w-12 rounded-full bg-linear-to-br from-blue-500 to-cyan-500 text-white shadow-lg transition-all duration-200 hover:from-blue-600 hover:to-cyan-600 hover:shadow-blue-500/25"
                     >
                       <ArrowUpDown className="h-5 w-5" />
                     </Button>
@@ -429,7 +429,7 @@ export function TokenExchange() {
 
                   <ContentCard variant="light" className="pt-4">
                     <div className="flex items-center gap-1">
-                      <div className="text-5xl text-gray-200 font-bold flex-1 truncate overflow-hidden">
+                      <div className="flex-1 truncate overflow-hidden text-5xl font-bold text-gray-200">
                         {isQuoteLoading ? (
                           <span className="animate-pulse text-xs">Fetching quote</span>
                         ) : quoteExactInputSingle?.result ? (
@@ -457,11 +457,11 @@ export function TokenExchange() {
                     className={cn(
                       'overflow-hidden transition-all duration-300 ease-out',
                       Number(values.value) > 0
-                        ? 'max-h-[500px] mt-4' // “open” state: enough max-height + some top margin
-                        : 'max-h-0 mt-0' // “closed” state: zero height + no margin
+                        ? 'mt-4 max-h-[500px]' // “open” state: enough max-height + some top margin
+                        : 'mt-0 max-h-0' // “closed” state: zero height + no margin
                     )}
                   >
-                    <ContentCard variant="light" className="pt-4 space-y-6">
+                    <ContentCard variant="light" className="space-y-6 pt-4">
                       <div className="flex items-center justify-between text-sm">
                         <span className="text-gray-400">Exchange Rate</span>
                         <span className="text-white">{formattedExchangeRate}</span>
@@ -483,7 +483,7 @@ export function TokenExchange() {
                               key={option.fee}
                               variant="outline"
                               onClick={() => setPoolFee(option)}
-                              className={`h-auto p-3 flex flex-col items-center gap-1 transition-all duration-200 ${
+                              className={`flex h-auto flex-col items-center gap-1 p-3 transition-all duration-200 ${
                                 poolFee.fee === option.fee
                                   ? `border-2 ${option.color.replace('text-', 'border-')} bg-gray-700`
                                   : 'border-gray-600 bg-gray-800 hover:bg-gray-700'
@@ -492,14 +492,14 @@ export function TokenExchange() {
                               <span className={`font-bold ${poolFee === option ? option.color : 'text-white'}`}>
                                 {option.label}
                               </span>
-                              <span className="text-xs text-gray-400 text-center leading-tight">
+                              <span className="text-center text-xs leading-tight text-gray-400">
                                 {option.description}
                               </span>
                               <Badge
                                 className={`text-xs ${
                                   poolFee.fee === option.fee
                                     ? `${option.color.replace('text-', 'bg-')}/20 ${option.color} border-current`
-                                    : 'bg-gray-600 text-gray-300 border-gray-500'
+                                    : 'border-gray-500 bg-gray-600 text-gray-300'
                                 }`}
                               >
                                 {option.volume} Volume
@@ -525,7 +525,7 @@ export function TokenExchange() {
                     </ContentCard>
                   </div>
 
-                  <div className="mt-4 flex w-full justify-center text-">
+                  <div className="text- mt-4 flex w-full justify-center">
                     <Button type="submit" className="mt-4" size="xl" disabled={isSubmitDisabled || !isFormValid}>
                       Swap
                     </Button>
@@ -565,12 +565,12 @@ type TransactionStatusDialogProps = {
 const STATUSES = {
   'waiting-approve': {
     title: 'Awaiting wallet confirmation',
-    icon: <span className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-400 mb-2" />,
+    icon: <span className="mb-2 h-8 w-8 animate-spin rounded-full border-b-2 border-indigo-400" />,
     message: 'Please confirm the transaction in your wallet.',
   },
   pending: {
     title: 'Transaction Pending',
-    icon: <span className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-400 mb-2" />,
+    icon: <span className="mb-2 h-8 w-8 animate-spin rounded-full border-b-2 border-indigo-400" />,
     message: 'Waiting for confirmation on the blockchain...',
   },
   confirmed: {
@@ -580,7 +580,7 @@ const STATUSES = {
   },
   error: {
     title: 'Transaction Failed',
-    icon: <span className="text-red-400 text-3xl">✗</span>,
+    icon: <span className="text-3xl text-red-400">✗</span>,
     message: 'Transaction failed. Please try again.',
   },
 };
@@ -595,9 +595,9 @@ const TransactionStatusDialog = ({ open, status, onClose, onNewSwap }: Transacti
           <DialogTitle>{current?.title || 'Swap'}</DialogTitle>
         </DialogHeader>
         {current && (
-          <div className="py-4 flex flex-col items-center gap-2">
+          <div className="flex flex-col items-center gap-2 py-4">
             {current?.icon}
-            <p className="text-gray-400 text-center">{current.message}</p>
+            <p className="text-center text-gray-400">{current.message}</p>
           </div>
         )}
         <DialogFooter>

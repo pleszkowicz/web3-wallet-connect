@@ -32,6 +32,12 @@ export function WalletConnect() {
     return null;
   }
 
+  const onConnectorSelect = async (connector: Connector) => {
+    await connectAsync({ connector });
+    setIsOpen(false);
+    push('/dashboard');
+  };
+
   return (
     <ContentLayout>
       <div>
@@ -47,20 +53,23 @@ export function WalletConnect() {
         <div className="mb-16">
           <h2 className="mb-8 text-center text-2xl font-bold text-white md:text-3xl">Explore & Trade NFTs</h2>
 
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">{nftPlaceholders}</div>
+          <div className="grid grid-cols-3 gap-6">{nftPlaceholders}</div>
         </div>
         <div className="mb-16 text-center">
           <h2 className="mb-8 text-2xl font-bold text-white md:text-3xl">Let's dive</h2>
 
           {!isConnected ? (
-            <Dialog open={open}>
-              <DialogTrigger asChild>
-                <Button variant="default" size="xl" onClick={() => setIsOpen(true)}>
+            <Dialog open={open} onOpenChange={setIsOpen}>
+              <DialogTrigger asChild onAbort={() => setIsOpen(false)}>
+                <Button variant="default" size="xl" className="cursor-pointer" onClick={() => setIsOpen(true)}>
                   <Wallet2 className="mr-2 h-6 w-6" />
                   Connect your wallet
                 </Button>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-[425px]" aria-describedby="dialog-content">
+              <DialogContent
+                className="border-gray-700 bg-gray-900 text-white sm:max-w-[425px]"
+                aria-describedby="dialog-content"
+              >
                 <DialogHeader>
                   <DialogTitle>Please connect your wallet</DialogTitle>
                 </DialogHeader>
@@ -71,11 +80,7 @@ export function WalletConnect() {
                         <WalletOption
                           key={connector.id}
                           connector={connector}
-                          onClick={async () => {
-                            await connectAsync({ connector });
-                            setIsOpen(false);
-                            push('/dashboard');
-                          }}
+                          onClick={onConnectorSelect}
                           pending={isConnectionPending}
                         />
                       ))
@@ -155,7 +160,7 @@ function WalletOption({
   pending,
 }: {
   connector: Connector;
-  onClick: () => void;
+  onClick: (connector: Connector) => void;
   pending: boolean;
 }) {
   const [ready, setReady] = useState(false);
@@ -171,9 +176,9 @@ function WalletOption({
     <Button
       variant="outline"
       size="lg"
-      className="hover:bg-accent flex w-full transform content-between justify-start text-lg transition-transform duration-500 hover:scale-[1.02]"
+      className="flex w-full transform cursor-pointer content-between justify-start border-gray-600 bg-gray-700 text-lg text-white transition-transform duration-500 hover:scale-[1.01] hover:bg-gray-600 hover:text-white"
       disabled={!ready || pending}
-      onClick={onClick}
+      onClick={() => onClick(connector)}
     >
       {connector.icon && (
         <Image
