@@ -124,7 +124,7 @@ export const NftListItemUI = ({
                 {isSaleApproved && <NftStatusHelper variant="for-sale" />}
               </div>
 
-              <div className="absolute bottom-0 left-0 top-[50%] p-2 w-full flex flex-row items-end gap-1 z-10 text-white text-left bg-gradient-to-b from-transparent to-black bg-opacity-100">
+              <div className="absolute bottom-0 left-0 top-[50%] p-2 w-full flex flex-row items-end gap-1 z-10 text-white text-left bg-linear-to-b from-transparent to-black bg-opacity-100">
                 <div className="w-full">
                   <h3 className="text-sm font-semibold truncate overflow-hidden whitespace-nowrap">
                     <b>{tokenDetails.name}</b>

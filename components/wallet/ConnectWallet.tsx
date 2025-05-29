@@ -38,7 +38,7 @@ export function WalletConnect() {
         <div className="text-center mb-16">
           <h1 className="text-4xl md:text-6xl font-bold text-white mb-4">
             Your All-in-One{' '}
-            <span className="bg-gradient-to-r from-orange-400 to-orange-600 bg-clip-text text-transparent">
+            <span className="bg-linear-to-r from-orange-400 to-orange-600 bg-clip-text text-transparent">
               Web3 Dashboard
             </span>
           </h1>
@@ -227,7 +227,7 @@ const generateRandomCircles = (count = 5) =>
     const cy = Math.floor(Math.random() * 100);
     const r = Math.floor(Math.random() * 10) + 3;
     const opacity = (Math.random() * 0.1 + 0.05).toFixed(2);
-    const blur = Math.random() > 0.5 ? 'blur-sm' : '';
+    const blur = Math.random() > 0.5 ? 'blur-xs' : '';
     const delay = `${Math.floor(Math.random() * 3)}s`;
     return (
       <circle
@@ -252,7 +252,7 @@ const NftPlaceholder = ({ delay }: { delay: number }) => {
         gradient,
         delayClass,
 
-        'relative aspect-square animate-fade-in overflow-hidden rounded-xl bg-gradient-to-br opacity-0'
+        'relative aspect-square animate-fade-in overflow-hidden rounded-xl bg-linear-to-br opacity-0'
       )}
     >
       <div className="absolute inset-0 opacity-20">
@@ -262,7 +262,7 @@ const NftPlaceholder = ({ delay }: { delay: number }) => {
           {/* Additional animated elements */}
         </svg>
       </div>
-      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-2">
+      <div className="absolute bottom-0 left-0 right-0 bg-linear-to-t from-black to-transparent p-2">
         <h3 className="font-bold text-white">{name}</h3>
         <p className="text-sm text-gray-300">{description}</p>
         <p className="mt-1 font-bold text-green-400">{price} ETH</p>

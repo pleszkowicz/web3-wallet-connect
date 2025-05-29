@@ -419,7 +419,7 @@ export function TokenExchange() {
                       type="button"
                       onClick={handleSwapTokens}
                       size="icon"
-                      className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white shadow-lg hover:shadow-blue-500/25 transition-all duration-200"
+                      className="w-12 h-12 rounded-full bg-linear-to-br from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white shadow-lg hover:shadow-blue-500/25 transition-all duration-200"
                     >
                       <ArrowUpDown className="h-5 w-5" />
                     </Button>

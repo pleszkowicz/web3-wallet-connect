@@ -23,7 +23,7 @@ export const NftList = () => {
 
   return (
     <div className="space-y-6">
-      <h3 className="text-xl font-semibold text-white">NFT Collection</h3>
+      <h3 className="text-xl font-semibold text-white">NFT Market</h3>
       {isLoading ? (
         <Loader />
       ) : error ? (

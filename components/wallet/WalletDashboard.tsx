@@ -87,7 +87,7 @@ const ActionLink = ({ href, bgColor, Icon, text }: ActionLinkProps) => {
   return (
     <Link
       href={href}
-      className={`h-20 w-20 lg:h-24 lg:w-24 text-gray-200 rounded-xl bg-gradient-to-br ${bgColor} hover:text-white border border-gray-800 hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl flex flex-col items-center justify-center`}
+      className={`h-20 w-20 lg:h-24 lg:w-24 text-gray-200 rounded-xl bg-linear-to-br ${bgColor} hover:text-white border border-gray-800 hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl flex flex-col items-center justify-center`}
     >
       <span className="inline-block p-2 pt-0 bg-transparent transform transition-transform duration-300 group-hover:scale-[1.02]">
         <Icon className="h-6 w-6" />

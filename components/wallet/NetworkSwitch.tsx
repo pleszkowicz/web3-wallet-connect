@@ -15,7 +15,7 @@ export const NetworkSwitch = () => {
         <div className="flex text-gray-200">
           <select
             className={cn(
-              'bg-gray-900 border border-gray-700 text-white hover:bg-gray-600 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500',
+              'bg-gray-900 border border-gray-700 text-white hover:bg-gray-600 px-4 py-2 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-blue-500',
               isPending ? 'animate-pulse' : ''
             )}
             onChange={(event) => event.target.value && switchChain({ chainId: parseInt(event.target.value) })}

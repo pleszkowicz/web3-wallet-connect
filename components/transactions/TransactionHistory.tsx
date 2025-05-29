@@ -71,7 +71,7 @@ const TransactionHistory = () => {
                 </td>
                 <td className="py-2 px-4">
                   {tx.category === 'erc721' && tx.from === zeroAddress ? (
-                    <Badge className="bg-blue-500/80 backdrop-blur-sm text-xs text-white px-2.5 py-0">
+                    <Badge className="bg-blue-500/80 backdrop-blur-xs text-xs text-white px-2.5 py-0">
                       NFT&nbsp;Minted
                     </Badge>
                   ) : (
