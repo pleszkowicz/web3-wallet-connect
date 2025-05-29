@@ -16,6 +16,7 @@ import { cn } from '@/lib/cn';
 import { CHAIN_TO_ADDRESSES_MAP } from '@uniswap/sdk-core';
 import { Field, Form, Formik } from 'formik';
 import { ArrowUpDown } from 'lucide-react';
+import Link from 'next/link';
 import { ChangeEvent, useState } from 'react';
 import { Address, formatUnits, Hash, parseEther, parseUnits } from 'viem';
 import { sepolia } from 'viem/chains';
@@ -602,8 +603,8 @@ const TransactionStatusDialog = ({ open, status, onClose, onNewSwap }: Transacti
         <DialogFooter>
           {status === 'confirmed' && (
             <>
-              <Button variant="outline" onClick={onClose}>
-                Go to Dashboard
+              <Button asChild variant="outline">
+                <Link href="/dashboard/tokens">Go to Dashboard</Link>
               </Button>
               <Button variant="secondary" onClick={onNewSwap}>
                 New Swap
