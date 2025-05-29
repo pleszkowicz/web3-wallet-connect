@@ -1,7 +1,7 @@
 {
   "name": "web3-wallet-connect",
-  "version": "0.1.3",
-  "private": true,
+  "version": "0.1.4",
+  "private": false,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -79,18 +79,5 @@
     "prisma": "^6.6.0",
     "tailwindcss": "^4.1.8",
     "typescript": "^5.8.2"
-  },
-  "prettier": {
-    "plugins": [
-      "prettier-plugin-tailwindcss",
-      "prettier-plugin-organize-imports"
-    ],
-    "trailingComma": "es5",
-    "printWidth": 120,
-    "tabWidth": 2,
-    "useTabs": false,
-    "semi": true,
-    "singleQuote": true,
-    "jsxSingleQuote": false
   }
 }

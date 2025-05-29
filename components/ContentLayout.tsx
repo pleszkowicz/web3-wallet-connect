@@ -53,39 +53,45 @@ export const ContentLayout = ({ title, description, goBackUrl, children }: CardL
               </div>
             </div>
 
-            <div className="flex flex-row gap-2">
-              {!isMobile && <WalletAddress />}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button size="icon" className="text-gray-400 hover:text-white hover:bg-gray-800" variant="ghost">
-                    <User width={20} />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" side="bottom" className="bg-gray-800 border border-gray-700 shadow-lg">
-                  {isMobile && (
-                    <>
-                      <div className="flex flex-col items-center gap-4 p-4 pb-2">
-                        <h3 className="text-lg text-gray-200">Your Wallet</h3>
-                        <WalletAddress />
-                      </div>
-                      <Separator className="my-2 bg-gray-700" />
-                    </>
-                  )}
+            {isConnected && (
+              <div className="flex flex-row gap-2">
+                {!isMobile && <WalletAddress />}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button size="icon" className="text-gray-400 hover:text-white hover:bg-gray-800" variant="ghost">
+                      <User width={20} />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    align="end"
+                    side="bottom"
+                    className="bg-gray-800 border border-gray-700 shadow-lg"
+                  >
+                    {isMobile && (
+                      <>
+                        <div className="flex flex-col items-center gap-4 p-4 pb-2">
+                          <h3 className="text-lg text-gray-200">Your Wallet</h3>
+                          <WalletAddress />
+                        </div>
+                        <Separator className="my-2 bg-gray-700" />
+                      </>
+                    )}
 
-                  <div className="flex flex-row gap-4 items-center p-4 py-2 justify-between">
-                    <span className="text-gray-400 text-sm">Network</span>
-                    <NetworkSwitch />
-                  </div>
-
-                  {isConnected && (
-                    <div>
-                      <Separator className="my-2 bg-gray-700" />
-                      <DisconnectWallet className="flex gap-2 w-full rounded-none text-gray-400 hover:text-white hover:bg-gray-700" />
+                    <div className="flex flex-row gap-4 items-center p-4 py-2 justify-between">
+                      <span className="text-gray-400 text-sm">Network</span>
+                      <NetworkSwitch />
                     </div>
-                  )}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
+
+                    {isConnected && (
+                      <div>
+                        <Separator className="my-2 bg-gray-700" />
+                        <DisconnectWallet className="flex gap-2 w-full rounded-none text-gray-400 hover:text-white hover:bg-gray-700" />
+                      </div>
+                    )}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            )}
           </div>
         </div>
       </header>

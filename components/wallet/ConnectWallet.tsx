@@ -35,22 +35,22 @@ export function WalletConnect() {
   return (
     <ContentLayout>
       <div>
-        <div className="text-center mb-16">
-          <h1 className="text-4xl md:text-6xl font-bold text-white mb-4">
+        <div className="mb-16 text-center">
+          <h1 className="mb-4 text-4xl font-bold text-white md:text-6xl">
             Your All-in-One{' '}
             <span className="bg-linear-to-r from-orange-400 to-orange-600 bg-clip-text text-transparent">
               Web3 Dashboard
             </span>
           </h1>
-          <p className="text-xl text-gray-400 max-w-2xl mx-auto">Swap tokens, trade NFTs, and connect your wallet</p>
+          <p className="mx-auto max-w-2xl text-xl text-gray-400">Swap tokens, trade NFTs, and connect your wallet</p>
         </div>
         <div className="mb-16">
-          <h2 className="text-2xl md:text-3xl font-bold text-white text-center mb-8">Explore & Trade NFTs</h2>
+          <h2 className="mb-8 text-center text-2xl font-bold text-white md:text-3xl">Explore & Trade NFTs</h2>
 
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">{nftPlaceholders}</div>
         </div>
-        <div className="text-center mb-16">
-          <h2 className="text-2xl md:text-3xl font-bold text-white mb-8">Let's dive</h2>
+        <div className="mb-16 text-center">
+          <h2 className="mb-8 text-2xl font-bold text-white md:text-3xl">Let's dive</h2>
 
           {!isConnected ? (
             <Dialog open={open}>
@@ -103,7 +103,7 @@ export function WalletConnect() {
         <div className="text-center">
           <Dialog>
             <DialogTrigger asChild>
-              <Button variant="link" className="text-gray-400 hover:text-white transition-colors duration-200">
+              <Button variant="link" className="text-gray-400 transition-colors duration-200 hover:text-white">
                 <Code className="mr-2 h-4 w-4" />
                 Local Setup Guide for Developers
               </Button>
@@ -114,7 +114,7 @@ export function WalletConnect() {
               </DialogHeader>
               <div className="text-slate-500">
                 <h3>To test all features locally, follow these steps:</h3>
-                <ol className="my-2 list-decimal space pl-6">
+                <ol className="space my-2 list-decimal pl-6">
                   <li>
                     <b>Clone and configure</b> the repository
                     <br />
@@ -171,7 +171,7 @@ function WalletOption({
     <Button
       variant="outline"
       size="lg"
-      className="flex w-full transform content-between justify-start text-lg transition-transform duration-500 hover:scale-[1.02] hover:bg-accent"
+      className="hover:bg-accent flex w-full transform content-between justify-start text-lg transition-transform duration-500 hover:scale-[1.02]"
       disabled={!ready || pending}
       onClick={onClick}
     >
@@ -251,18 +251,15 @@ const NftPlaceholder = ({ delay }: { delay: number }) => {
       className={cn(
         gradient,
         delayClass,
-
-        'relative aspect-square animate-fade-in overflow-hidden rounded-xl bg-linear-to-br opacity-0'
+        'animate-fade-in relative aspect-square overflow-hidden rounded-xl bg-linear-to-br opacity-0'
       )}
     >
       <div className="absolute inset-0 opacity-20">
-        {/* SVG animation or canvas-based animation */}
         <svg className="h-full w-full" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
           {generateRandomCircles(delay / 100)}
-          {/* Additional animated elements */}
         </svg>
       </div>
-      <div className="absolute bottom-0 left-0 right-0 bg-linear-to-t from-black to-transparent p-2">
+      <div className="absolute top-[30%] right-0 bottom-0 left-0 flex flex-col justify-end bg-linear-to-t from-black to-transparent p-2">
         <h3 className="font-bold text-white">{name}</h3>
         <p className="text-sm text-gray-300">{description}</p>
         <p className="mt-1 font-bold text-green-400">{price} ETH</p>
