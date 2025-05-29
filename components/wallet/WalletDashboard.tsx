@@ -33,10 +33,10 @@ export function WalletDashboard({ children }: PropsWithChildren) {
   return (
     <ContentLayout title="Wallet Dashboard">
       <ContentCard className="p-8">
-        <div className="flex flex-col sm:flex-row justify-between lg:justify-between gap-6">
+        <div className="flex flex-col justify-between gap-6 sm:flex-row lg:justify-between">
           <div className="flex flex-col justify-center sm:text-left">
-            <p className="text-sm text-gray-400 mb-2">Total Portfolio Value</p>
-            <h2 className="text-4xl text-center font-bold text-white">
+            <p className="mb-2 text-sm text-gray-400">Total Portfolio Value</p>
+            <h2 className="text-center text-4xl font-bold text-white">
               {isLoading ? <Loader size="sm" iconOnly /> : <span>≈${totalUsd.toFixed(2)}</span>}
             </h2>
             {/* <div className="flex items-center gap-2"> */}
@@ -46,8 +46,7 @@ export function WalletDashboard({ children }: PropsWithChildren) {
             {/* </div> */}
           </div>
 
-          {/* Quick Actions */}
-          <div className="grid grid-cols-3 gap-4 justify-items-center">
+          <div className="grid grid-cols-3 justify-items-center gap-4">
             <ActionLink bgColor="from-orange-500 to-pink-500" href="/nft/create" text="Mint NFT" Icon={ImagePlusIcon} />
             <ActionLink bgColor="from-blue-500 to-cyan-500" href="/exchange" text="Swap" Icon={RefreshCw} />
             <ActionLink bgColor="from-green-500 to-emerald-500" href="/transfer" text="Send" Icon={SendIcon} />
@@ -55,14 +54,14 @@ export function WalletDashboard({ children }: PropsWithChildren) {
         </div>
       </ContentCard>
 
-      <div className="grid w-full grid-cols-3 text-center mt-8 bg-gray-800 border border-gray-700 p-1 rounded-xl">
+      <div className="mt-8 grid w-full grid-cols-3 rounded-xl border border-gray-700 bg-gray-800 p-1 text-center">
         {tabLinks.map((tab) => {
           const isActive = pathname.startsWith(tab.href);
           return (
             <Link
               key={tab.href}
               href={tab.href}
-              className={`text-gray-400 hover:text-white rounded-lg p-2 ${isActive ? 'text-white bg-gray-700' : ''}`}
+              className={`rounded-lg p-2 text-gray-400 hover:text-white ${isActive ? 'bg-gray-700 text-white' : ''}`}
               aria-current={isActive ? 'page' : undefined}
             >
               {tab.label}
@@ -87,9 +86,9 @@ const ActionLink = ({ href, bgColor, Icon, text }: ActionLinkProps) => {
   return (
     <Link
       href={href}
-      className={`h-20 w-20 lg:h-24 lg:w-24 text-gray-200 rounded-xl bg-linear-to-br ${bgColor} hover:text-white border border-gray-800 hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl flex flex-col items-center justify-center`}
+      className={`h-20 w-20 rounded-xl bg-linear-to-br text-gray-200 lg:h-24 lg:w-24 ${bgColor} flex flex-col items-center justify-center border border-gray-800 shadow-lg transition-all duration-200 hover:scale-105 hover:text-white hover:shadow-xl`}
     >
-      <span className="inline-block p-2 pt-0 bg-transparent transform transition-transform duration-300 group-hover:scale-[1.02]">
+      <span className="inline-block transform bg-transparent p-2 pt-0 transition-transform duration-300 group-hover:scale-[1.02]">
         <Icon className="h-6 w-6" />
       </span>
       <span className="text-xs font-medium">{text}</span>
