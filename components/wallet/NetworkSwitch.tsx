@@ -33,7 +33,7 @@ export const NetworkSwitch = () => {
         <div className="flex text-gray-200">
           <select
             className={cn(
-              'rounded-lg border border-gray-700 bg-gray-900 px-4 py-2 text-white hover:bg-gray-600 focus:ring-2 focus:ring-blue-500 focus:outline-hidden',
+              'rounded-lg bg-transparent px-4 py-2 text-white hover:bg-gray-600 focus:outline-hidden',
               isPending ? 'animate-pulse' : ''
             )}
             onChange={onChainChange}

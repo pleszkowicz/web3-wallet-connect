@@ -25,7 +25,7 @@ export const DisconnectWallet = ({ className }: DisconnectAccountTypes) => {
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <Button size="lg" className={className} onClick={handleDisconnect} variant="ghost">
+        <Button className={className} onClick={handleDisconnect} variant="ghost">
           <PowerOff width={20} />
           <span>Disconnect Wallet</span>
         </Button>

@@ -8,6 +8,7 @@ import { NetworkSwitch } from '@/components/wallet/NetworkSwitch';
 import { useIsMobile } from '@/hooks/useMobile';
 import { useMounted } from '@/hooks/useMounted';
 import { ArrowLeft, CheckIcon, CopyIcon, ExternalLink, User, Wallet } from 'lucide-react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ReactElement, ReactNode, useEffect, useState } from 'react';
 import { useAccount, useEnsName } from 'wagmi';
@@ -39,13 +40,13 @@ export const ContentLayout = ({ title, description, goBackUrl, children }: CardL
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="text-gray-400 hover:text-white hover:bg-gray-800"
+                  className="text-gray-400 hover:bg-gray-800 hover:text-white"
                   onClick={() => push(goBackUrl)}
                 >
                   <ArrowLeft className="h-5 w-5" />
                 </Button>
               ) : (
-                <div className="w-5 h-5" /> // Placeholder for consistent spacing
+                <div className="h-5 w-5" /> // Placeholder for consistent spacing
               )}
               <div>
                 <h1 className="text-xl font-semibold text-white">{title}</h1>
@@ -58,14 +59,14 @@ export const ContentLayout = ({ title, description, goBackUrl, children }: CardL
                 {!isMobile && <WalletAddress />}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button size="icon" className="text-gray-400 hover:text-white hover:bg-gray-800" variant="ghost">
+                    <Button size="icon" className="text-gray-400 hover:bg-gray-800 hover:text-white" variant="ghost">
                       <User width={20} />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent
                     align="end"
                     side="bottom"
-                    className="bg-gray-800 border border-gray-700 shadow-lg"
+                    className="border border-gray-700 bg-gray-800 shadow-lg"
                   >
                     {isMobile && (
                       <>
@@ -73,19 +74,33 @@ export const ContentLayout = ({ title, description, goBackUrl, children }: CardL
                           <h3 className="text-lg text-gray-200">Your Wallet</h3>
                           <WalletAddress />
                         </div>
-                        <Separator className="my-2 bg-gray-700" />
                       </>
                     )}
 
-                    <div className="flex flex-row gap-4 items-center p-4 py-2 justify-between">
-                      <span className="text-gray-400 text-sm">Network</span>
+                    <div className="flex flex-row items-center justify-between gap-4 p-4 pt-2 pb-4">
+                      <span className="text-sm text-gray-400">Network</span>
                       <NetworkSwitch />
                     </div>
 
                     {isConnected && (
                       <div>
-                        <Separator className="my-2 bg-gray-700" />
-                        <DisconnectWallet className="flex gap-2 w-full rounded-none text-gray-400 hover:text-white hover:bg-gray-700" />
+                        <Separator className="bg-gray-700" />
+
+                        <Button
+                          asChild
+                          variant="ghost"
+                          className="w-full rounded-none text-gray-400 hover:bg-gray-700 hover:text-white"
+                        >
+                          <Link href="/dashboard">
+                            <span className="flex items-center gap-2">
+                              <Wallet className="h-4 w-4" />
+                              Dashboard
+                            </span>
+                          </Link>
+                        </Button>
+                        <Separator className="bg-gray-700" />
+
+                        <DisconnectWallet className="flex w-full cursor-pointer gap-2 rounded-none text-gray-400 hover:bg-gray-700 hover:text-white" />
                       </div>
                     )}
                   </DropdownMenuContent>
@@ -96,7 +111,7 @@ export const ContentLayout = ({ title, description, goBackUrl, children }: CardL
         </div>
       </header>
 
-      <main className="mx-auto max-w-7xl px-4 py-4 lg:py-12 lg:px-8 space-y-8">{children}</main>
+      <main className="mx-auto max-w-7xl space-y-8 px-4 py-4 lg:px-8 lg:py-12">{children}</main>
 
       {/* <Card className="bg-gray-900 max-w-3xl w-full min-h-screen sm:min-h-[80vh]">
         <CardContent className="space-y-4">{children}</CardContent>
@@ -122,9 +137,9 @@ const WalletAddress = () => {
   }, [isAddressCopiedIconVisible]);
 
   return (
-    <div className="flex items-center gap-2 rounded-full bg-gray-900 border border-gray-700 px-3 py-1.5">
+    <div className="flex items-center gap-2 rounded-full border border-gray-700 bg-gray-900 px-3 py-1.5">
       <Wallet className="h-4 w-4 text-orange-400" />
-      <span className="text-sm font-mono text-gray-300">{formattedAddress}</span>
+      <span className="font-mono text-sm text-gray-300">{formattedAddress}</span>
 
       <Tooltip>
         <TooltipTrigger asChild>
