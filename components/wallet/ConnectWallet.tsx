@@ -61,7 +61,13 @@ export function WalletConnect() {
           {!isConnected ? (
             <Dialog open={open} onOpenChange={setIsOpen}>
               <DialogTrigger asChild onAbort={() => setIsOpen(false)}>
-                <Button variant="default" size="xl" className="cursor-pointer" onClick={() => setIsOpen(true)}>
+                <Button
+                  data-testid="connect-wallet-button"
+                  variant="default"
+                  size="xl"
+                  className="cursor-pointer"
+                  onClick={() => setIsOpen(true)}
+                >
                   <Wallet2 className="mr-2 h-6 w-6" />
                   Connect your wallet
                 </Button>
@@ -97,8 +103,8 @@ export function WalletConnect() {
               </DialogContent>
             </Dialog>
           ) : (
-            <Button asChild variant="default" size="xl">
-              <Link href="/dashboard">
+            <Button asChild variant="default" size="xl" data-testid="launch-dashboard-button">
+              <Link href="/dashboard/tokens">
                 <Rocket className="mr-2" /> Launch Dashboard
               </Link>
             </Button>
@@ -174,6 +180,7 @@ function WalletOption({
 
   return (
     <Button
+      data-testid={`connector-${connector.id}`}
       variant="outline"
       size="lg"
       className="flex w-full transform cursor-pointer content-between justify-start border-gray-600 bg-gray-700 text-lg text-white transition-transform duration-500 hover:scale-[1.01] hover:bg-gray-600 hover:text-white"
