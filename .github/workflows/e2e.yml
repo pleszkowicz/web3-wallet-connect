@@ -63,7 +63,6 @@ jobs:
       - name: Deploy contracts to local node
         run: |
           cd smart-contract
-          npx hardhat compile
           npm run deploy:local > deploy-output.txt
 
       - name: Extract contract address
