@@ -61,11 +61,12 @@ jobs:
         run: find smart-contract -iname "NftMarketplace.ts"
 
       - name: Deploy contracts to local node
+        env:
+          PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
+          SEPOLIA_RPC_URL: ${{ secrets.SEPOLIA_RPC_URL }}
         run: |
           cd smart-contract
           npm run deploy:local > deploy-output.txt
-        env:
-          PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
 
       - name: Show deploy-output.txt
         run: cat smart-contract/deploy-output.txt
