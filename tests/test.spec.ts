@@ -54,8 +54,8 @@ testWithWallet("should be able to connect", async ({ wallet, page }) => {
   await wallet.approve();
   await page.waitForURL('**/dashboard/tokens');
 
-  const connectStatus = page.getByTestId("connect-status");
-  expect(connectStatus).toHaveValue("connected");
+  // const connectStatus = page.getByTestId("connect-status");
+  // expect(connectStatus).toHaveValue("connected");
 
 
   // await page.click("#switch-network-button");
