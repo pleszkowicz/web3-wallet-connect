@@ -67,7 +67,7 @@ jobs:
       - name: Copy ABI to frontend
         run: |
           mkdir -p lib/abi
-          cp smart-contract/artifacts/contracts/*.json lib/abi/
+          cp smart-contract/artifacts/contracts/*/*.json lib/abi/
 
       - name: Build frontend
         run: pnpm run build
