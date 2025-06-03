@@ -49,7 +49,7 @@ jobs:
         run: |
           cd smart-contract
           npm ci
-          npx hardhat compile
+          npx deploy:local
 
       - name: Start Hardhat Node
         run: |
@@ -57,6 +57,26 @@ jobs:
           npx hardhat node --hostname 0.0.0.0 --port 8545 &
       - name: Wait for Hardhat RPC
         run: npx wait-on http://localhost:8545
+
+      - name: Deploy contracts to local node
+        run: |
+          cd smart-contract
+          npm run deploy:local > deploy-output.txt
+
+      - name: Extract contract address
+        run: |
+          ADDRESS=$(grep -oE '0x[a-fA-F0-9]{40}' smart-contract/deploy-output.txt | head -1)
+          echo "NEXT_PUBLIC_CUSTOM_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS=$ADDRESS" >> $GITHUB_ENV
+
+      - name: Copy ABI to frontend
+        run: |
+          mkdir -p lib/abi
+          cp smart-contract/artifacts/contracts/*/*.json lib/abi/
+          cp lib/abi/contract-address.json lib/abi/
+
+      - name: Create .env.local with dynamic address
+        run: |
+          echo "NEXT_PUBLIC_CUSTOM_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS=$ADDRESS" > .env.local
 
       - name: Install frontend deps
         run: pnpm i
