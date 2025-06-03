@@ -18,7 +18,7 @@ jobs:
       - name: Checkout hardhat-smart-contract
         uses: actions/checkout@v4
         with:
-          repository: pleszko​​wicz/hardhat-smart-contract
+          repository: pleszkowicz/hardhat-nft-marketplace
           path: hardhat-smart-contract
 
       - name: Install contracts deps & build
