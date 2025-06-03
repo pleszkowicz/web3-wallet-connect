@@ -73,6 +73,7 @@ jobs:
 
       - name: Extract contract address
         run: |
+          mkdir -p lib/abi
           ADDRESS=$(grep -oE '0x[a-fA-F0-9]{40}' smart-contract/deploy-output.txt | head -1)
           echo "{\"NftMarketplace\":\"$ADDRESS\"}" > lib/abi/contract-address.json
           echo "NEXT_PUBLIC_CUSTOM_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS=$ADDRESS" >> $GITHUB_ENV
