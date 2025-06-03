@@ -49,7 +49,7 @@ jobs:
         run: |
           cd smart-contract
           npm ci
-          npx deploy:local
+          npm run deploy:local
 
       - name: Start Hardhat Node
         run: |
