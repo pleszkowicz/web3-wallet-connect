@@ -90,6 +90,14 @@ jobs:
       - name: Install frontend deps
         run: pnpm i
 
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-
+
       - name: Install Playwright Browsers
         run: pnpm exec playwright install --with-deps
 
@@ -100,20 +108,23 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: pnpm build
 
-      - name: Start frontend
-        run: npm run start &
-        env:
-          NEXT_PUBLIC_CUSTOM_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS: ${{ env.NEXT_PUBLIC_CUSTOM_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS }}
-          NEXT_PUBLIC_ALCHEMY_API_KEY: ${{ secrets.NEXT_PUBLIC_ALCHEMY_API_KEY }}
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      # - name: Start frontend
+      #   run: npm run start &
+      #   env:
+      #     NEXT_PUBLIC_CUSTOM_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS: ${{ env.NEXT_PUBLIC_CUSTOM_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS }}
+      #     NEXT_PUBLIC_ALCHEMY_API_KEY: ${{ secrets.NEXT_PUBLIC_ALCHEMY_API_KEY }}
+      #     DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
-      - name: Wait for frontend
-        run: npx wait-on http://localhost:3000
+      # - name: Wait for frontend
+      #   run: npx wait-on http://localhost:3000
 
       - name: Run Playwright tests
         run: pnpm exec playwright test
         env:
           CI: true
+          NEXT_PUBLIC_CUSTOM_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS: ${{ env.NEXT_PUBLIC_CUSTOM_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS }}
+          NEXT_PUBLIC_ALCHEMY_API_KEY: ${{ secrets.NEXT_PUBLIC_ALCHEMY_API_KEY }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
