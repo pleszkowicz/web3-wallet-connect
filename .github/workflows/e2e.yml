@@ -59,9 +59,9 @@ jobs:
 
       - name: Deploy contracts to local node
         run: |
+          echo $(ls -R smart-contract | grep -i NftMarketplace.ts)
           cd smart-contract
           npx hardhat compile
-          ls -R smart-contract | grep -i NftMarketplace.ts
           npm run deploy:local > deploy-output.txt
 
       - name: Extract contract address
