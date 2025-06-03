@@ -19,17 +19,17 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: pleszkowicz/hardhat-nft-marketplace
-          path: hardhat-smart-contract
+          path: smart-contract
 
       - name: Install contracts deps & build
         run: |
-          cd hardhat-smart-contract
+          cd smart-contract
           npm ci
           npx hardhat compile
 
       - name: Start Hardhat Node
         run: |
-          cd hardhat-smart-contract
+          cd smart-contract
           npx hardhat node --hostname 0.0.0.0 --port 8545 &
       - name: Wait for Hardhat RPC
         run: npx wait-on http://localhost:8545
