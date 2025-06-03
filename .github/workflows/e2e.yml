@@ -65,6 +65,9 @@ jobs:
           cd smart-contract
           npm run deploy:local > deploy-output.txt
 
+      - name: Show deploy-output.txt
+        run: cat smart-contract/deploy-output.txt
+
       - name: Extract contract address
         run: |
           ADDRESS=$(grep -oE '0x[a-fA-F0-9]{40}' smart-contract/deploy-output.txt | head -1)
