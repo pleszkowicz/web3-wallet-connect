@@ -15,7 +15,31 @@ jobs:
       - name: Checkout frontend repo
         uses: actions/checkout@v4
 
-      - name: Checkout hardhat-smart-contract
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.6.1
+
+      - name: Setup PNPM
+        uses: pnpm/action-setup@v2
+        with:
+          version: 10.8.0
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          STORE_PATH=$(pnpm store path 2>/dev/null || echo "/tmp/.pnpm-store")
+          echo "STORE_PATH=$STORE_PATH" >> $GITHUB_ENV
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
+
+      - name: Checkout hardhat-nft-marketplace
         uses: actions/checkout@v4
         with:
           repository: pleszkowicz/hardhat-nft-marketplace
@@ -35,7 +59,7 @@ jobs:
         run: npx wait-on http://localhost:8545
 
       - name: Install frontend deps
-        run: npm install -g pnpm && pnpm install
+        run: pnpm i
 
       - name: Install Playwright Browsers
         run: pnpm exec playwright install --with-deps
@@ -43,7 +67,7 @@ jobs:
       - name: Copy ABI to frontend
         run: |
           mkdir -p lib/abi
-          cp hardhat-smart-contract/artifacts/contracts/*.json lib/abi/
+          cp smart-contract/artifacts/contracts/*.json lib/abi/
 
       - name: Build frontend
         run: pnpm run build
