@@ -12,7 +12,7 @@ export const testWithWallet = base.extend<{ wallet: Dappwright }, { walletContex
         wallet: "metamask",
         version: MetaMaskWallet.recommendedVersion,
         seed: "test test test test test test test test test test test junk", // Hardhat's default https://hardhat.org/hardhat-network/docs/reference#accounts
-        headless: false,
+        headless: true,
       });
 
       await wallet.addNetwork({
