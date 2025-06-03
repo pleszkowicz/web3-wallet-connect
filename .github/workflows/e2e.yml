@@ -23,7 +23,7 @@ jobs:
         ports:
           - 8545:8545
         volumes:
-          - ../my-contracts:/contracts
+          - ${{ github.workspace }}/my-contracts:/contracts
 
     steps:
       - uses: actions/checkout@v4
