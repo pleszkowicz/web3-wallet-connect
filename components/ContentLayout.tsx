@@ -1,7 +1,6 @@
 'use client';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Separator } from '@/components/ui/separator';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { DisconnectWallet } from '@/components/wallet/DisconnectWallet';
 import { NetworkSwitch } from '@/components/wallet/NetworkSwitch';
@@ -68,10 +67,11 @@ export const ContentLayout = ({ title, description, goBackUrl, children }: CardL
                     side="bottom"
                     className="border border-gray-700 bg-gray-800 shadow-lg"
                   >
+                    <h3 className="mt-2 text-center text-lg text-gray-200">Your Wallet</h3>
+
                     {isMobile && (
                       <>
                         <div className="flex flex-col items-center gap-4 p-4 pb-2">
-                          <h3 className="text-lg text-gray-200">Your Wallet</h3>
                           <WalletAddress />
                         </div>
                       </>
@@ -84,7 +84,7 @@ export const ContentLayout = ({ title, description, goBackUrl, children }: CardL
 
                     {isConnected && (
                       <div>
-                        <Separator className="bg-gray-700" />
+                        {/* <Separator className="bg-gray-700" /> */}
 
                         <Button
                           asChild
@@ -98,7 +98,7 @@ export const ContentLayout = ({ title, description, goBackUrl, children }: CardL
                             </span>
                           </Link>
                         </Button>
-                        <Separator className="bg-gray-700" />
+                        {/* <Separator className="bg-gray-700" /> */}
 
                         <DisconnectWallet className="flex w-full cursor-pointer gap-2 rounded-none text-gray-400 hover:bg-gray-700 hover:text-white" />
                       </div>

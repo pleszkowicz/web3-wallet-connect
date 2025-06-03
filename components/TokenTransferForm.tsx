@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ERC20Token, tokenMap, TokenMapKey, tokens } from '@/const/tokens';
 import { usePortfolio } from '@/context/PortfolioBalanceProvider';
-import { Field, Form, Formik } from 'formik';
+import { Field, Form, Formik, FormikHelpers } from 'formik';
 import { useEffect, useState } from 'react';
 import { Address, encodeFunctionData, formatEther, formatUnits, isAddress, parseEther, parseUnits } from 'viem';
 import { useAccount, useBalance, usePublicClient, useReadContract, useSendTransaction, useWriteContract } from 'wagmi';
@@ -86,6 +86,37 @@ export function TokenTransferForm() {
     fetchGas();
   }, [client, selectedToken, chain, address]);
 
+  const onFormSubmit = async (values: typeof initialValues, { resetForm }: FormikHelpers<typeof initialValues>) => {
+    try {
+      const txHash =
+        selectedToken === tokenMap.eth.symbol
+          ? await sendTransactionAsync({ to: values.to as Address, value: parseEther(String(values.value)) })
+          : await writeContractAsync({
+              address: erc20Token.address,
+              abi: erc20Token.abi,
+              functionName: 'transfer',
+              args: [
+                values.to as Address, // Recipient address
+                parseUnits(values.value.toString(), tokenMap[selectedToken].decimals), // Amount to transfer
+              ],
+            });
+
+      toast({ title: 'Transaction sent', description: 'Waiting for confirmation.' });
+      await client?.waitForTransactionReceipt({ hash: txHash });
+      toast({ title: 'Transaction confirmed on-chain!' });
+      resetForm();
+    } catch (error) {
+      if ((error as Error)?.message?.includes('User rejected the request')) {
+        return;
+      }
+      toast({
+        title: 'Transaction failed',
+        description: 'An error occurred during transfer',
+        variant: 'destructive',
+      });
+    }
+  };
+
   const currentBalance = (selectedToken === tokenMap.eth.symbol ? ethBalance?.value : (erc20Balance as bigint)) ?? 0n;
 
   const validationSchema = Yup.object().shape({
@@ -105,42 +136,9 @@ export function TokenTransferForm() {
     <ContentLayout title="Send" goBackUrl="/dashboard/tokens">
       <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6 lg:px-8">
         <ContentCard title="Transfer token">
-          <Formik
-            validationSchema={validationSchema}
-            initialValues={initialValues}
-            onSubmit={async (values, { resetForm }) => {
-              try {
-                const txHash =
-                  selectedToken === tokenMap.eth.symbol
-                    ? await sendTransactionAsync({ to: values.to as Address, value: parseEther(String(values.value)) })
-                    : await writeContractAsync({
-                        address: erc20Token.address,
-                        abi: erc20Token.abi,
-                        functionName: 'transfer',
-                        args: [
-                          values.to as Address, // Recipient address
-                          parseUnits(values.value.toString(), tokenMap[selectedToken].decimals), // Amount to transfer
-                        ],
-                      });
-
-                toast({ title: 'Transaction sent', description: 'Waiting for confirmation.' });
-                await client?.waitForTransactionReceipt({ hash: txHash });
-                toast({ title: 'Confirmed on-chain!' });
-                resetForm();
-              } catch (error) {
-                if ((error as Error)?.message?.includes('User rejected the request')) {
-                  return;
-                }
-                toast({
-                  title: 'Transaction failed',
-                  description: 'An error occurred during transfer',
-                  variant: 'destructive',
-                });
-              }
-            }}
-          >
-            {({ setFieldValue, values }) => (
-              <Form className="space-y-4 flex flex-col gap-4">
+          <Formik validationSchema={validationSchema} initialValues={initialValues} onSubmit={onFormSubmit}>
+            {({ setFieldValue, values, isValid }) => (
+              <Form className="flex flex-col gap-4 space-y-4">
                 <div className="space-y-4">
                   <Label htmlFor="to" className="flex-1 text-sm font-medium text-white">
                     To
@@ -151,9 +149,9 @@ export function TokenTransferForm() {
                     id="to"
                     name="to"
                     placeholder="Enter public address 0x"
-                    className="flex w-full rounded-md border px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 h-14 pr-12"
+                    className="ring-offset-background file:text-foreground focus-visible:ring-ring flex h-14 w-full rounded-md border px-3 py-2 pr-12 text-sm text-gray-200 file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-hidden disabled:cursor-not-allowed disabled:opacity-50"
                   />
-                  <FormError name="to" className="text-yellow-300 text-sm mt-1" />
+                  <FormError name="to" className="mt-1 text-sm text-yellow-300" />
                 </div>
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
@@ -166,7 +164,7 @@ export function TokenTransferForm() {
                     </div>
                   </div>
                   <ContentCard variant="light" className="pt-4">
-                    <div className="flex flex-row justify-between relative items-center">
+                    <div className="relative flex flex-row items-center justify-between">
                       <div>
                         <Field
                           as={Input}
@@ -174,10 +172,10 @@ export function TokenTransferForm() {
                           type="number"
                           name="value"
                           placeholder="0.00"
-                          className="text-5xl text-gray-200 font-bold bg-transparent border-none shadow-none p-0 h-auto focus-visible:ring-0 focus-visible:ring-offset-0 appearance-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-inner-spin-button]:m-0"
+                          className="h-auto appearance-none border-none bg-transparent p-0 text-5xl font-bold text-gray-200 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none"
                         />
 
-                        <div className="text-sm text-gray-400 mt-1">
+                        <div className="mt-1 text-sm text-gray-400">
                           ≈$
                           {values.unit &&
                             ((balances.get(values.unit)?.tokenPrice ?? 0) * Number(values.value)).toFixed(2)}
@@ -188,7 +186,7 @@ export function TokenTransferForm() {
 
                       <div className="flex items-center">
                         <TokenSelect
-                          className="bg-white text-gray-950 border-none rounded-full p-6 pl-3 pr-4 focus:ring-0 overflow-hidden"
+                          className="overflow-hidden rounded-full border-none bg-white p-6 pr-4 pl-3 text-gray-950 focus:ring-0"
                           name="unit"
                           tokens={tokens}
                           onChange={(tokenSymbol: TokenMapKey) => {
@@ -201,7 +199,7 @@ export function TokenTransferForm() {
                   </ContentCard>
                 </div>
 
-                <div className="bg-black bg-opacity-30 rounded-lg p-4 flex items-center justify-between">
+                <div className="bg-opacity-30 flex items-center justify-between rounded-lg bg-black p-4">
                   <span className="text-white">Estimated Gas:</span>
                   {/* {isGasPriceFetching ? (
                   <Loader size="sm" />
@@ -210,7 +208,14 @@ export function TokenTransferForm() {
                   {/* )} */}
                 </div>
 
-                <Button type="submit">Send</Button>
+                <Button
+                  disabled={
+                    isTransactionPending || isWriteContractPending || !isValid || isGasPriceFetching || !gasPrice
+                  }
+                  type="submit"
+                >
+                  Send
+                </Button>
               </Form>
             )}
           </Formik>
