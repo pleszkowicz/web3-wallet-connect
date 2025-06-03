@@ -93,16 +93,12 @@ jobs:
       - name: Install Playwright Browsers
         run: pnpm exec playwright install --with-deps
 
-      - name: Copy ABI to frontend
-        run: |
-          mkdir -p lib/abi
-          cp smart-contract/artifacts/contracts/*/*.json lib/abi/
-
-      - name: Build frontend
-        run: pnpm run build
-
       - name: Start frontend
         run: npm run start &
+        env:
+          NEXT_PUBLIC_CUSTOM_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS: ${{ secrets.NEXT_PUBLIC_CUSTOM_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS }}
+          NEXT_PUBLIC_ALCHEMY_API_KEY: ${{ secrets.NEXT_PUBLIC_ALCHEMY_API_KEY }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       - name: Wait for frontend
         run: npx wait-on http://localhost:3000
