@@ -57,9 +57,11 @@ jobs:
       - name: Wait for Hardhat RPC
         run: npx wait-on http://localhost:8545
 
+      - name: Debug List NftMarketplace.ts files
+        run: find smart-contract -iname "NftMarketplace.ts"
+
       - name: Deploy contracts to local node
         run: |
-          echo $(ls -R smart-contract | grep -i NftMarketplace.ts)
           cd smart-contract
           npx hardhat compile
           npm run deploy:local > deploy-output.txt
