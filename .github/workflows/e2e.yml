@@ -45,11 +45,10 @@ jobs:
           repository: pleszkowicz/hardhat-nft-marketplace
           path: smart-contract
 
-      - name: Install contracts deps & build
+      - name: Install contracts deps
         run: |
           cd smart-contract
           npm ci
-          npm run deploy:local
 
       - name: Start Hardhat Node
         run: |
