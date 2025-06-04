@@ -42,7 +42,6 @@ jobs:
       - name: Cache MetaMask extension (dappwright)
         uses: actions/cache@v4
         with:
-          # The path must match the `downloadDir` in tests/metamaskSetup.ts
           path: ./.cache/metamask
           key: ${{ runner.os }}-metamask-v12.16.0
           restore-keys: |
@@ -66,13 +65,7 @@ jobs:
       - name: Wait for Hardhat RPC
         run: npx wait-on http://localhost:8545
 
-      - name: Debug List NftMarketplace.ts files
-        run: find smart-contract -iname "NftMarketplace.ts"
-
       - name: Deploy contracts to local node
-        env:
-          PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
-          SEPOLIA_RPC_URL: ${{ secrets.SEPOLIA_RPC_URL }}
         run: |
           cd smart-contract
           npm run deploy:local > deploy-output.txt
@@ -91,13 +84,14 @@ jobs:
         run: |
           mkdir -p lib/abi
           cp smart-contract/artifacts/contracts/*/*.json lib/abi/
+          cp lib/abi/contract-address.json lib/abi/
 
       - name: Create .env.local with dynamic address
         run: |
           echo "NEXT_PUBLIC_CUSTOM_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS=$ADDRESS" > .env.local
 
       - name: Install frontend deps
-        run: pnpm i
+        run: pnpm install
 
       - name: Cache Playwright browsers
         uses: actions/cache@v4
@@ -114,28 +108,28 @@ jobs:
         uses: actions/cache@v4
         with:
           path: |
-            ~/.npm
+            ${{ env.STORE_PATH }}
             ${{ github.workspace }}/.next/cache
-          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('**/*.js', '**/*.jsx', '**/*.ts', '**/*.tsx') }}
+          key: ${{ runner.os }}-pnpm-nextjs-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('**/*.js', '**/*.jsx', '**/*.ts', '**/*.tsx') }}
           restore-keys: |
-            ${{ runner.os }}-nextjs-${{ hashFiles('**/pnpm-lock.yaml') }}-
+            ${{ runner.os }}-pnpm-nextjs-${{ hashFiles('**/pnpm-lock.yaml') }}-
 
-      - name: Run build
+      - name: Build frontend
+        run: pnpm run build
         env:
           NEXT_PUBLIC_CUSTOM_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS: ${{ env.NEXT_PUBLIC_CUSTOM_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS }}
           NEXT_PUBLIC_ALCHEMY_API_KEY: ${{ secrets.NEXT_PUBLIC_ALCHEMY_API_KEY }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-        run: pnpm build
 
-      # - name: Start frontend
-      #   run: npm run start &
-      #   env:
-      #     NEXT_PUBLIC_CUSTOM_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS: ${{ env.NEXT_PUBLIC_CUSTOM_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS }}
-      #     NEXT_PUBLIC_ALCHEMY_API_KEY: ${{ secrets.NEXT_PUBLIC_ALCHEMY_API_KEY }}
-      #     DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      - name: Start frontend (dev)
+        run: pnpm run dev &
+        env:
+          NEXT_PUBLIC_CUSTOM_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS: ${{ env.NEXT_PUBLIC_CUSTOM_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS }}
+          NEXT_PUBLIC_ALCHEMY_API_KEY: ${{ secrets.NEXT_PUBLIC_ALCHEMY_API_KEY }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
-      # - name: Wait for frontend
-      #   run: npx wait-on http://localhost:3000
+      - name: Wait for frontend
+        run: npx wait-on http://localhost:3000
 
       - name: Debug cache directory before tests
         run: |
