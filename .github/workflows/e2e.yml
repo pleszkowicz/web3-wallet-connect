@@ -185,8 +185,8 @@ jobs:
             ${{ runner.os }}-pnpm-nextjs-${{ needs.fe-cache.outputs.pnpm-hash }}-
 
       - name: Start Hardhat Node (w tle)
-        working-directory: smart-contract
         run: |
+          cd smart-contract
           npx hardhat node --hostname 0.0.0.0 --port 8545 &
       - name: Wait for Hardhat RPC
         run: npx wait-on http://localhost:8545
