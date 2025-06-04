@@ -43,8 +43,6 @@ testWithWallet("should be able to connect", async ({ wallet, page }) => {
   await page.goto("http://localhost:3000");
   await page.getByTestId('connect-wallet-button').click();
 
-  await page.pause()
-
   const CONNECTOR_NAME = 'connector-io.metamask';
   await page.getByTestId(CONNECTOR_NAME).click();
 
