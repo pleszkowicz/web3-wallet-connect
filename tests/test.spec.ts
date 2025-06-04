@@ -11,7 +11,7 @@ export const testWithWallet = base.extend<{ wallet: Dappwright }, { walletContex
       // Launch context with extension
       const [wallet, context] = await launchMetamask();
 
-      wallet.switchNetwork(sepolia.name);
+      // wallet.switchNetwork(sepolia.name);
 
       // await wallet.addNetwork({
       //   chainId: 31337,
