@@ -12,7 +12,7 @@ export async function launchMetamask(): Promise<[Dappwright, BrowserContext]> {
     version,
     downloadDir,
     seed: "test test test test test test test test test test test junk", // domyślny seed Hardhata
-    headless: true,
+    headless: false,
   });
 
   return [wallet, context];
