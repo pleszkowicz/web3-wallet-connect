@@ -3,17 +3,13 @@ import { BrowserContext } from 'playwright-core';
 import dappwright, { bootstrap, Dappwright, getWallet, MetaMaskWallet, OfficialOptions } from '@tenkeylabs/dappwright';
 import { hardhat } from 'viem/chains';
 import { metaMask } from 'wagmi/connectors'
+import { launchMetamask } from '@/tests/metamaskSetup';
 
 export const testWithWallet = base.extend<{ wallet: Dappwright }, { walletContext: BrowserContext }>({
   walletContext: [
     async ({ }, use, info) => {
       // Launch context with extension
-      const [wallet, _, context] = await dappwright.bootstrap("", {
-        wallet: "metamask",
-        version: MetaMaskWallet.recommendedVersion,
-        seed: "test test test test test test test test test test test junk", // Hardhat's default https://hardhat.org/hardhat-network/docs/reference#accounts
-        headless: true,
-      });
+      const [wallet, context] = await launchMetamask();
 
       await wallet.addNetwork({
         chainId: 31337,

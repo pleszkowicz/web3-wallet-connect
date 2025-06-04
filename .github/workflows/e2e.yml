@@ -39,6 +39,15 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-
 
+      - name: Cache MetaMask extension (dappwright)
+        uses: actions/cache@v4
+        with:
+          # The path must match the `downloadDir` in tests/metamaskSetup.ts
+          path: ./.cache/metamask
+          key: ${{ runner.os }}-metamask-v12.16.0
+          restore-keys: |
+            ${{ runner.os }}-metamask-
+
       - name: Checkout hardhat-nft-marketplace
         uses: actions/checkout@v4
         with:
