@@ -2,153 +2,245 @@ name: E2E Playwright Tests
 
 on:
   push:
-    branches: [main, master]
+    branches: [main]
   pull_request:
-    branches: [main, master]
+    branches: [main]
 
 jobs:
-  e2e:
-    timeout-minutes: 60
+  sc-cache:
+    name: SC → install & cache
     runs-on: ubuntu-latest
-
+    outputs:
+      lock-hash: ${{ steps.get-hash.outputs.hash }}
     steps:
-      - name: Checkout frontend repo
+      - name: Checkout hardhat-nft-marketplace
         uses: actions/checkout@v4
+        with:
+          path: smart-contract
 
-      - name: Setup Node.js
+      - name: Setup Node.js 20.x
         uses: actions/setup-node@v4
         with:
           node-version: 20.6.1
 
-      - name: Setup PNPM
-        uses: pnpm/action-setup@v2
+      - name: Pobierz hash package-lock.json
+        id: get-hash
+        run: |
+          echo "::set-output name=hash::$(sha256sum smart-contract/package-lock.json | cut -d' ' -f1)"
+
+      - name: Cache SC node_modules
+        uses: actions/cache@v4
+        with:
+          path: smart-contract/node_modules
+          key: ${{ runner.os }}-sc-npm-${{ steps.get-hash.outputs.hash }}
+          restore-keys: |
+            ${{ runner.os }}-sc-npm-
+
+      - name: Install SC dependencies
+        working-directory: smart-contract
+        run: npm ci
+
+  fe-cache:
+    name: FE → install & cache
+    runs-on: ubuntu-latest
+    outputs:
+      pnpm-hash: ${{ steps.get-hash-fe.outputs.hash }}
+      js-hash: ${{ steps.get-js-hash.outputs.hash }}
+    steps:
+      - name: Checkout frontend repo
+        uses: actions/checkout@v4
+        with:
+          path: frontend
+
+      - name: Setup Node.js 20.x & PNPM
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.6.1
+      - uses: pnpm/action-setup@v2
         with:
           version: 10.8.0
 
-      - name: Get pnpm store directory
+      - name: Pobierz hash pnpm-lock.yaml
+        id: get-hash-fe
+        run: |
+          echo "::set-output name=hash::$(sha256sum frontend/pnpm-lock.yaml | cut -d' ' -f1)"
+
+      - name: Pobierz hash wszystkich .js/.ts dla Next.js cache
+        id: get-js-hash
+        run: |
+          JS_FILES=$(find frontend -type f \( -name '*.js' -o -name '*.jsx' -o -name '*.ts' -o -name '*.tsx' \) -exec sha256sum {} + | sort | sha256sum | cut -d' ' -f1)
+          echo "::set-output name=hash::${JS_FILES}"
+
+      - name: Get pnpm store dir
         shell: bash
         run: |
           STORE_PATH=$(pnpm store path 2>/dev/null || echo "/tmp/.pnpm-store")
           echo "STORE_PATH=$STORE_PATH" >> $GITHUB_ENV
 
-      - name: Cache dependencies
+      - name: Cache pnpm store (frontend)
         uses: actions/cache@v4
         with:
           path: ${{ env.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('pnpm-lock.yaml') }}
+          key: ${{ runner.os }}-pnpm-${{ steps.get-hash-fe.outputs.hash }}
           restore-keys: |
             ${{ runner.os }}-pnpm-
 
-      - name: Cache MetaMask extension (dappwright)
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/dappwright/metamask # usuń wersję w ścieżce, aby chwyciło zawsze
-          key: ${{ runner.os }}-dappwright-metamask-v12.16.0-${{ hashFiles('smart-contract/deploy-output.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-dappwright-metamask-v12.16.0-
-
-      - name: Checkout hardhat-nft-marketplace
-        uses: actions/checkout@v4
-        with:
-          repository: pleszkowicz/hardhat-nft-marketplace
-          path: smart-contract
-
-      - name: Install contracts deps
-        run: |
-          cd smart-contract
-          npm ci
-
-      - name: Start Hardhat Node
-        run: |
-          cd smart-contract
-          npx hardhat node --hostname 0.0.0.0 --port 8545 &
-      - name: Wait for Hardhat RPC
-        run: npx wait-on http://localhost:8545
-
-      - name: Deploy contracts to local node
-        env:
-          PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
-          SEPOLIA_RPC_URL: ${{ secrets.SEPOLIA_RPC_URL }}
-        run: |
-          cd smart-contract
-          npm run deploy:local > deploy-output.txt
-
-      - name: Show deploy-output.txt
-        run: cat smart-contract/deploy-output.txt
-
-      - name: Extract contract address
-        run: |
-          mkdir -p lib/abi
-          ADDRESS=$(grep -oE '0x[a-fA-F0-9]{40}' smart-contract/deploy-output.txt | head -1)
-          echo "{\"NftMarketplace\":\"$ADDRESS\"}" > lib/abi/contract-address.json
-          echo "NEXT_PUBLIC_CUSTOM_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS=$ADDRESS" >> $GITHUB_ENV
-
-      - name: Copy ABI to frontend
-        run: |
-          mkdir -p lib/abi
-          cp smart-contract/artifacts/contracts/*/*.json lib/abi/
-
-      - name: Create .env.local with dynamic address
-        run: |
-          echo "NEXT_PUBLIC_CUSTOM_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS=$ADDRESS" > .env.local
-
-      - name: Install frontend deps
+      - name: Install frontend dependencies
+        working-directory: frontend
         run: pnpm install
 
       - name: Cache Playwright browsers
         uses: actions/cache@v4
         with:
           path: ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ hashFiles('pnpm-lock.yaml') }}
+          key: ${{ runner.os }}-playwright-${{ steps.get-hash-fe.outputs.hash }}
           restore-keys: |
             ${{ runner.os }}-playwright-
 
-      - name: Install Playwright Browsers
+      - name: Install Playwright browsers
+        working-directory: frontend
         run: pnpm exec playwright install chromium
 
-      - name: Cache Next.js build cache
+      - name: Cache Next.js build-cache
         uses: actions/cache@v4
         with:
           path: |
             ${{ env.STORE_PATH }}
-            ${{ github.workspace }}/.next/cache
-          key: ${{ runner.os }}-pnpm-nextjs-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('**/*.js', '**/*.jsx', '**/*.ts', '**/*.tsx') }}
+            ${{ github.workspace }}/frontend/.next/cache
+          key: ${{ runner.os }}-pnpm-nextjs-${{ steps.get-hash-fe.outputs.hash }}-${{ steps.get-js-hash.outputs.hash }}
           restore-keys: |
-            ${{ runner.os }}-pnpm-nextjs-${{ hashFiles('**/pnpm-lock.yaml') }}-
+            ${{ runner.os }}-pnpm-nextjs-${{ steps.get-hash-fe.outputs.hash }}-
+
+  e2e:
+    name: e2e → deploy, build & test
+    needs: [sc-cache, fe-cache]
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout frontend
+        uses: actions/checkout@v4
+        with:
+          path: frontend
+
+      - name: Checkout smart-contract
+        uses: actions/checkout@v4
+        with:
+          path: smart-contract
+
+      - name: Setup Node.js 20.x & PNPM
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.6.1
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 10.8.0
+
+      - name: Get pnpm store dir (znowu)
+        shell: bash
+        run: |
+          STORE_PATH=$(pnpm store path 2>/dev/null || echo "/tmp/.pnpm-store")
+          echo "STORE_PATH=$STORE_PATH" >> $GITHUB_ENV
+
+      - name: Restore SC node_modules
+        uses: actions/cache@v4
+        with:
+          path: smart-contract/node_modules
+          key: ${{ runner.os }}-sc-npm-${{ needs.sc-cache.outputs.lock-hash }}
+          restore-keys: |
+            ${{ runner.os }}-sc-npm-
+
+      - name: Restore pnpm store (frontend)
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-${{ needs.fe-cache.outputs.pnpm-hash }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
+
+      - name: Restore Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ needs.fe-cache.outputs.pnpm-hash }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-
+
+      - name: Install Playwright browsers (na wszelki wypadek)
+        working-directory: frontend
+        run: pnpm exec playwright install chromium
+
+      - name: Restore Next.js build-cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ env.STORE_PATH }}
+            ${{ github.workspace }}/frontend/.next/cache
+          key: ${{ runner.os }}-pnpm-nextjs-${{ needs.fe-cache.outputs.pnpm-hash }}-${{ needs.fe-cache.outputs.js-hash }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-nextjs-${{ needs.fe-cache.outputs.pnpm-hash }}-
+
+      - name: Start Hardhat Node (w tle)
+        working-directory: smart-contract
+        run: |
+          npx hardhat node --hostname 0.0.0.0 --port 8545 &
+      - name: Wait for Hardhat RPC
+        run: npx wait-on http://localhost:8545
+
+      - name: Deploy contracts to local node
+        working-directory: smart-contract
+        env:
+          PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
+          SEPOLIA_RPC_URL: ${{ secrets.SEPOLIA_RPC_URL }}
+        run: npm run deploy:local > deploy-output.txt
+
+      - name: Extract contract address
+        run: |
+          mkdir -p frontend/lib/abi
+          ADDRESS=$(grep -oE '0x[a-fA-F0-9]{40}' smart-contract/deploy-output.txt | head -1)
+          echo "{\"NftMarketplace\":\"$ADDRESS\"}" > frontend/lib/abi/contract-address.json
+          echo "NEXT_PUBLIC_CUSTOM_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS=$ADDRESS" >> $GITHUB_ENV
+
+      - name: Copy ABI → FE
+        run: |
+          mkdir -p frontend/lib/abi
+          cp smart-contract/artifacts/contracts/*/*.json frontend/lib/abi/
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: pnpm install
 
       - name: Build frontend
+        working-directory: frontend
+        env:
+          NEXT_PUBLIC_CUSTOM_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS: ${{ env.NEXT_PUBLIC_CUSTOM_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS }}
+          NEXT_PUBLIC_ALCHEMY_API_KEY: ${{ secrets.NEXT_PUBLIC_ALCHEMY_API_KEY }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: pnpm run build
+
+      - name: Start frontend (prod) in background
+        working-directory: frontend
         env:
           NEXT_PUBLIC_CUSTOM_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS: ${{ env.NEXT_PUBLIC_CUSTOM_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS }}
           NEXT_PUBLIC_ALCHEMY_API_KEY: ${{ secrets.NEXT_PUBLIC_ALCHEMY_API_KEY }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-
-      - name: Start frontend (dev)
         run: pnpm run start &
-        env:
-          NEXT_PUBLIC_CUSTOM_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS: ${{ env.NEXT_PUBLIC_CUSTOM_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS }}
-          NEXT_PUBLIC_ALCHEMY_API_KEY: ${{ secrets.NEXT_PUBLIC_ALCHEMY_API_KEY }}
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
-      - name: Wait for frontend
+      - name: Wait for frontend to be up
         run: npx wait-on http://localhost:3000
 
-      - name: Debug cache directory before tests
-        run: |
-          echo "Content of ./.cache:"
-          ls -R ./.cache || echo "No .cache directory found"
-
       - name: Run Playwright tests
-        run: xvfb-run --auto-servernum -- pnpm exec playwright test
+        working-directory: frontend
         env:
           CI: true
           NEXT_PUBLIC_CUSTOM_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS: ${{ env.NEXT_PUBLIC_CUSTOM_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS }}
           NEXT_PUBLIC_ALCHEMY_API_KEY: ${{ secrets.NEXT_PUBLIC_ALCHEMY_API_KEY }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: xvfb-run --auto-servernum -- pnpm exec playwright test
 
-      - uses: actions/upload-artifact@v4
+      - name: Upload Playwright report
+        uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
           name: playwright-report
-          path: playwright-report/
+          path: frontend/playwright-report/
           retention-days: 30
