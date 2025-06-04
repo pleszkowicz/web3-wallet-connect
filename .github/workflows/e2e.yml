@@ -138,7 +138,7 @@ jobs:
       #   run: npx wait-on http://localhost:3000
 
       - name: Run Playwright tests
-        run: pnpm exec playwright test
+        run: xvfb-run --auto-servernum -- pnpm exec playwright test
         env:
           CI: true
           NEXT_PUBLIC_CUSTOM_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS: ${{ env.NEXT_PUBLIC_CUSTOM_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS }}
