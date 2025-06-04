@@ -16,6 +16,7 @@ jobs:
       - name: Checkout hardhat-nft-marketplace
         uses: actions/checkout@v4
         with:
+          repository: pleszkowicz/hardhat-nft-marketplace
           path: smart-contract
 
       - name: Setup Node.js 20.x
