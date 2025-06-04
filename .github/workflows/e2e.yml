@@ -166,7 +166,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-playwright-
 
-      - name: Install Playwright browsers (na wszelki wypadek)
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: pnpm install
+
+      - name: Install Playwright browsers
         working-directory: frontend
         run: pnpm exec playwright install chromium
 
@@ -205,10 +209,6 @@ jobs:
         run: |
           mkdir -p frontend/lib/abi
           cp smart-contract/artifacts/contracts/*/*.json frontend/lib/abi/
-
-      - name: Install frontend dependencies
-        working-directory: frontend
-        run: pnpm install
 
       - name: Build frontend
         working-directory: frontend
