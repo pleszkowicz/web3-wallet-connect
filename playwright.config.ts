@@ -1,4 +1,5 @@
 import { defineConfig, devices } from '@playwright/test';
+import { MetaMaskWallet } from '@tenkeylabs/dappwright';
 
 /**
  * Read environment variables from file.
@@ -27,18 +28,20 @@ export default defineConfig({
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
     // baseURL: 'http://localhost:3000',
-
-    /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-    trace: 'on-first-retry',
+    trace: process.env.CI ? 'retain-on-first-failure' : 'on',
+    headless: false,
   },
   maxFailures: process.env.CI ? 0 : 1,
 
   /* Configure projects for major browsers */
   projects: [
     {
-      name: 'chromium',
+      name: 'MetaMask',
       use: { ...devices['Desktop Chrome'] },
       metadata: {
+        version: MetaMaskWallet.recommendedVersion,
+        seed: "test test test test test test test test test test test junk",
+        password: 'password1234!@#$',
         wallet: 'metamask',
       }
     },
