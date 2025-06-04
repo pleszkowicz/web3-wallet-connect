@@ -42,7 +42,7 @@ jobs:
       - name: Cache MetaMask extension (dappwright)
         uses: actions/cache@v4
         with:
-          path: ./.cache/metamask
+          path: ~/.cache/dappwright/metamask-12.16.0
           key: ${{ runner.os }}-metamask-v12.16.0
           restore-keys: |
             ${{ runner.os }}-metamask-
@@ -141,7 +141,7 @@ jobs:
       - name: Run Playwright tests
         run: xvfb-run --auto-servernum -- pnpm exec playwright test
         env:
-          CI: false
+          CI: true
           NEXT_PUBLIC_CUSTOM_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS: ${{ env.NEXT_PUBLIC_CUSTOM_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS }}
           NEXT_PUBLIC_ALCHEMY_API_KEY: ${{ secrets.NEXT_PUBLIC_ALCHEMY_API_KEY }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
