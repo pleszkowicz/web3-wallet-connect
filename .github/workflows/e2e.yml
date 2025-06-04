@@ -158,7 +158,8 @@ jobs:
           ls -R ./.cache || echo "No .cache directory found"
 
       - name: Run Playwright tests
-        run: xvfb-run --auto-servernum -- pnpm exec playwright test
+        run: xvfb-run --auto-servernum -- pnpm exec playwright test --headed --timeout 60000
+
         env:
           GITHUB_TOKEN: ${{ github.token }}
           CI: true
