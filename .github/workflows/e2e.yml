@@ -186,9 +186,13 @@ jobs:
 
       - name: Start Hardhat Node (w tle)
         run: |
-          cd smart-contract
+          echo "====== Zawartość smart-contract ======"
+          ls -R smart-contract
+          echo "====================================="
           npx hardhat node --hostname 0.0.0.0 --port 8545 &
       - name: Wait for Hardhat RPC
+        working-directory: smart-contract
+
         run: npx wait-on http://localhost:8545
 
       - name: Deploy contracts to local node
