@@ -11,6 +11,7 @@
     "prepare": "husky",
     "postinstall": "prisma generate",
     "test": "npx playwright test",
+    "test:ci": "npx playwright test --headed --timeout 60000",
     "test:ui": "npx playwright test --ui"
   },
   "dependencies": {
