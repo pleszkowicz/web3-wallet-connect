@@ -28,7 +28,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-            - name: Checkout hardhat-nft-marketplace
+      - name: Checkout hardhat-nft-marketplace
         uses: actions/checkout@v4
         with:
           repository: pleszkowicz/hardhat-nft-marketplace
@@ -89,7 +89,6 @@ jobs:
       - name: Create .env.local with dynamic address
         run: |
           echo "NEXT_PUBLIC_CUSTOM_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS=$ADDRESS" > .env.local
-
 
       - name: Test
         env:
