@@ -1,7 +1,7 @@
 import { test as base, expect } from '@playwright/test';
 import { BrowserContext } from 'playwright-core';
 import dappwright, { bootstrap, Dappwright, getWallet, MetaMaskWallet, OfficialOptions } from '@tenkeylabs/dappwright';
-import { hardhat } from 'viem/chains';
+import { hardhat, sepolia } from 'viem/chains';
 import { metaMask } from 'wagmi/connectors'
 import { launchMetamask } from '@/tests/metamaskSetup';
 
@@ -11,12 +11,14 @@ export const testWithWallet = base.extend<{ wallet: Dappwright }, { walletContex
       // Launch context with extension
       const [wallet, context] = await launchMetamask();
 
-      await wallet.addNetwork({
-        chainId: 31337,
-        networkName: "Hardhat Local",
-        rpc: 'http://localhost:8545',
-        symbol: "ETH",
-      });
+      wallet.switchNetwork(sepolia.id.toString());
+
+      // await wallet.addNetwork({
+      //   chainId: 31337,
+      //   networkName: "Hardhat Local",
+      //   rpc: 'http://localhost:8545',
+      //   symbol: "ETH",
+      // });
 
       await use(context);
       await context.close();
