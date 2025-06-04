@@ -66,6 +66,9 @@ jobs:
         run: npx wait-on http://localhost:8545
 
       - name: Deploy contracts to local node
+        env:
+          PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
+          SEPOLIA_RPC_URL: ${{ secrets.SEPOLIA_RPC_URL }}
         run: |
           cd smart-contract
           npm run deploy:local > deploy-output.txt
