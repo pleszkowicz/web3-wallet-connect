@@ -31,6 +31,9 @@ jobs:
       - name: Test
         env:
           GITHUB_TOKEN: ${{ github.token }}
+          NEXT_PUBLIC_CUSTOM_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS: ${{ env.NEXT_PUBLIC_CUSTOM_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS }}
+          NEXT_PUBLIC_ALCHEMY_API_KEY: ${{ secrets.NEXT_PUBLIC_ALCHEMY_API_KEY }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
           xvfb-run --auto-servernum pnpm exec playwright test --headed --timeout 60000
       - name: Upload test results
