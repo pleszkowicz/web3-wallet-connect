@@ -162,7 +162,7 @@ jobs:
 
         env:
           GITHUB_TOKEN: ${{ github.token }}
-          CI: true
+          CI: false
           NEXT_PUBLIC_CUSTOM_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS: ${{ env.NEXT_PUBLIC_CUSTOM_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS }}
           NEXT_PUBLIC_ALCHEMY_API_KEY: ${{ secrets.NEXT_PUBLIC_ALCHEMY_API_KEY }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
