@@ -5,7 +5,7 @@ import { bootstrap, Dappwright, MetaMaskWallet } from '@tenkeylabs/dappwright';
 export async function launchMetamask(): Promise<[Dappwright, BrowserContext]> {
   const version = MetaMaskWallet.recommendedVersion;
 
-  const downloadDir = ".cache/metamask";
+  const downloadDir = "~/.cache/dappwright/metamask-12.16.0";
 
   const [wallet, , context] = await bootstrap("", {
     wallet: "metamask",
