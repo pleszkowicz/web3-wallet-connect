@@ -38,8 +38,9 @@ jobs:
             ${{ runner.os }}-sc-npm-
 
       - name: Install SC dependencies
-        working-directory: smart-contract
-        run: npm ci
+        run: |
+          cd smart-contract
+          npm ci
 
   fe-cache:
     name: FE → install & cache
@@ -87,8 +88,9 @@ jobs:
             ${{ runner.os }}-pnpm-
 
       - name: Install frontend dependencies
-        working-directory: frontend
-        run: pnpm install
+        run: |
+          cd frontend
+          pnpm install
 
       - name: Cache Playwright browsers
         uses: actions/cache@v4
@@ -99,8 +101,9 @@ jobs:
             ${{ runner.os }}-playwright-
 
       - name: Install Playwright browsers
-        working-directory: frontend
-        run: pnpm exec playwright install chromium
+        run: |
+          cd frontend
+          pnpm exec playwright install chromium
 
       - name: Cache Next.js build-cache
         uses: actions/cache@v4
@@ -126,6 +129,7 @@ jobs:
       - name: Checkout smart-contract
         uses: actions/checkout@v4
         with:
+          repository: pleszkowicz/hardhat-nft-marketplace
           path: smart-contract
 
       - name: Setup Node.js 20.x & PNPM
@@ -136,7 +140,7 @@ jobs:
         with:
           version: 10.8.0
 
-      - name: Get pnpm store dir (znowu)
+      - name: Get pnpm store dir
         shell: bash
         run: |
           STORE_PATH=$(pnpm store path 2>/dev/null || echo "/tmp/.pnpm-store")
@@ -167,12 +171,14 @@ jobs:
             ${{ runner.os }}-playwright-
 
       - name: Install frontend dependencies
-        working-directory: frontend
-        run: pnpm install
+        run: |
+          cd frontend
+          pnpm install
 
       - name: Install Playwright browsers
-        working-directory: frontend
-        run: pnpm exec playwright install chromium
+        run: |
+          cd frontend
+          pnpm exec playwright install chromium
 
       - name: Restore Next.js build-cache
         uses: actions/cache@v4
@@ -184,63 +190,63 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-nextjs-${{ needs.fe-cache.outputs.pnpm-hash }}-
 
-      - name: Start Hardhat Node (w tle)
+      - name: Start Hardhat Node (in the background)
         run: |
           echo "====== Zawartość smart-contract ======"
           ls -R smart-contract
           echo "====================================="
+          cd smart-contract/packages/contracts
           npx hardhat node --hostname 0.0.0.0 --port 8545 &
-      - name: Wait for Hardhat RPC
-        working-directory: smart-contract
 
-        run: npx wait-on http://localhost:8545
+      - name: Wait for Hardhat RPC
+        run: |
+          cd smart-contract/packages/contracts
+          npx wait-on http://localhost:8545
 
       - name: Deploy contracts to local node
-        working-directory: smart-contract
-        env:
-          PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
-          SEPOLIA_RPC_URL: ${{ secrets.SEPOLIA_RPC_URL }}
-        run: npm run deploy:local > deploy-output.txt
+        run: |
+          cd smart-contract/packages/contracts
+          npm run deploy:local > deploy-output.txt
 
       - name: Extract contract address
         run: |
           mkdir -p frontend/lib/abi
-          ADDRESS=$(grep -oE '0x[a-fA-F0-9]{40}' smart-contract/deploy-output.txt | head -1)
+          ADDRESS=$(grep -oE '0x[a-fA-F0-9]{40}' smart-contract/packages/contracts/deploy-output.txt | head -1)
           echo "{\"NftMarketplace\":\"$ADDRESS\"}" > frontend/lib/abi/contract-address.json
           echo "NEXT_PUBLIC_CUSTOM_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS=$ADDRESS" >> $GITHUB_ENV
 
       - name: Copy ABI → FE
         run: |
           mkdir -p frontend/lib/abi
-          cp smart-contract/artifacts/contracts/*/*.json frontend/lib/abi/
+          cp smart-contract/packages/contracts/artifacts/contracts/*/*.json frontend/lib/abi/
 
       - name: Build frontend
-        working-directory: frontend
+        run: |
+          cd frontend
+          pnpm run build
         env:
           NEXT_PUBLIC_CUSTOM_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS: ${{ env.NEXT_PUBLIC_CUSTOM_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS }}
           NEXT_PUBLIC_ALCHEMY_API_KEY: ${{ secrets.NEXT_PUBLIC_ALCHEMY_API_KEY }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-        run: pnpm run build
 
       - name: Start frontend (prod) in background
-        working-directory: frontend
-        env:
-          NEXT_PUBLIC_CUSTOM_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS: ${{ env.NEXT_PUBLIC_CUSTOM_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS }}
-          NEXT_PUBLIC_ALCHEMY_API_KEY: ${{ secrets.NEXT_PUBLIC_ALCHEMY_API_KEY }}
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-        run: pnpm run start &
+        run: |
+          cd frontend
+          pnpm run start &
 
       - name: Wait for frontend to be up
-        run: npx wait-on http://localhost:3000
+        run: |
+          npx wait-on http://localhost:3000
 
       - name: Run Playwright tests
-        working-directory: frontend
+        run: |
+          cd frontend
+          xvfb-run --auto-servernum -- pnpm exec playwright test
         env:
           CI: true
           NEXT_PUBLIC_CUSTOM_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS: ${{ env.NEXT_PUBLIC_CUSTOM_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS }}
           NEXT_PUBLIC_ALCHEMY_API_KEY: ${{ secrets.NEXT_PUBLIC_ALCHEMY_API_KEY }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-        run: xvfb-run --auto-servernum -- pnpm exec playwright test
 
       - name: Upload Playwright report
         uses: actions/upload-artifact@v4
