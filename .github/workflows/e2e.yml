@@ -24,7 +24,7 @@ jobs:
         with:
           node-version: 20.6.1
 
-      - name: Pobierz hash package-lock.json
+      - name: Download package-lock.json hash
         id: get-hash
         run: |
           echo "::set-output name=hash::$(sha256sum smart-contract/package-lock.json | cut -d' ' -f1)"
@@ -62,12 +62,12 @@ jobs:
         with:
           version: 10.8.0
 
-      - name: Pobierz hash pnpm-lock.yaml
+      - name: Download pnpm-lock.yaml hash
         id: get-hash-fe
         run: |
           echo "::set-output name=hash::$(sha256sum frontend/pnpm-lock.yaml | cut -d' ' -f1)"
 
-      - name: Pobierz hash wszystkich .js/.ts dla Next.js cache
+      - name: Download all .js/.ts hashes for Next.js cache
         id: get-js-hash
         run: |
           JS_FILES=$(find frontend -type f \( -name '*.js' -o -name '*.jsx' -o -name '*.ts' -o -name '*.tsx' \) -exec sha256sum {} + | sort | sha256sum | cut -d' ' -f1)
@@ -192,9 +192,6 @@ jobs:
 
       - name: Start Hardhat Node (in the background)
         run: |
-          echo "====== Zawartość smart-contract ======"
-          ls -R smart-contract
-          echo "====================================="
           cd smart-contract
           npx hardhat node --hostname 0.0.0.0 --port 8545 &
 
@@ -207,6 +204,9 @@ jobs:
         run: |
           cd smart-contract
           npm run deploy:local > deploy-output.txt
+        env:
+          PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
+          SEPOLIA_RPC_URL: ${{ secrets.SEPOLIA_RPC_URL }}
 
       - name: Extract contract address
         run: |
