@@ -87,7 +87,6 @@ jobs:
         run: |
           mkdir -p lib/abi
           cp smart-contract/artifacts/contracts/*/*.json lib/abi/
-          cp lib/abi/contract-address.json lib/abi/
 
       - name: Create .env.local with dynamic address
         run: |
