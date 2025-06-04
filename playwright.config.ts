@@ -29,7 +29,7 @@ export default defineConfig({
     /* Base URL to use in actions like `await page.goto('/')`. */
     // baseURL: 'http://localhost:3000',
     trace: process.env.CI ? 'retain-on-first-failure' : 'on',
-    headless: false,
+    headless: true,
 
   },
   maxFailures: process.env.CI ? 0 : 1,
