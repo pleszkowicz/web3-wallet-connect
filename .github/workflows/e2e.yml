@@ -195,30 +195,30 @@ jobs:
           echo "====== Zawartość smart-contract ======"
           ls -R smart-contract
           echo "====================================="
-          cd smart-contract/packages/contracts
+          cd smart-contract
           npx hardhat node --hostname 0.0.0.0 --port 8545 &
 
       - name: Wait for Hardhat RPC
         run: |
-          cd smart-contract/packages/contracts
+          cd smart-contract
           npx wait-on http://localhost:8545
 
       - name: Deploy contracts to local node
         run: |
-          cd smart-contract/packages/contracts
+          cd smart-contract
           npm run deploy:local > deploy-output.txt
 
       - name: Extract contract address
         run: |
           mkdir -p frontend/lib/abi
-          ADDRESS=$(grep -oE '0x[a-fA-F0-9]{40}' smart-contract/packages/contracts/deploy-output.txt | head -1)
+          ADDRESS=$(grep -oE '0x[a-fA-F0-9]{40}' smart-contract/deploy-output.txt | head -1)
           echo "{\"NftMarketplace\":\"$ADDRESS\"}" > frontend/lib/abi/contract-address.json
           echo "NEXT_PUBLIC_CUSTOM_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS=$ADDRESS" >> $GITHUB_ENV
 
       - name: Copy ABI → FE
         run: |
           mkdir -p frontend/lib/abi
-          cp smart-contract/packages/contracts/artifacts/contracts/*/*.json frontend/lib/abi/
+          cp smart-contract/artifacts/contracts/*/*.json frontend/lib/abi/
 
       - name: Build frontend
         run: |
