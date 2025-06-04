@@ -28,8 +28,9 @@ export default defineConfig({
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
     // baseURL: 'http://localhost:3000',
-    trace: 'on',
+    trace: process.env.CI ? 'retain-on-first-failure' : 'on',
     headless: false,
+
   },
   maxFailures: process.env.CI ? 0 : 1,
 
@@ -84,6 +85,6 @@ export default defineConfig({
     command: 'pnpm run dev',
     url: 'http://localhost:3000',
     timeout: 120 * 1000,
-    reuseExistingServer: false,
+    reuseExistingServer: true,
   },
 });
