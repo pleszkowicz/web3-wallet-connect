@@ -10,8 +10,6 @@ jobs:
   e2e:
     timeout-minutes: 60
     runs-on: ubuntu-latest
-    container:
-      image: mcr.microsoft.com/playwright:v1.52.0-jammy
 
     steps:
       - name: Checkout frontend repo
@@ -44,10 +42,10 @@ jobs:
       - name: Cache MetaMask extension (dappwright)
         uses: actions/cache@v4
         with:
-          path: ~/.cache/dappwright/metamask-12.16.0
-          key: ${{ runner.os }}-metamask-v12.16.0
+          path: ~/.cache/dappwright/metamask # usuń wersję w ścieżce, aby chwyciło zawsze
+          key: ${{ runner.os }}-dappwright-metamask-v12.16.0-${{ hashFiles('smart-contract/deploy-output.txt') }}
           restore-keys: |
-            ${{ runner.os }}-metamask-
+            ${{ runner.os }}-dappwright-metamask-v12.16.0-
 
       - name: Checkout hardhat-nft-marketplace
         uses: actions/checkout@v4
@@ -60,37 +58,20 @@ jobs:
           cd smart-contract
           npm ci
 
-      - name: Start Hardhat Node & Deploy to local
+      - name: Start Hardhat Node
+        run: |
+          cd smart-contract
+          npx hardhat node --hostname 0.0.0.0 --port 8545 &
+      - name: Wait for Hardhat RPC
+        run: npx wait-on http://localhost:8545
+
+      - name: Deploy contracts to local node
         env:
           PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
           SEPOLIA_RPC_URL: ${{ secrets.SEPOLIA_RPC_URL }}
         run: |
           cd smart-contract
-
-          # 1) Start Hardhat Node w tle i loguj do pliku
-          nohup npx hardhat node --hostname 0.0.0.0 --port 8545 > hardhat.log 2>&1 &
-
-          # 2) Czekaj do 60s, aż localhost:8545 odpowie
-          npx wait-on http://127.0.0.1:8545 --timeout 60000
-
-          # 3) (opcjonalnie) szybki podgląd loga, aby sprawdzić, czy node się poprawnie wystartował
-          echo "=== Hardhat log (ostatnie 20 linii) ==="
-          tail -n 20 hardhat.log || echo "(brak logów)"
-
-          # 4) Wykonaj deploy do lokalnego RPC
           npm run deploy:local > deploy-output.txt
-
-          # 5) Wyciągnij adres z deploy-output i zapisz do GITHUB_ENV
-          ADDRESS=$(grep -oE '0x[a-fA-F0-9]{40}' deploy-output.txt | head -1)
-          echo "NEXT_PUBLIC_CUSTOM_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS=$ADDRESS" >> $GITHUB_ENV
-
-          # 6) (opcjonalnie) skopiuj ABI do folderu, z którego później build frontendu może go odczytać
-          mkdir -p ../lib/abi
-          cp artifacts/contracts/*/*.json ../lib/abi/
-
-          # 7) Pokaż zawartość deploy-output dla pewności
-          echo "=== deploy-output.txt ==="
-          cat deploy-output.txt
 
       - name: Show deploy-output.txt
         run: cat smart-contract/deploy-output.txt
@@ -142,15 +123,15 @@ jobs:
           NEXT_PUBLIC_ALCHEMY_API_KEY: ${{ secrets.NEXT_PUBLIC_ALCHEMY_API_KEY }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
-      # - name: Start frontend (dev)
-      #   run: pnpm run start &
-      #   env:
-      #     NEXT_PUBLIC_CUSTOM_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS: ${{ env.NEXT_PUBLIC_CUSTOM_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS }}
-      #     NEXT_PUBLIC_ALCHEMY_API_KEY: ${{ secrets.NEXT_PUBLIC_ALCHEMY_API_KEY }}
-      #     DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      - name: Start frontend (dev)
+        run: pnpm run start &
+        env:
+          NEXT_PUBLIC_CUSTOM_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS: ${{ env.NEXT_PUBLIC_CUSTOM_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS }}
+          NEXT_PUBLIC_ALCHEMY_API_KEY: ${{ secrets.NEXT_PUBLIC_ALCHEMY_API_KEY }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
-      # - name: Wait for frontend
-      # run: npx wait-on http://localhost:3000
+      - name: Wait for frontend
+        run: npx wait-on http://localhost:3000
 
       - name: Debug cache directory before tests
         run: |
@@ -158,11 +139,9 @@ jobs:
           ls -R ./.cache || echo "No .cache directory found"
 
       - name: Run Playwright tests
-        run: xvfb-run --auto-servernum -- pnpm exec playwright test --headed --timeout 60000
-
+        run: xvfb-run --auto-servernum -- pnpm exec playwright test
         env:
-          GITHUB_TOKEN: ${{ github.token }}
-          CI: false
+          CI: true
           NEXT_PUBLIC_CUSTOM_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS: ${{ env.NEXT_PUBLIC_CUSTOM_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS }}
           NEXT_PUBLIC_ALCHEMY_API_KEY: ${{ secrets.NEXT_PUBLIC_ALCHEMY_API_KEY }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}

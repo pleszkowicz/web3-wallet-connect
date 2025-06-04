@@ -13,12 +13,12 @@ export const testWithWallet = base.extend<{ wallet: Dappwright }, { walletContex
 
       // wallet.switchNetwork(sepolia.name);
 
-      // await wallet.addNetwork({
-      //   chainId: 31337,
-      //   networkName: "Hardhat Local",
-      //   rpc: 'http://localhost:8545',
-      //   symbol: "ETH",
-      // });
+      await wallet.addNetwork({
+        chainId: 31337,
+        networkName: "Hardhat Local",
+        rpc: 'http://localhost:8545',
+        symbol: "ETH",
+      });
 
       await use(context);
       await context.close();
