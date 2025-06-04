@@ -229,15 +229,7 @@ jobs:
           NEXT_PUBLIC_ALCHEMY_API_KEY: ${{ secrets.NEXT_PUBLIC_ALCHEMY_API_KEY }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
-      - name: Start frontend (prod) in background
-        run: |
-          cd frontend
-          pnpm run start &
-
-      - name: Wait for frontend to be up
-        run: |
-          npx wait-on http://localhost:3000
-
+      # Playwright starts a server internally
       - name: Run Playwright tests
         run: |
           cd frontend
