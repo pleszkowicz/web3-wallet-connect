@@ -58,7 +58,8 @@ testWithWallet("should be able to connect", async ({ wallet, page }) => {
   await page.getByTestId('value-input').fill('0.00001');
   await page.getByTestId('send-button').click();
 
-  await wallet.confirmTransaction();
+  // test with sign
+  await wallet.sign();
 
 
   // await page.getByTestId('mint-nft-button').click();
