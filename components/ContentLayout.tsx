@@ -58,7 +58,12 @@ export const ContentLayout = ({ title, description, goBackUrl, children }: CardL
                 {!isMobile && <WalletAddress />}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button size="icon" className="text-gray-400 hover:bg-gray-800 hover:text-white" variant="ghost">
+                    <Button
+                      size="icon"
+                      className="text-gray-400 hover:bg-gray-800 hover:text-white"
+                      variant="ghost"
+                      data-testid="wallet-menu-button"
+                    >
                       <User width={20} />
                     </Button>
                   </DropdownMenuTrigger>
