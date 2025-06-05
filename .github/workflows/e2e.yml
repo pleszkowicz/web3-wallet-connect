@@ -103,7 +103,7 @@ jobs:
       - name: Install Playwright browsers
         run: |
           cd frontend
-          pnpm exec playwright install --with-deps chromium
+          pnpm exec playwright install chromium
 
       - name: Cache Next.js build-cache
         uses: actions/cache@v4
@@ -178,7 +178,7 @@ jobs:
       - name: Install Playwright browsers
         run: |
           cd frontend
-          pnpm exec playwright install --with-deps chromium
+          pnpm exec playwright install chromium
 
       - name: Restore Next.js build-cache
         uses: actions/cache@v4
