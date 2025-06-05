@@ -59,7 +59,7 @@ testWithWallet("should be able to connect", async ({ wallet, page }) => {
   await page.getByTestId('send-button').click();
 
   // test with sign
-  await wallet.sign();
+  await wallet.confirmTransaction();
 
   const toAddressInput = page.getByTestId('to-address-input');
   await expect(toAddressInput).toHaveValue('');
