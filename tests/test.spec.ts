@@ -65,6 +65,7 @@ testWithWallet.afterEach(async ({ wallet, page }) => {
 });
 
 testWithWallet("should create NFT", async ({ wallet, page }) => {
+  await page.waitForURL('**/dashboard/tokens');
   await page.goto("http://localhost:3000/dashboard/tokens");
   await page.getByTestId('mint-nft-button').click();
   await page.waitForURL('**/nft/create');
@@ -79,7 +80,7 @@ testWithWallet("should create NFT", async ({ wallet, page }) => {
 });
 
 testWithWallet("should transfer to another account", async ({ wallet, page }) => {
-  await page.goto("http://localhost:3000/dashboard/tokens");
+  await page.waitForURL('**/dashboard/tokens');
   await page.getByTestId('send-button').click();
 
   await page.waitForURL('**/transfer');
