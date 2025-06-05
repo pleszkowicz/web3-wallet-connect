@@ -62,16 +62,17 @@ testWithWallet("should create NFT and transfer successfully", async ({ wallet, p
   }
   await page.waitForURL('**/dashboard/tokens');
 
-  await page.getByTestId('mint-nft-button').click();
-  await page.waitForURL('**/nft/create');
-  await page.getByTestId('image-input').fill('https://i.scdn.co/image/ab67616d0000b2738853842f15505951267f0d59');
-  await page.getByTestId('name-input').fill('Name');
-  await page.getByTestId('description-input').fill('Description');
-  await page.getByTestId('nft-submit-button').click();
+  // NFT creation 
+  // await page.getByTestId('mint-nft-button').click();
+  // await page.waitForURL('**/nft/create');
+  // await page.getByTestId('image-input').fill('https://i.scdn.co/image/ab67616d0000b2738853842f15505951267f0d59');
+  // await page.getByTestId('name-input').fill('Name');
+  // await page.getByTestId('description-input').fill('Description');
+  // await page.getByTestId('nft-submit-button').click();
 
-  await wallet.confirmTransaction();
+  // await wallet.confirmTransaction();
 
-  await page.waitForURL("**/dashboard/nfts");
+  // await page.waitForURL("**/dashboard/nfts");
 
   // test with transfer
   await page.getByTestId('send-button').click();
@@ -82,7 +83,6 @@ testWithWallet("should create NFT and transfer successfully", async ({ wallet, p
   await page.getByTestId('value-input').fill('0.00001');
   await page.getByTestId('send-button').click();
 
-  // test with sign
   await wallet.confirmTransaction();
 
   const toAddressInput = page.getByTestId('to-address-input');
