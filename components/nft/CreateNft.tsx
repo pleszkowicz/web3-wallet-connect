@@ -181,7 +181,7 @@ export function CreateNFT() {
                           id="image"
                           name="image"
                           placeholder="https://"
-                          data-testId="image-input"
+                          data-testid="image-input"
                         />
                         <div className="absolute inset-y-0 top-0 right-0 bottom-0 flex h-full items-center pr-3">
                           {imageUrl &&
@@ -199,7 +199,7 @@ export function CreateNFT() {
                       <Label htmlFor="name" className="flex-1 text-lg font-medium text-gray-400">
                         Name *
                       </Label>
-                      <FormInput id="name" name="name" data-testId="name-input" />
+                      <FormInput id="name" name="name" data-testid="name-input" />
                       <FormError name="name" />
                       <div className="flex justify-between text-xs text-gray-500">
                         <span>Choose a memorable name for your NFT</span>
@@ -211,7 +211,7 @@ export function CreateNFT() {
                       <Label htmlFor="description" className="flex-1 text-lg font-medium text-gray-400">
                         Description
                       </Label>
-                      <FormInput id="description" name="description" data-testId="description-input" />
+                      <FormInput id="description" name="description" data-testid="description-input" />
                       <FormError name="description" />
                       <div className="flex justify-between text-xs text-gray-500">
                         <span>Provide a detailed description to attract collectors</span>
@@ -267,7 +267,7 @@ export function CreateNFT() {
                     </div>
 
                     <Button
-                      data-testId="nft-submit-button"
+                      data-testid="nft-submit-button"
                       variant="default"
                       className="w-full"
                       type="submit"

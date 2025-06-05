@@ -101,9 +101,9 @@ export function TokenTransferForm() {
               ],
             });
 
-      toast({ title: 'Transaction sent', description: 'Waiting for confirmation.' });
+      toast({ title: 'Transaction sent', description: 'Waiting for confirmation.', testId: 'transfer-sent-toast' });
       await client?.waitForTransactionReceipt({ hash: txHash });
-      toast({ title: 'Transaction confirmed on-chain!' });
+      toast({ title: 'Transaction confirmed on-chain!', testId: 'transfer-confirmed-toast' });
       resetForm();
     } catch (error) {
       if ((error as Error)?.message?.includes('User rejected the request')) {
@@ -145,6 +145,7 @@ export function TokenTransferForm() {
                   </Label>
 
                   <Field
+                    data-testid="to-address-input"
                     as={Input}
                     id="to"
                     name="to"
@@ -167,6 +168,7 @@ export function TokenTransferForm() {
                     <div className="relative flex flex-row items-center justify-between">
                       <div>
                         <Field
+                          data-testid="value-input"
                           as={Input}
                           id="value"
                           type="number"
@@ -209,6 +211,7 @@ export function TokenTransferForm() {
                 </div>
 
                 <Button
+                  data-testid="send-button"
                   disabled={
                     isTransactionPending || isWriteContractPending || !isValid || isGasPriceFetching || !gasPrice
                   }

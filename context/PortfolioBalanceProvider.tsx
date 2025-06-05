@@ -96,6 +96,7 @@ export const PortfolioBalanceProvider = ({ children }: PropsWithChildren) => {
       const ethAmount = parseFloat(formatUnits(ethBalance.value, tokenMap.eth.decimals));
       const tokenPrice = priceMap[tokenMap.eth.symbol] || 0;
       const ethUsd = ethAmount * tokenPrice;
+
       balancesRef.current.set(tokenMap.eth.symbol, {
         formattedValue: ethAmount,
         rawValue: ethBalance.value,
