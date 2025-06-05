@@ -8,7 +8,7 @@ on:
 
 jobs:
   sc-cache:
-    name: SC → install & cache
+    name: Smart Contract → install & cache
     runs-on: ubuntu-latest
     outputs:
       lock-hash: ${{ steps.get-hash.outputs.hash }}
@@ -27,7 +27,7 @@ jobs:
       - name: Download package-lock.json hash
         id: get-hash
         run: |
-          echo "::set-output name=hash::$(sha256sum smart-contract/package-lock.json | cut -d' ' -f1)"
+          echo "hash=$(sha256sum smart-contract/package-lock.json | cut -d' ' -f1)" >> $GITHUB_OUTPUT
 
       - name: Cache SC node_modules
         uses: actions/cache@v4
@@ -43,7 +43,7 @@ jobs:
           npm ci
 
   fe-cache:
-    name: FE → install & cache
+    name: Frontend → install & cache
     runs-on: ubuntu-latest
     outputs:
       pnpm-hash: ${{ steps.get-hash-fe.outputs.hash }}
@@ -65,13 +65,13 @@ jobs:
       - name: Download pnpm-lock.yaml hash
         id: get-hash-fe
         run: |
-          echo "::set-output name=hash::$(sha256sum frontend/pnpm-lock.yaml | cut -d' ' -f1)"
+          echo "hash=$(sha256sum frontend/pnpm-lock.yaml | cut -d' ' -f1)" >> $GITHUB_OUTPUT
 
       - name: Download all .js/.ts hashes for Next.js cache
         id: get-js-hash
         run: |
           JS_FILES=$(find frontend -type f \( -name '*.js' -o -name '*.jsx' -o -name '*.ts' -o -name '*.tsx' \) -exec sha256sum {} + | sort | sha256sum | cut -d' ' -f1)
-          echo "::set-output name=hash::${JS_FILES}"
+          echo "hash=${JS_FILES}" >> $GITHUB_OUTPUT
 
       - name: Get pnpm store dir
         shell: bash
@@ -116,7 +116,7 @@ jobs:
             ${{ runner.os }}-pnpm-nextjs-${{ steps.get-hash-fe.outputs.hash }}-
 
   e2e:
-    name: e2e → deploy, build & test
+    name: E2E → deploy, build & test
     needs: [sc-cache, fe-cache]
     timeout-minutes: 60
     runs-on: ubuntu-latest
