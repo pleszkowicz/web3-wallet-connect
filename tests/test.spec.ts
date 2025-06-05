@@ -33,8 +33,18 @@ export const testWithWallet = base.extend<{ wallet: Dappwright }, { walletContex
     await use(wallet);
   },
 });
+// testWithWallet.afterEach(async ({ wallet, page }) => {
 
-testWithWallet.beforeAll(async ({ page, wallet }) => {
+//   // Reset wallet state after each test
+//   const walletMenuButton = page.getByTestId('wallet-menu-button');
+//   if (await walletMenuButton.isVisible()) {
+//     await walletMenuButton.click();
+//     await page.getByTestId('disconnect-wallet-button').click();
+//   }
+//   // await page.close();
+// });
+
+testWithWallet("should create NFT and transfer successfully", async ({ wallet, page }) => {
   await page.goto("http://localhost:3000");
 
   // indicates user is connected to the wallet
@@ -51,21 +61,6 @@ testWithWallet.beforeAll(async ({ page, wallet }) => {
     await page.getByTestId('launch-dashboard-button').click();
   }
   await page.waitForURL('**/dashboard/tokens');
-});
-
-// testWithWallet.afterEach(async ({ wallet, page }) => {
-
-//   // Reset wallet state after each test
-//   const walletMenuButton = page.getByTestId('wallet-menu-button');
-//   if (await walletMenuButton.isVisible()) {
-//     await walletMenuButton.click();
-//     await page.getByTestId('disconnect-wallet-button').click();
-//   }
-//   // await page.close();
-// });
-
-testWithWallet("should create NFT", async ({ wallet, page }) => {
-  await page.goto("http://localhost:3000/dashboard/tokens");
 
   await page.getByTestId('mint-nft-button').click();
   await page.waitForURL('**/nft/create');
@@ -77,11 +72,8 @@ testWithWallet("should create NFT", async ({ wallet, page }) => {
   await wallet.confirmTransaction();
 
   await page.waitForURL("**/dashboard/nfts");
-});
 
-testWithWallet("should transfer to another account", async ({ wallet, page }) => {
-  await page.goto("http://localhost:3000/dashboard/tokens");
-
+  // test with transfer
   await page.getByTestId('send-button').click();
 
   await page.waitForURL('**/transfer');
