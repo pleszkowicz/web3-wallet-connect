@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import { test as base, expect } from '@playwright/test';
 import { BrowserContext } from 'playwright-core';
 import dappwright, { bootstrap, Dappwright, getWallet, MetaMaskWallet, OfficialOptions } from '@tenkeylabs/dappwright';
@@ -10,8 +11,6 @@ export const testWithWallet = base.extend<{ wallet: Dappwright }, { walletContex
     async ({ }, use, info) => {
       // Launch context with extension
       const [wallet, context] = await launchMetamask();
-
-      // wallet.switchNetwork(sepolia.name);
 
       await wallet.addNetwork({
         chainId: 31337,
@@ -35,21 +34,46 @@ export const testWithWallet = base.extend<{ wallet: Dappwright }, { walletContex
   },
 });
 
-// testWithWallet.beforeEach(async ({ page }) => {
-//   await page.goto("http://localhost:3000");
-// });
-
-testWithWallet("should be able to connect", async ({ wallet, page }) => {
+testWithWallet.beforeEach(async ({ page, wallet }) => {
   await page.goto("http://localhost:3000");
-  await page.getByTestId('connect-wallet-button').click();
 
-  const CONNECTOR_NAME = 'connector-io.metamask';
-  await page.getByTestId(CONNECTOR_NAME).click();
+  const connectWalletButton = page.getByTestId('connect-wallet-button');
+  const launchDashboardButton = page.getByTestId('launch-dashboard-button');
 
-  // await wallet.sign()
-  await wallet.approve();
+  if (await connectWalletButton.isVisible()) {
+    await connectWalletButton.click();
+
+    const CONNECTOR_NAME = 'connector-io.metamask';
+    await page.getByTestId(CONNECTOR_NAME).click();
+
+    await wallet.approve();
+  } else if (await launchDashboardButton.isVisible()) {
+    await launchDashboardButton.click();
+  } else {
+    throw new Error("Neither connect wallet nor launch dashboard button is visible");
+  }
+
   await page.waitForURL('**/dashboard/tokens');
+});
 
+testWithWallet("should create NFT", async ({ wallet, page }) => {
+  await page.getByTestId('mint-nft-button').click();
+  await page.waitForURL('**/nft/create');
+  await page.getByTestId('image-input').fill('https://i.scdn.co/image/ab67616d0000b2738853842f15505951267f0d59');
+  await page.getByTestId('name-input').fill('Name');
+  await page.getByTestId('description-input').fill('Description');
+  await page.getByTestId('nft-submit-button').click();
+
+  await wallet.confirmTransaction();
+
+  await page.waitForURL("**/dashboard/nfts");
+  await page.getByTestId("toast-nft-confirmed").waitFor({
+    state: "visible",
+    timeout: 60000,
+  });
+});
+
+testWithWallet("should transfer to another account", async ({ wallet, page }) => {
   await page.getByTestId('send-button').click();
 
   await page.waitForURL('**/transfer');
@@ -65,20 +89,7 @@ testWithWallet("should be able to connect", async ({ wallet, page }) => {
   await expect(toAddressInput).toHaveValue('');
 
 
-  // await page.getByTestId('mint-nft-button').click();
-  // await page.waitForURL('**/nft/create');
-  // await page.getByTestId('image-input').fill('https://i.scdn.co/image/ab67616d0000b2738853842f15505951267f0d59');
-  // await page.getByTestId('name-input').fill('Name');
-  // await page.getByTestId('description-input').fill('Description');
-  // await page.getByTestId('nft-submit-button').click();
 
-  // await wallet.confirmTransaction();
-
-  // await page.waitForURL("**/dashboard/nfts");
-  // await page.getByTestId("toast-nft-confirmed").waitFor({
-  //   state: "visible",
-  //   timeout: 60000,
-  // });
 
 
   // const connectStatus = page.getByTestId("connect-status");
