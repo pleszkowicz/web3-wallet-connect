@@ -50,6 +50,22 @@ testWithWallet("should be able to connect", async ({ wallet, page }) => {
   await wallet.approve();
   await page.waitForURL('**/dashboard/tokens');
 
+  await page.getByTestId('mint-nft-button').click();
+  await page.waitForURL('**/nft/create');
+  await page.getByTestId('image-input').fill('https://i.scdn.co/image/ab67616d0000b2738853842f15505951267f0d59');
+  await page.getByTestId('name-input').fill('Name');
+  await page.getByTestId('description-input').fill('Description');
+  await page.getByTestId('nft-submit-button').click();
+
+  await wallet.confirmTransaction();
+
+  await page.waitForURL("**/dashboard/nfts");
+  await page.getByTestId("toast-nft-confirmed").waitFor({
+    state: "visible",
+    timeout: 60000,
+  });
+
+
   // const connectStatus = page.getByTestId("connect-status");
   // expect(connectStatus).toHaveValue("connected");
 

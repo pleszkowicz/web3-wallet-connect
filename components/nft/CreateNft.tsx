@@ -132,7 +132,7 @@ export function CreateNFT() {
 
       await client?.waitForTransactionReceipt({ hash: txHash });
 
-      toast({ title: 'NFT confirmed on the blockchain!' });
+      toast({ title: 'NFT confirmed on the blockchain!', testId: 'toast-nft-confirmed' });
 
       router.push('/dashboard/nfts');
     } catch (error) {
@@ -165,19 +165,25 @@ export function CreateNFT() {
                   title="NFT Details"
                   description="Provide information about your NFT"
                   badge={
-                    <Badge className=" bg-amber-500/10 text-amber-600 border-amber-500/20 hover:bg-amber-500/20">
+                    <Badge className="border-amber-500/20 bg-amber-500/10 text-amber-600 hover:bg-amber-500/20">
                       ERC-721
                     </Badge>
                   }
                 >
                   <Form className="space-y-6" aria-disabled={isSubmitting || isTransactionPending}>
                     <div className="space-y-2">
-                      <Label htmlFor="image" className="flex-1 text-gray-400 text-lg font-medium">
+                      <Label htmlFor="image" className="flex-1 text-lg font-medium text-gray-400">
                         Image URL
                       </Label>
                       <div className="relative">
-                        <FormInput className="pr-10" id="image" name="image" placeholder="https://" />
-                        <div className="absolute top-0 bottom-0 h-full inset-y-0 right-0 flex items-center pr-3">
+                        <FormInput
+                          className="pr-10"
+                          id="image"
+                          name="image"
+                          placeholder="https://"
+                          data-testId="image-input"
+                        />
+                        <div className="absolute inset-y-0 top-0 right-0 bottom-0 flex h-full items-center pr-3">
                           {imageUrl &&
                             (errors.image ? (
                               <AlertCircle className="h-4 w-4 text-red-400" />
@@ -190,10 +196,10 @@ export function CreateNFT() {
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="name" className="flex-1 text-gray-400 text-lg font-medium">
+                      <Label htmlFor="name" className="flex-1 text-lg font-medium text-gray-400">
                         Name *
                       </Label>
-                      <FormInput id="name" name="name" />
+                      <FormInput id="name" name="name" data-testId="name-input" />
                       <FormError name="name" />
                       <div className="flex justify-between text-xs text-gray-500">
                         <span>Choose a memorable name for your NFT</span>
@@ -202,10 +208,10 @@ export function CreateNFT() {
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="description" className="flex-1 text-gray-400 text-lg font-medium">
+                      <Label htmlFor="description" className="flex-1 text-lg font-medium text-gray-400">
                         Description
                       </Label>
-                      <FormInput id="description" name="description" />
+                      <FormInput id="description" name="description" data-testId="description-input" />
                       <FormError name="description" />
                       <div className="flex justify-between text-xs text-gray-500">
                         <span>Provide a detailed description to attract collectors</span>
@@ -219,7 +225,7 @@ export function CreateNFT() {
 
                     {/* Blockchain Info */}
                     <div className="rounded-lg border border-gray-800 bg-gray-800/50 p-4">
-                      <h3 className="text-sm font-medium text-white mb-3 flex items-center gap-2">
+                      <h3 className="mb-3 flex items-center gap-2 text-sm font-medium text-white">
                         <Sparkles className="h-4 w-4 text-amber-400" />
                         Blockchain Details
                       </h3>
@@ -245,7 +251,7 @@ export function CreateNFT() {
                           <span className="flex items-center gap-1 text-sm font-medium text-amber-600">
                             <Tooltip>
                               <TooltipTrigger asChild>
-                                <InfoIcon className="inline-block w-4 h-4" />
+                                <InfoIcon className="inline-block h-4 w-4" />
                               </TooltipTrigger>
                               <TooltipContent>
                                 <p>
@@ -261,6 +267,7 @@ export function CreateNFT() {
                     </div>
 
                     <Button
+                      data-testId="nft-submit-button"
                       variant="default"
                       className="w-full"
                       type="submit"
@@ -301,28 +308,28 @@ export function CreateNFT() {
                     <div className="rounded-lg border border-gray-800 bg-gray-800/50 p-4">
                       <div className="space-y-3">
                         <div>
-                          <h4 className="font-medium text-white truncate">{values.name || 'Untitled NFT'}</h4>
+                          <h4 className="truncate font-medium text-white">{values.name || 'Untitled NFT'}</h4>
                           <p className="text-sm text-gray-400">by {shrotenAddress(address)}</p>
                         </div>
 
                         {values.description && (
-                          <p className="text-sm text-gray-300 line-clamp-3 leading-relaxed">{values.description}</p>
+                          <p className="line-clamp-3 text-sm leading-relaxed text-gray-300">{values.description}</p>
                         )}
 
-                        <div className="flex items-center justify-between pt-2 border-t border-gray-700">
+                        <div className="flex items-center justify-between border-t border-gray-700 pt-2">
                           <span className="text-xs text-gray-500">Token ID</span>
-                          <span className="text-xs font-mono text-gray-400">#TBD</span>
+                          <span className="font-mono text-xs text-gray-400">#TBD</span>
                         </div>
                       </div>
                     </div>
 
                     {/* Status */}
-                    <div className="rounded-lg bg-amber-500/10 border border-amber-500/20 p-3">
+                    <div className="rounded-lg border border-amber-500/20 bg-amber-500/10 p-3">
                       <div className="flex items-center gap-2">
                         <Info className="h-4 w-4 text-amber-400" />
                         <span className="text-sm font-medium text-amber-300">Ready to mint</span>
                       </div>
-                      <p className="text-xs text-amber-400/80 mt-1">
+                      <p className="mt-1 text-xs text-amber-400/80">
                         Your NFT will be permanently stored on the blockchain
                       </p>
                     </div>

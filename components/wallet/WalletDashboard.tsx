@@ -47,9 +47,27 @@ export function WalletDashboard({ children }: PropsWithChildren) {
           </div>
 
           <div className="grid grid-cols-3 justify-items-center gap-4">
-            <ActionLink bgColor="from-orange-500 to-pink-500" href="/nft/create" text="Mint NFT" Icon={ImagePlusIcon} />
-            <ActionLink bgColor="from-blue-500 to-cyan-500" href="/exchange" text="Swap" Icon={RefreshCw} />
-            <ActionLink bgColor="from-green-500 to-emerald-500" href="/transfer" text="Send" Icon={SendIcon} />
+            <ActionLink
+              bgColor="from-orange-500 to-pink-500"
+              href="/nft/create"
+              text="Mint NFT"
+              Icon={ImagePlusIcon}
+              testId="mint-nft-button"
+            />
+            <ActionLink
+              bgColor="from-blue-500 to-cyan-500"
+              href="/exchange"
+              text="Swap"
+              Icon={RefreshCw}
+              testId="swap-button"
+            />
+            <ActionLink
+              bgColor="from-green-500 to-emerald-500"
+              href="/transfer"
+              text="Send"
+              Icon={SendIcon}
+              testId="send-button"
+            />
           </div>
         </div>
       </ContentCard>
@@ -80,13 +98,15 @@ type ActionLinkProps = PropsWithChildren & {
   bgColor: string;
   Icon: LucideIcon;
   text: string;
+  testId?: string;
 };
 
-const ActionLink = ({ href, bgColor, Icon, text }: ActionLinkProps) => {
+const ActionLink = ({ href, bgColor, Icon, text, testId }: ActionLinkProps) => {
   return (
     <Link
       href={href}
       className={`h-20 w-20 rounded-xl bg-linear-to-br text-gray-200 lg:h-24 lg:w-24 ${bgColor} flex flex-col items-center justify-center border border-gray-800 shadow-lg transition-all duration-200 hover:scale-105 hover:text-white hover:shadow-xl`}
+      data-testid={testId}
     >
       <span className="inline-block transform bg-transparent p-2 pt-0 transition-transform duration-300 group-hover:scale-[1.02]">
         <Icon className="h-6 w-6" />
