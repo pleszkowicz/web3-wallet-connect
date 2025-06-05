@@ -28,7 +28,7 @@ export default defineConfig({
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
     // baseURL: 'http://localhost:3000',
-    trace: process.env.CI ? 'retain-on-first-failure' : 'on',
+    trace: 'on',
     headless: false,
     viewport: { width: 1366, height: 768 },
 
@@ -39,7 +39,7 @@ export default defineConfig({
   projects: [
     {
       name: 'MetaMask',
-      use: { ...devices['Desktop Chrome'] },
+      use: { ...devices['Desktop Chrome'], channel: 'chromium' },
       metadata: {
         version: MetaMaskWallet.recommendedVersion,
         seed: "test test test test test test test test test test test junk",
@@ -83,9 +83,9 @@ export default defineConfig({
 
   /* Run your local dev server before starting the tests */
   webServer: {
-    command: 'pnpm run dev',
+    command: 'pnpm run start',
     url: 'http://localhost:3000',
     timeout: 120 * 1000,
-    reuseExistingServer: !process.env.CI, // Reuse existing server in non-CI environments
+    reuseExistingServer: false, // Reuse existing server in non-CI environments
   },
 });
