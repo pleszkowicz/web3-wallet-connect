@@ -53,45 +53,41 @@ testWithWallet.beforeEach(async ({ page, wallet }) => {
   await page.waitForURL('**/dashboard/tokens');
 });
 
-testWithWallet("should create NFT", async ({ wallet, page }) => {
-  await page.goto("http://localhost:3000/dashboard/tokens");
-  await page.getByTestId('mint-nft-button').click();
-  await page.waitForURL('**/nft/create');
-  await page.getByTestId('image-input').fill('https://i.scdn.co/image/ab67616d0000b2738853842f15505951267f0d59');
-  await page.getByTestId('name-input').fill('Name');
-  await page.getByTestId('description-input').fill('Description');
-  await page.getByTestId('nft-submit-button').click();
-
-  await wallet.confirmTransaction();
-
-  await page.waitForURL("**/dashboard/nfts");
-});
-
-// testWithWallet("should transfer to another account", async ({ wallet, page }) => {
+// testWithWallet("should create NFT", async ({ wallet, page }) => {
 //   await page.goto("http://localhost:3000/dashboard/tokens");
-//   await page.getByTestId('send-button').click();
+//   await page.getByTestId('mint-nft-button').click();
+//   await page.waitForURL('**/nft/create');
+//   await page.getByTestId('image-input').fill('https://i.scdn.co/image/ab67616d0000b2738853842f15505951267f0d59');
+//   await page.getByTestId('name-input').fill('Name');
+//   await page.getByTestId('description-input').fill('Description');
+//   await page.getByTestId('nft-submit-button').click();
 
-//   await page.waitForURL('**/transfer');
-
-//   await page.getByTestId('to-address-input').fill('0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'); // Example address
-//   await page.getByTestId('value-input').fill('0.00001');
-//   await page.getByTestId('send-button').click();
-
-//   // test with sign
 //   await wallet.confirmTransaction();
 
-//   const toAddressInput = page.getByTestId('to-address-input');
-//   await expect(toAddressInput).toHaveValue('');
-
-
-
-
-
-//   // const connectStatus = page.getByTestId("connect-status");
-//   // expect(connectStatus).toHaveValue("connected");
-
-
-//   // await page.click("#switch-network-button");
-//   // const networkStatus = page.getByTestId("network-status");
-//   // expect(networkStatus).toHaveValue("31337");
+//   await page.waitForURL("**/dashboard/nfts");
 // });
+
+testWithWallet("should transfer to another account", async ({ wallet, page }) => {
+  await page.goto("http://localhost:3000/dashboard/tokens");
+  await page.getByTestId('send-button').click();
+
+  await page.waitForURL('**/transfer');
+
+  await page.getByTestId('to-address-input').fill('0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'); // Example address
+  await page.getByTestId('value-input').fill('0.00001');
+  await page.getByTestId('send-button').click();
+
+  // test with sign
+  await wallet.confirmTransaction();
+
+  const toAddressInput = page.getByTestId('to-address-input');
+  await expect(toAddressInput).toHaveValue('');
+
+  // const connectStatus = page.getByTestId("connect-status");
+  // expect(connectStatus).toHaveValue("connected");
+
+
+  // await page.click("#switch-network-button");
+  // const networkStatus = page.getByTestId("network-status");
+  // expect(networkStatus).toHaveValue("31337");
+});
