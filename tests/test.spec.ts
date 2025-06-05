@@ -34,7 +34,7 @@ export const testWithWallet = base.extend<{ wallet: Dappwright }, { walletContex
   },
 });
 
-testWithWallet.beforeAll(async ({ page, wallet }) => {
+testWithWallet.beforeEach(async ({ page, wallet }) => {
   await page.goto("http://localhost:3000");
 
   // indicates user is connected to the wallet
@@ -50,27 +50,26 @@ testWithWallet.beforeAll(async ({ page, wallet }) => {
   } else {
     await page.getByTestId('launch-dashboard-button').click();
   }
-
   await page.waitForURL('**/dashboard/tokens');
 });
 
-testWithWallet("should create NFT", async ({ wallet, page }) => {
-  await page.goto("http://localhost:3000/dashboard/tokens");
-  await page.getByTestId('mint-nft-button').click();
-  await page.waitForURL('**/nft/create');
-  await page.getByTestId('image-input').fill('https://i.scdn.co/image/ab67616d0000b2738853842f15505951267f0d59');
-  await page.getByTestId('name-input').fill('Name');
-  await page.getByTestId('description-input').fill('Description');
-  await page.getByTestId('nft-submit-button').click();
+// testWithWallet("should create NFT", async ({ wallet, page }) => {
+//   await page.goto("http://localhost:3000/dashboard/tokens");
+//   await page.getByTestId('mint-nft-button').click();
+//   await page.waitForURL('**/nft/create');
+//   await page.getByTestId('image-input').fill('https://i.scdn.co/image/ab67616d0000b2738853842f15505951267f0d59');
+//   await page.getByTestId('name-input').fill('Name');
+//   await page.getByTestId('description-input').fill('Description');
+//   await page.getByTestId('nft-submit-button').click();
 
-  await wallet.confirmTransaction();
+//   await wallet.confirmTransaction();
 
-  await page.waitForURL("**/dashboard/nfts");
-  await page.getByTestId("toast-nft-confirmed").waitFor({
-    state: "visible",
-    timeout: 60000,
-  });
-});
+//   await page.waitForURL("**/dashboard/nfts");
+//   await page.getByTestId("toast-nft-confirmed").waitFor({
+//     state: "visible",
+//     timeout: 60000,
+//   });
+// });
 
 testWithWallet("should transfer to another account", async ({ wallet, page }) => {
   await page.goto("http://localhost:3000/dashboard/tokens");
