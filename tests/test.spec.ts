@@ -65,7 +65,7 @@ testWithWallet("should create NFT and transfer successfully", async ({ wallet, p
   // NFT creation
   await page.getByTestId('mint-nft-button').click();
   await page.waitForURL('**/nft/create');
-  await page.getByTestId('image-input').fill('https://i.scdn.co/image/ab67616d0000b2738853842f15505951267f0d59');
+  await page.getByTestId('image-input').fill('https://picsum.photos/536/354');
   await page.getByTestId('name-input').fill('Name');
   await page.getByTestId('description-input').fill('Description');
   await page.getByTestId('nft-submit-button').click();
