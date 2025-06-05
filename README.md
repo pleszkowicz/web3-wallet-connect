@@ -69,9 +69,17 @@ pnpm dev
 
 Visit [http://localhost:3000](http://localhost:3000) in your browser
 
-## 🙌 Contributing
+## 🐛 E2E Testing
 
-Contributions are welcome! Feel free to fork this repository and submit pull requests to improve the project.
+This dApp uses [PlayWright](https://playwright.dev/) + [@tenkeylabs/dappwright](https://github.com/TenKeyLabs/dappwright). `dappwright` allows to use Metamask wallet extension for automated tests and proper pre-configuration.
+
+### Run tests locally
+
+```bash
+pnpm run test:ui
+```
+
+See `package.json` for more.
 
 ## 📖 Documentation & Useful Links
 
@@ -86,3 +94,7 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## 🙌 Contributing
+
+Contributions are welcome! Feel free to fork this repository and submit pull requests to improve the project.
