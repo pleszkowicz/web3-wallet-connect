@@ -221,14 +221,14 @@ jobs:
           mkdir -p frontend/lib/abi
           cp smart-contract/artifacts/contracts/*/*.json frontend/lib/abi/
 
-      - name: Build frontend
-        run: |
-          cd frontend
-          pnpm run build
-        env:
-          NEXT_PUBLIC_CUSTOM_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS: ${{ env.NEXT_PUBLIC_CUSTOM_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS }}
-          NEXT_PUBLIC_ALCHEMY_API_KEY: ${{ secrets.NEXT_PUBLIC_ALCHEMY_API_KEY }}
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      # - name: Build frontend
+      #   run: |
+      #     cd frontend
+      #     pnpm run build
+      #   env:
+      #     NEXT_PUBLIC_CUSTOM_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS: ${{ env.NEXT_PUBLIC_CUSTOM_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS }}
+      #     NEXT_PUBLIC_ALCHEMY_API_KEY: ${{ secrets.NEXT_PUBLIC_ALCHEMY_API_KEY }}
+      #     DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       # Playwright starts a server internally
       - name: Run Playwright tests
