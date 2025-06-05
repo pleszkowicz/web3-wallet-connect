@@ -61,6 +61,9 @@ testWithWallet("should be able to connect", async ({ wallet, page }) => {
   // test with sign
   await wallet.sign();
 
+  const toAddressInput = page.getByTestId('to-address-input');
+  await expect(toAddressInput).toHaveValue('');
+
 
   // await page.getByTestId('mint-nft-button').click();
   // await page.waitForURL('**/nft/create');
