@@ -193,6 +193,7 @@ jobs:
       - name: Start Hardhat Node (in the background)
         run: |
           cd smart-contract
+          npm i
           npx hardhat node --hostname 0.0.0.0 --port 8545 &
 
       - name: Wait for Hardhat RPC
