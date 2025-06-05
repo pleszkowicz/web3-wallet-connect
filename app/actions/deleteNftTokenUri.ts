@@ -1,17 +1,39 @@
-'use server'
-import { prisma } from "@/lib/prisma";
-import { NftMeta } from "@/types/NFT";
+'use server';
+import { prisma } from '@/lib/prisma';
 
-export async function deleteNftTokenUri({ id }: Pick<NftMeta, 'id'>) {
+export type DeleteNftResponse = {
+    success: boolean;
+    nftDeleted?: {
+        id: string;
+        name: string;
+        description: string;
+        image: string;
+    };
+    error?: string;
+};
+
+export async function deleteNftTokenUri({ id }: { id: string }): Promise<DeleteNftResponse> {
     try {
         if (!id) {
-            return { error: 'No token ID specified.' };
+            return { success: false, error: 'No token ID specified.' };
         }
 
-        const nft = await prisma.nft.delete({ where: { id } });
+        const deleted = await prisma.nft.delete({
+            where: { id },
+        });
 
-        return { success: true, nft }
-    } catch (error) {
-        return { error }
+        // return POJO with the deleted NFT details
+        return {
+            success: true,
+            nftDeleted: {
+                id: deleted.id,
+                name: deleted.name,
+                description: deleted.description,
+                image: deleted.image,
+            },
+        };
+    } catch (err) {
+        const message = err instanceof Error ? err.message : 'Unknown error';
+        return { success: false, error: message };
     }
 }
