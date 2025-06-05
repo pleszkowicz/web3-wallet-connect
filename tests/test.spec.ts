@@ -37,20 +37,18 @@ export const testWithWallet = base.extend<{ wallet: Dappwright }, { walletContex
 testWithWallet.beforeAll(async ({ page, wallet }) => {
   await page.goto("http://localhost:3000");
 
-  const connectWalletButton = page.getByTestId('connect-wallet-button');
-  const launchDashboardButton = page.getByTestId('launch-dashboard-button');
+  // indicates user is connected to the wallet
+  const walletMenuButton = page.getByTestId('wallet-menu-button');
 
-  if (await connectWalletButton.isVisible()) {
-    await connectWalletButton.click();
+  if (await walletMenuButton.isHidden()) {
+    await page.getByTestId('connect-wallet-button').click();
 
     const CONNECTOR_NAME = 'connector-io.metamask';
     await page.getByTestId(CONNECTOR_NAME).click();
 
     await wallet.approve();
-  } else if (await launchDashboardButton.isVisible()) {
-    await launchDashboardButton.click();
   } else {
-    throw new Error("Neither connect wallet nor launch dashboard button is visible");
+    await page.getByTestId('launch-dashboard-button').click();
   }
 
   await page.waitForURL('**/dashboard/tokens');
