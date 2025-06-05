@@ -25,7 +25,7 @@ export const tokenMap: Record<Token['symbol'], Token> = {
     symbol: 'eth',
     label: 'Sepolia ETH',
     decimals: 18,
-    logo: 'https://token-icons.s3.amazonaws.com/eth.png',
+    logo: '/images/tokens/eth.png',
     faucetUrl: 'https://cloud.google.com/application/web3/faucet/ethereum/sepolia'
   },
   weth: {
@@ -34,7 +34,7 @@ export const tokenMap: Record<Token['symbol'], Token> = {
     address: '0x7b79995e5f793a07bc00c21412e50ecae098e7f9',
     decimals: 18,
     abi: WETH_ABI,
-    logo: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/logo.png',
+    logo: '/images/tokens/weth.png',
   },
   link: {
     symbol: 'link',
@@ -42,7 +42,7 @@ export const tokenMap: Record<Token['symbol'], Token> = {
     address: '0x779877A7B0D9E8603169DdbD7836e478b4624789',
     decimals: 18,
     abi: LINK_TOKEN_ABI,
-    logo: 'https://coin-images.coingecko.com/coins/images/877/large/chainlink-new-logo.png',
+    logo: '/images/tokens/link.png',
   },
   usdc: {
     symbol: 'usdc',
@@ -50,7 +50,7 @@ export const tokenMap: Record<Token['symbol'], Token> = {
     address: '0x94a9D9AC8a22534E3FaCa9F4e7F2E2cf85d5E4C8',
     decimals: 6,
     abi: USDC_ABI,
-    logo: 'https://coin-images.coingecko.com/coins/images/6319/large/usdc.png',
+    logo: '/images/tokens/usdc.png',
   },
 };
 
