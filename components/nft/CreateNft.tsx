@@ -1,7 +1,6 @@
 'use client';
 import { createNftTokenUri } from '@/app/actions/createNftTokenUri';
 import { deleteNftTokenUri } from '@/app/actions/deleteNftTokenUri';
-import { validateImageUrl } from '@/app/actions/validateImageUrl';
 import { ContentCard } from '@/components/ContentCard';
 import { ContentLayout } from '@/components/ContentLayout';
 import { NftListItemUI } from '@/components/nft/NftListItem';
@@ -80,9 +79,9 @@ export function CreateNFT() {
           if (!currentImage || currentImage === imageUrl) {
             return true;
           }
-          const { valid } = await validateImageUrl(currentImage);
+          // const { valid } = await validateImageUrl(currentImage);
           setImageUrl(currentImage);
-          return valid;
+          return true;
         })
     ),
   });
