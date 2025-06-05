@@ -2,7 +2,7 @@
 import { test as base, expect } from '@playwright/test';
 import { BrowserContext } from 'playwright-core';
 import dappwright, { bootstrap, Dappwright, getWallet, MetaMaskWallet, OfficialOptions } from '@tenkeylabs/dappwright';
-import { hardhat, sepolia } from 'viem/chains';
+import { cyber, hardhat, sepolia } from 'viem/chains';
 import { metaMask } from 'wagmi/connectors'
 import { launchMetamask } from '@/tests/metamaskSetup';
 
@@ -34,7 +34,7 @@ export const testWithWallet = base.extend<{ wallet: Dappwright }, { walletContex
   },
 });
 
-testWithWallet.beforeEach(async ({ page, wallet }) => {
+testWithWallet.beforeAll(async ({ page, wallet }) => {
   await page.goto("http://localhost:3000");
 
   const connectWalletButton = page.getByTestId('connect-wallet-button');
@@ -57,6 +57,7 @@ testWithWallet.beforeEach(async ({ page, wallet }) => {
 });
 
 testWithWallet("should create NFT", async ({ wallet, page }) => {
+  await page.goto("http://localhost:3000/dashboard/tokens");
   await page.getByTestId('mint-nft-button').click();
   await page.waitForURL('**/nft/create');
   await page.getByTestId('image-input').fill('https://i.scdn.co/image/ab67616d0000b2738853842f15505951267f0d59');
@@ -74,6 +75,7 @@ testWithWallet("should create NFT", async ({ wallet, page }) => {
 });
 
 testWithWallet("should transfer to another account", async ({ wallet, page }) => {
+  await page.goto("http://localhost:3000/dashboard/tokens");
   await page.getByTestId('send-button').click();
 
   await page.waitForURL('**/transfer');
