@@ -20,7 +20,7 @@ export const testWithWallet = base.extend<{ wallet: Dappwright }, { walletContex
       });
 
       await use(context);
-      await context.close();
+      // await context.close();
     },
     { scope: 'worker' },
   ],
