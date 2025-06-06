@@ -31,6 +31,7 @@ export async function createNftTokenUri({ name, description, image }: Prisma.Nft
             },
         }
     } catch (error) {
+        console.log('createNftTokenUri: ', error)
         const message = error instanceof Error ? error.message : "Unknown error";
         return { success: false, error: message };
     }

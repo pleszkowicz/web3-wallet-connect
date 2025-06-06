@@ -33,6 +33,8 @@ export async function deleteNftTokenUri({ id }: { id: string }): Promise<DeleteN
             },
         };
     } catch (err) {
+        console.log('deleteNftTokenUri: ', err)
+
         const message = err instanceof Error ? err.message : 'Unknown error';
         return { success: false, error: message };
     }

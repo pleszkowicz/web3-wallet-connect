@@ -36,6 +36,8 @@ export async function getNftTokenUri(id: string): Promise<GetNftResponse> {
             },
         };
     } catch (err) {
+        console.log('getNftTokenUri: ', err)
+
         const message = err instanceof Error ? err.message : "Unknown error";
         return { success: false, nftUri: null, error: message };
     }
