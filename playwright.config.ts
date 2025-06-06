@@ -31,6 +31,9 @@ export default defineConfig({
     trace: process.env.CI ? 'retain-on-first-failure' : 'on',
     headless: false,
     viewport: { width: 1366, height: 768 },
+    launchOptions: {
+      args: ["--enable-gpu"],
+    },
 
   },
   maxFailures: process.env.CI ? 0 : 1,
@@ -83,9 +86,11 @@ export default defineConfig({
 
   /* Run your local dev server before starting the tests */
   webServer: {
-    command: 'pnpm run start',
+    command: 'pnpm run dev',
     url: 'http://localhost:3000',
     timeout: 120 * 1000,
     reuseExistingServer: !process.env.CI, // Reuse existing server in non-CI environments
+    stdout: 'pipe',
+    stderr: 'pipe',
   },
 });
