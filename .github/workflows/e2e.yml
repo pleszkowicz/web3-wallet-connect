@@ -162,11 +162,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-
 
-      - name: Install Playwright browsers
-        run: |
-          cd frontend
-          pnpm exec playwright install chrome
-
       - name: Restore Playwright browsers
         uses: actions/cache@v4
         with:
@@ -184,11 +179,6 @@ jobs:
           key: ${{ runner.os }}-pnpm-nextjs-${{ needs.fe-cache.outputs.pnpm-hash }}-${{ needs.fe-cache.outputs.js-hash }}
           restore-keys: |
             ${{ runner.os }}-pnpm-nextjs-${{ needs.fe-cache.outputs.pnpm-hash }}-
-
-      - name: Install frontend dependencies
-        run: |
-          cd frontend
-          pnpm install
 
       - name: Start Hardhat Node (in the background)
         run: |
