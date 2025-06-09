@@ -170,16 +170,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-playwright-
 
-      - name: Restore Next.js build-cache
-        uses: actions/cache@v4
-        with:
-          path: |
-            ${{ env.STORE_PATH }}
-            ${{ github.workspace }}/frontend/.next/cache
-          key: ${{ runner.os }}-pnpm-nextjs-${{ needs.fe-cache.outputs.pnpm-hash }}-${{ needs.fe-cache.outputs.js-hash }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-nextjs-${{ needs.fe-cache.outputs.pnpm-hash }}-
-
       - name: Start Hardhat Node (in the background)
         run: |
           cd smart-contract
@@ -210,6 +200,16 @@ jobs:
         run: |
           mkdir -p frontend/lib/abi
           cp smart-contract/artifacts/contracts/*/*.json frontend/lib/abi/
+
+      - name: Restore Next.js build-cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ env.STORE_PATH }}
+            ${{ github.workspace }}/frontend/.next/cache
+          key: ${{ runner.os }}-pnpm-nextjs-${{ needs.fe-cache.outputs.pnpm-hash }}-${{ needs.fe-cache.outputs.js-hash }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-nextjs-${{ needs.fe-cache.outputs.pnpm-hash }}-
 
       - name: Build frontend
         run: |
