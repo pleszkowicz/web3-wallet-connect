@@ -2,6 +2,7 @@ import { AuthManager } from '@/components/AuthManager';
 import { Toaster } from '@/components/ui/toaster';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import WagmiProviderWrapper from '@/context/WagmiProviderWrapper';
+import { GoogleAnalytics } from '@next/third-parties/google';
 import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 import { StrictMode } from 'react';
@@ -42,6 +43,7 @@ export default function RootLayout({
           <Toaster />
         </StrictMode>
       </body>
+      <GoogleAnalytics gaId="G-9EM4NEZD7G" />
     </html>
   );
 }
