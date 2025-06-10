@@ -66,7 +66,7 @@ jobs:
 
       - name: Wire up FE with deployed contract
         run: |
-          ADDRESS=$(grep -oE '0x[a-fA-F0-9]{40}' deploy-output.txt | head -1)
+          ADDRESS=$(grep -oE '0x[a-fA-F0-9]{40}' smart-contract/deploy-output.txt | head -1)
           mkdir -p lib/abi
           cp smart-contract/artifacts/contracts/*/*.json lib/abi/
           echo "{\"NftMarketplace\":\"$ADDRESS\"}" \
