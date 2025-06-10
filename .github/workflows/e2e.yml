@@ -71,7 +71,7 @@ jobs:
         run: |
           ADDRESS=$(grep -oE '0x[a-fA-F0-9]{40}' deploy-output.txt | head -1)
           mkdir -p lib/abi
-          cp artifacts/contracts/*/*.json lib/abi/
+          cp smart-contract/artifacts/contracts/*/*.json lib/abi/
           echo "{\"NftMarketplace\":\"$ADDRESS\"}" \
             > lib/abi/contract-address.json
           echo "NEXT_PUBLIC_CUSTOM_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS=$ADDRESS" \
