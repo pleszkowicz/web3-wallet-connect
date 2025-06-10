@@ -61,7 +61,7 @@ jobs:
           npx hardhat node --hostname 0.0.0.0 --port 8545 &
           cd ..
           npx wait-on http://localhost:8545
-          cd ../smart-contract
+          cd smart-contract
           npm run deploy:local > deploy-output.txt
         env:
           PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
