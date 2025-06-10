@@ -52,20 +52,6 @@ jobs:
           (cd smart-contract && npm ci) &
           wait
 
-      - name: Set Playwright browsers cache dir
-        run: echo "PLAYWRIGHT_BROWSERS_PATH=$HOME/.cache/ms-playwright-chrome" >> $GITHUB_ENV
-
-      - name: Cache Playwright Chrome
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.PLAYWRIGHT_BROWSERS_PATH }}
-          key: ${{ runner.os }}-playwright-chrome-${{ hashFiles('pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-playwright-chrome-
-
-      - name: Install Playwright Chrome
-        run: pnpm exec playwright install --with-deps chrome
-
       - name: Start Hardhat node & deploy
         run: |
           cd smart-contract
@@ -90,6 +76,20 @@ jobs:
 
       - name: Build frontend
         run: pnpm run build
+
+      - name: Set Playwright browsers cache dir
+        run: echo "PLAYWRIGHT_BROWSERS_PATH=$HOME/.cache/ms-playwright-chrome" >> $GITHUB_ENV
+
+      - name: Cache Playwright Chrome
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.PLAYWRIGHT_BROWSERS_PATH }}
+          key: ${{ runner.os }}-playwright-chrome-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-chrome-
+
+      - name: Install Playwright Chrome
+        run: pnpm exec playwright install
 
       - name: Run Playwright tests
         run: xvfb-run --auto-servernum -- pnpm exec playwright test --headed --timeout 90000
