@@ -2,5 +2,10 @@ onlyBuiltDependencies:
   - '@prisma/client'
   - '@prisma/engines'
   - '@tailwindcss/oxide'
+  - bufferutil
+  - es5-ext
   - esbuild
+  - keccak
   - prisma
+  - sharp
+  - utf-8-validate
