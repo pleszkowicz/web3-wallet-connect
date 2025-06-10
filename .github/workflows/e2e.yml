@@ -76,6 +76,8 @@ jobs:
 
       - name: Build frontend
         run: pnpm run build
+        env:
+          NEXT_PUBLIC_CUSTOM_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS: ${{ env.NEXT_PUBLIC_CUSTOM_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS }}
 
       - name: Set Playwright browsers cache dir
         run: echo "PLAYWRIGHT_BROWSERS_PATH=$HOME/.cache/ms-playwright-chrome" >> $GITHUB_ENV
