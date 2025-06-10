@@ -95,6 +95,7 @@ jobs:
         run: xvfb-run --auto-servernum -- pnpm exec playwright test --headed --timeout 90000
         env:
           CI: true
+          NEXT_PUBLIC_CUSTOM_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS: ${{ env.NEXT_PUBLIC_CUSTOM_NFT_MARKETPLACE_SMART_CONTRACT_ADDRESS }}
 
       - name: Upload Playwright report
         if: ${{ !cancelled() }}
