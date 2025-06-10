@@ -93,9 +93,6 @@ jobs:
       - name: Install Playwright Chrome
         run: pnpm exec playwright install
 
-      - name: Echo all environment variables
-        run: printenv | sort
-
       - name: Run Playwright tests
         run: xvfb-run --auto-servernum -- pnpm exec playwright test --headed --timeout 90000
         env:
