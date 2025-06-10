@@ -8,4 +8,5 @@ onlyBuiltDependencies:
   - keccak
   - prisma
   - sharp
+  - unrs-resolver
   - utf-8-validate
