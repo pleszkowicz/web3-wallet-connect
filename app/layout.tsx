@@ -1,11 +1,12 @@
 import { AuthManager } from '@/components/AuthManager';
+import { Loader } from '@/components/ui/loader';
 import { Toaster } from '@/components/ui/toaster';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import WagmiProviderWrapper from '@/context/WagmiProviderWrapper';
 import { GoogleAnalytics } from '@next/third-parties/google';
 import type { Metadata } from 'next';
 import localFont from 'next/font/local';
-import { StrictMode } from 'react';
+import { StrictMode, Suspense } from 'react';
 import './globals.css';
 
 const geistSans = localFont({
@@ -37,7 +38,9 @@ export default function RootLayout({
         <StrictMode>
           <WagmiProviderWrapper>
             <TooltipProvider>
-              <AuthManager>{children}</AuthManager>
+              <AuthManager>
+                <Suspense fallback={<Loader size="lg" />}>{children}</Suspense>
+              </AuthManager>
             </TooltipProvider>
           </WagmiProviderWrapper>
           <Toaster />
