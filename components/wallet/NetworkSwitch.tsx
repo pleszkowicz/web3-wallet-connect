@@ -2,6 +2,7 @@
 import { useToast } from '@/components/ui/hooks/use-toast';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/cn';
+import { ChevronDownIcon } from 'lucide-react';
 import { ChangeEvent } from 'react';
 import { useChainId, useSwitchChain } from 'wagmi';
 
@@ -30,10 +31,10 @@ export const NetworkSwitch = () => {
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <div className="flex text-gray-200">
+        <div className="relative flex w-full text-gray-200">
           <select
             className={cn(
-              'rounded-lg bg-transparent px-4 py-2 text-white hover:bg-gray-600 focus:outline-hidden',
+              'w-full appearance-none rounded-lg bg-gray-700 px-4 py-2 pr-10 text-center text-white hover:bg-gray-600 focus:outline-hidden',
               isPending ? 'animate-pulse' : ''
             )}
             onChange={onChainChange}
@@ -46,6 +47,7 @@ export const NetworkSwitch = () => {
               </option>
             ))}
           </select>
+          <ChevronDownIcon className="pointer-events-none absolute top-1/2 right-2 -translate-y-1/2 text-white" />
         </div>
       </TooltipTrigger>
       <TooltipContent>

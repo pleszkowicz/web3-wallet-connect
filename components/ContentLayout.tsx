@@ -1,6 +1,7 @@
 'use client';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Separator } from '@/components/ui/separator';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { DisconnectWallet } from '@/components/wallet/DisconnectWallet';
 import { NetworkSwitch } from '@/components/wallet/NetworkSwitch';
@@ -72,20 +73,26 @@ export const ContentLayout = ({ title, description, goBackUrl, children }: CardL
                     side="bottom"
                     className="border border-gray-700 bg-gray-800 shadow-lg"
                   >
-                    <h3 className="mt-2 text-center text-lg text-gray-200">Your Wallet</h3>
+                    <div>
+                      <h3 className="my-4 text-center text-lg text-gray-200">Account</h3>
 
-                    {isMobile && (
-                      <>
-                        <div className="flex flex-col items-center gap-4 p-4 pb-2">
-                          <WalletAddress />
-                        </div>
-                      </>
-                    )}
+                      {isMobile && (
+                        <>
+                          <div className="flex flex-col items-center gap-4 p-4 pb-2">
+                            <WalletAddress />
+                          </div>
+                        </>
+                      )}
+                    </div>
 
-                    <div className="flex flex-row items-center justify-between gap-4 p-4 pt-2 pb-4">
-                      <span className="text-sm text-gray-400">Network</span>
+                    {/* <Separator className="bg-gray-700/50" /> */}
+
+                    <div className="flex flex-col items-center justify-center gap-1 p-4 pt-2 pb-4">
+                      <p className="text-xs text-gray-400">Network:</p>
                       <NetworkSwitch />
                     </div>
+
+                    <Separator className="bg-gray-700/50" />
 
                     {isConnected && (
                       <div>
