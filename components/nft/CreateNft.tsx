@@ -179,6 +179,7 @@ export function CreateNFT() {
                           className="pr-10"
                           id="image"
                           name="image"
+                          type="url"
                           placeholder="https://"
                           data-testid="image-input"
                         />
