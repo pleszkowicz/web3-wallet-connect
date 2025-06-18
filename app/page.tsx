@@ -1,15 +1,16 @@
 'use client';
-import { Loader } from '@/components/ui/loader';
-import { WalletConnect } from '@/components/wallet/ConnectWallet';
 import { withMounted } from '@/lib/hoc/withMounted';
-import { Suspense } from 'react';
+import dynamic from 'next/dynamic';
+
+const LazyWalletConnect = dynamic(
+  () => import('@/components/wallet/ConnectWallet').then((module) => module.ConnectWallet),
+  {
+    ssr: false,
+  }
+);
 
 function HomePage() {
-  return (
-    <Suspense fallback={<Loader size="lg" />}>
-      <WalletConnect />
-    </Suspense>
-  );
+  return <LazyWalletConnect />;
 }
 
 const HomePageWithMounted = withMounted(HomePage);

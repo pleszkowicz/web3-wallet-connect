@@ -1,3 +1,4 @@
+'use client';
 import { Loader } from '@/components/ui/loader';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { JSX } from 'react/jsx-runtime';

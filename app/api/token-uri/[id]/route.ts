@@ -1,7 +1,10 @@
-'use server';
 import invariant from "tiny-invariant";
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
+
+export const revalidate = 60; // seconds
+
+export const fetchCache = 'force-cache';
 
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     try {

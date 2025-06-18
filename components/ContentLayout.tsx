@@ -103,7 +103,7 @@ export const ContentLayout = ({ title, description, goBackUrl, children }: CardL
                           variant="ghost"
                           className="w-full rounded-none text-gray-400 hover:bg-gray-700 hover:text-white"
                         >
-                          <Link href="/dashboard">
+                          <Link href="/dashboard/tokens">
                             <span className="flex items-center gap-2">
                               <Wallet className="h-4 w-4" />
                               Dashboard

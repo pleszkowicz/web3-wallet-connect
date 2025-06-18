@@ -1,15 +1,21 @@
-'use client';
-import { TokenTransferForm } from '@/components/TokenTransferForm';
+import { ContentLayout } from '@/components/ContentLayout';
 import { Loader } from '@/components/ui/loader';
 import { PortfolioBalanceProvider } from '@/context/PortfolioBalanceProvider';
-import { Suspense } from 'react';
+import dynamic from 'next/dynamic';
+
+const LazyTokentransferForm = dynamic(
+  () => import('@/components/TokenTransferForm').then((mod) => mod.TokenTransferForm),
+  {
+    loading: () => <Loader size="lg" />,
+  }
+);
 
 export default function TransactionPage() {
   return (
     <PortfolioBalanceProvider>
-      <Suspense fallback={<Loader />}>
-        <TokenTransferForm />
-      </Suspense>
+      <ContentLayout title="Send" goBackUrl="/dashboard/tokens">
+        <LazyTokentransferForm />
+      </ContentLayout>
     </PortfolioBalanceProvider>
   );
 }

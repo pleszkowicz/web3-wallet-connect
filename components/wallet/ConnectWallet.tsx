@@ -13,7 +13,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { Connector, useAccount, useConnect } from 'wagmi';
 
-export function WalletConnect() {
+export function ConnectWallet() {
   const { connectors, connectAsync, isPending: isConnectionPending, isSuccess: isConnectionSuccess } = useConnect();
   const { isConnected } = useAccount();
   const { push } = useRouter();
@@ -40,121 +40,119 @@ export function WalletConnect() {
 
   return (
     <ContentLayout>
-      <div>
-        <div className="mb-16 text-center">
-          <h1 className="mb-4 text-4xl font-bold text-white md:text-6xl">
-            Your All-in-One{' '}
-            <span className="bg-linear-to-r from-orange-400 to-orange-600 bg-clip-text text-transparent">
-              Web3 Dashboard
-            </span>
-          </h1>
-          <p className="mx-auto max-w-2xl text-xl text-gray-400">Swap tokens, trade NFTs, and connect your wallet</p>
-        </div>
-        <div className="mb-16">
-          <h2 className="mb-8 text-center text-2xl font-bold text-white md:text-3xl">Explore & Trade NFTs</h2>
+      <div className="mb-16 text-center">
+        <h1 className="mb-4 text-4xl font-bold text-white md:text-6xl">
+          Your All-in-One{' '}
+          <span className="bg-linear-to-r from-orange-400 to-orange-600 bg-clip-text text-transparent">
+            Web3 Dashboard
+          </span>
+        </h1>
+        <p className="mx-auto max-w-2xl text-xl text-gray-400">Swap tokens, trade NFTs, and connect your wallet</p>
+      </div>
+      <div className="mb-16">
+        <h2 className="mb-8 text-center text-2xl font-bold text-white md:text-3xl">Explore & Trade NFTs</h2>
 
-          <div className="grid grid-cols-3 gap-6">{nftPlaceholders}</div>
-        </div>
-        <div className="mb-16 text-center">
-          <h2 className="mb-8 text-2xl font-bold text-white md:text-3xl">Let's dive</h2>
+        <div className="grid grid-cols-3 gap-6">{nftPlaceholders}</div>
+      </div>
+      <div className="mb-16 text-center">
+        <h2 className="mb-8 text-2xl font-bold text-white md:text-3xl">Let's dive</h2>
 
-          {!isConnected ? (
-            <Dialog open={open} onOpenChange={setIsOpen}>
-              <DialogTrigger asChild onAbort={() => setIsOpen(false)}>
-                <Button
-                  data-testid="connect-wallet-button"
-                  variant="default"
-                  size="xl"
-                  className="cursor-pointer"
-                  onClick={() => setIsOpen(true)}
-                >
-                  <Wallet2 className="mr-2 h-6 w-6" />
-                  Connect your wallet
-                </Button>
-              </DialogTrigger>
-              <DialogContent
-                className="border-gray-700 bg-gray-900 text-white sm:max-w-[425px]"
-                aria-describedby="dialog-content"
+        {!isConnected ? (
+          <Dialog open={open} onOpenChange={setIsOpen}>
+            <DialogTrigger asChild onAbort={() => setIsOpen(false)}>
+              <Button
+                data-testid="connect-wallet-button"
+                variant="default"
+                size="xl"
+                className="cursor-pointer"
+                onClick={() => setIsOpen(true)}
               >
-                <DialogHeader>
-                  <DialogTitle>Please connect your wallet</DialogTitle>
-                </DialogHeader>
-                <DialogDescription asChild>
-                  <div className="mt-6 grid w-full gap-2">
-                    {connectors.length ? (
-                      connectors.map((connector) => (
-                        <WalletOption
-                          key={connector.id}
-                          connector={connector}
-                          onClick={onConnectorSelect}
-                          pending={isConnectionPending}
-                        />
-                      ))
-                    ) : (
-                      <div className="text-slate-700">
-                        <p>
-                          Unfortunately, I <b>coud not find any crypto wallet</b> enabled in your browser. Once you
-                          install, please try again.
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                </DialogDescription>
-              </DialogContent>
-            </Dialog>
-          ) : (
-            <Button asChild variant="default" size="xl" data-testid="launch-dashboard-button">
-              <Link href="/dashboard/tokens">
-                <Rocket className="mr-2" /> Launch Dashboard
-              </Link>
-            </Button>
-          )}
-        </div>
-
-        <div className="text-center">
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button variant="link" className="text-gray-400 transition-colors duration-200 hover:text-white">
-                <Code className="mr-2 h-4 w-4" />
-                Local Setup Guide for Developers
+                <Wallet2 className="mr-2 h-6 w-6" />
+                Connect your wallet
               </Button>
             </DialogTrigger>
-            <DialogContent aria-describedby="dialog-content" className="sm:max-w-[425px]">
+            <DialogContent
+              className="border-gray-700 bg-gray-900 text-white sm:max-w-[425px]"
+              aria-describedby="dialog-content"
+            >
               <DialogHeader>
-                <DialogTitle>Local Setup Guide for Developers</DialogTitle>
+                <DialogTitle>Please connect your wallet</DialogTitle>
               </DialogHeader>
-              <div className="text-slate-500">
-                <h3>To test all features locally, follow these steps:</h3>
-                <ol className="space my-2 list-decimal pl-6">
-                  <li>
-                    <b>Clone and configure</b> the repository
-                    <br />
-                    <Link
-                      href="https://github.com/pleszkowicz/hardhat-smart-contract"
-                      className="text-blue-600"
-                      target="_blank"
-                    >
-                      pleszkowicz/hardhat-smart-contract <OpenInNewWindowIcon className="inline" />
-                    </Link>{' '}
-                  </li>
-                  <li>
-                    <b>Set up environment variables</b> as described in the repository’s documentation. .
-                  </li>
-                  <li>
-                    <b>Start a local Hardhat node</b> and deploy the smart contract by following the instructions in the{' '}
-                    <Link
-                      href="https://github.com/pleszkowicz/web3-wallet-connect/blob/main/README.md"
-                      className="inline-block text-blue-600"
-                      target="_blank"
-                    >
-                      readme <OpenInNewWindowIcon className="inline" />.
-                    </Link>
-                  </li>
-                </ol>
-              </div>
+              <DialogDescription asChild>
+                <div className="mt-6 grid w-full gap-2">
+                  {connectors.length ? (
+                    connectors.map((connector) => (
+                      <WalletOption
+                        key={connector.id}
+                        connector={connector}
+                        onClick={onConnectorSelect}
+                        pending={isConnectionPending}
+                      />
+                    ))
+                  ) : (
+                    <div className="text-slate-700">
+                      <p>
+                        Unfortunately, I <b>coud not find any crypto wallet</b> enabled in your browser. Once you
+                        install, please try again.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </DialogDescription>
             </DialogContent>
           </Dialog>
-        </div>
+        ) : (
+          <Button asChild variant="default" size="xl" data-testid="launch-dashboard-button">
+            <Link href="/dashboard/tokens">
+              <Rocket className="mr-2" /> Launch Dashboard
+            </Link>
+          </Button>
+        )}
+      </div>
+
+      <div className="text-center">
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="link" className="text-gray-400 transition-colors duration-200 hover:text-white">
+              <Code className="mr-2 h-4 w-4" />
+              Local Setup Guide for Developers
+            </Button>
+          </DialogTrigger>
+          <DialogContent aria-describedby="dialog-content" className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Local Setup Guide for Developers</DialogTitle>
+            </DialogHeader>
+            <div className="text-slate-500">
+              <h3>To test all features locally, follow these steps:</h3>
+              <ol className="space my-2 list-decimal pl-6">
+                <li>
+                  <b>Clone and configure</b> the repository
+                  <br />
+                  <Link
+                    href="https://github.com/pleszkowicz/hardhat-smart-contract"
+                    className="text-blue-600"
+                    target="_blank"
+                  >
+                    pleszkowicz/hardhat-smart-contract <OpenInNewWindowIcon className="inline" />
+                  </Link>{' '}
+                </li>
+                <li>
+                  <b>Set up environment variables</b> as described in the repository’s documentation. .
+                </li>
+                <li>
+                  <b>Start a local Hardhat node</b> and deploy the smart contract by following the instructions in the{' '}
+                  <Link
+                    href="https://github.com/pleszkowicz/web3-wallet-connect/blob/main/README.md"
+                    className="inline-block text-blue-600"
+                    target="_blank"
+                  >
+                    readme <OpenInNewWindowIcon className="inline" />.
+                  </Link>
+                </li>
+              </ol>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </ContentLayout>
   );

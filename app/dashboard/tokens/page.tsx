@@ -1,4 +1,3 @@
-'use client';
 import { TokenBalance } from '@/components/wallet/TokenBalance';
 import { Token, tokens } from '@/const/tokens';
 

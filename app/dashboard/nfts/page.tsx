@@ -1,12 +1,10 @@
 'use client';
-import { NftList } from '@/components/nft/NftList';
-import { Loader } from '@/components/ui/loader';
-import { Suspense } from 'react';
+import dynamic from 'next/dynamic';
+
+const LazyNftList = dynamic(() => import('@/components/nft/NftList').then((module) => module.NftList), {
+  ssr: false,
+});
 
 export default function NftsPage() {
-  return (
-    <Suspense fallback={<Loader size="lg" />}>
-      <NftList />
-    </Suspense>
-  );
+  return <LazyNftList />;
 }
