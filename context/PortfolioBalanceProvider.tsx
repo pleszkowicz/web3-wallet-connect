@@ -28,7 +28,7 @@ const PortfolioBalanceContext = createContext<PortfolioContext>({
   refetchTokens: () => {},
 });
 
-export function usePortfolio() {
+export function usePortfolioBalance() {
   return useContext(PortfolioBalanceContext);
 }
 
