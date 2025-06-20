@@ -14,13 +14,13 @@ import { UNISWAP_V3_ROUTER_ABI } from '@/const/uniswap/uniswap-v3-router-abi';
 import { usePortfolio } from '@/context/PortfolioBalanceProvider';
 import { cn } from '@/lib/cn';
 import { CHAIN_TO_ADDRESSES_MAP } from '@uniswap/sdk-core';
-import { Field, Form, Formik } from 'formik';
+import { Field, Form, Formik, FormikHelpers } from 'formik';
 import { ArrowUpDown } from 'lucide-react';
 import Link from 'next/link';
 import { ChangeEvent, useState } from 'react';
 import { Address, formatUnits, Hash, parseEther, parseUnits } from 'viem';
 import { sepolia } from 'viem/chains';
-import { useAccount, useBalance, usePublicClient, useReadContract, useSimulateContract, useWriteContract } from 'wagmi';
+import { useAccount, useBalance, usePublicClient, useSimulateContract, useWriteContract } from 'wagmi';
 import { useSendCalls } from 'wagmi/experimental';
 import * as Yup from 'yup';
 
@@ -92,17 +92,9 @@ export function TokenExchange() {
   const tokenIn = tokenMap[tokenInSymbol];
   const tokenOut = tokenMap[tokenOutSymbol];
 
-  const { data: erc20Balance } = useReadContract({
-    address: isErc20(tokenIn) ? tokenIn.address : undefined,
-    abi: isErc20(tokenIn) ? tokenIn.abi : undefined,
-    functionName: 'balanceOf',
-    args: isErc20(tokenIn) ? [address] : undefined,
-    query: { enabled: !!amount && !!isErc20(tokenIn) && !!address },
-  });
-
   const { writeContractAsync, isPending: isWriteContractPending } = useWriteContract();
 
-  const tokenInBalance = (tokenIn === tokenMap.eth ? ethBalance?.value : (erc20Balance as bigint)) ?? 0n;
+  const tokenInBalance = (tokenIn === tokenMap.eth ? ethBalance?.value : balances.get(tokenIn.symbol)?.rawValue) ?? 0n;
 
   const validationSchema = Yup.object().shape({
     tokenIn: Yup.string()
@@ -211,6 +203,97 @@ export function TokenExchange() {
   // });
   // };
 
+  const onFormSubmit = async (values: typeof initialValues, { resetForm }: FormikHelpers<typeof initialValues>) => {
+    setDialogOpen(true);
+    setTxStatus('waiting-approve');
+
+    try {
+      let txHash: Hash;
+
+      if (isNativeToken(tokenIn) && tokenOut === tokenMap.weth) {
+        txHash = await writeContractAsync({
+          address: (tokenMap.weth as ERC20Token).address,
+          abi: (tokenMap.weth as ERC20Token).abi,
+          functionName: 'deposit',
+          args: [],
+          value: parseEther(amount), // Amount of WETH to deposit
+        });
+        setTxStatus('pending');
+      } else {
+        // const { capabilities, id } = await sendCallsAsync({
+        //   account: address as Address,
+        //   calls: [
+        //     {
+        //       address: tokenIn.address as Address,
+        //       abi: tokenIn.abi as Abi,
+        //       functionName: 'approve',
+        //       args: [swapRouterAddress, parseEther(values.value.toString())],
+        //     },
+        //     {
+        //       address: swapRouterAddress as Address,
+        //       abi: UNISWAP_V3_ROUTER_ABI,
+        //       functionName: 'exactInputSingle',
+        //       args: [
+        //         {
+        //           tokenIn: tokenIn.address as Address,
+        //           tokenOut: tokenOut.address as Address,
+        //           fee: poolFee.fee,
+        //           recipient: address as Address,
+        //           amountIn: parseUnits(amount, tokenIn.decimals),
+        //           amountOutMinimum, // Minimum amount of output tokens to receive
+        //           sqrtPriceLimitX96: BigInt(0), // No price limit
+        //         },
+        //       ],
+        //     },
+        //   ],
+        // });
+        // console.log(capabilities, id);
+        // txHash = id as Address;
+
+        // Approve
+        await writeContractAsync({
+          address: (tokenIn as ERC20Token).address,
+          abi: (tokenIn as ERC20Token).abi,
+          functionName: 'approve',
+          args: [swapRouterAddress, parseEther(values.value.toString())],
+        });
+
+        setTxStatus('pending');
+
+        // Swap
+        txHash = await writeContractAsync({
+          address: swapRouterAddress as Address,
+          abi: UNISWAP_V3_ROUTER_ABI,
+          functionName: 'exactInputSingle',
+          args: [
+            {
+              tokenIn: (tokenIn as ERC20Token).address,
+              tokenOut: (tokenOut as ERC20Token).address,
+              fee: poolFee.fee,
+              recipient: address!,
+              amountIn: parseUnits(amount, tokenIn.decimals),
+              amountOutMinimum, // Minimum amount of output tokens to receive
+              sqrtPriceLimitX96: 0n, // No price limit
+            },
+          ],
+        });
+      }
+
+      await client?.waitForTransactionReceipt({ hash: txHash });
+
+      setTxStatus('confirmed');
+      resetForm();
+    } catch (error) {
+      setDialogOpen(false);
+
+      if ((error as Error)?.message?.includes('User rejected the request')) {
+        return;
+      }
+      console.error('Error sending transaction:', error);
+      setTxStatus('error');
+    }
+  };
+
   return (
     <ContentLayout title="Swap" description="Exchange tokens instantly" goBackUrl="/dashboard/tokens">
       <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6 lg:px-8">
@@ -225,96 +308,7 @@ export function TokenExchange() {
               tokenOut: initialValues.tokenOut,
               value: initialValues.value,
             }}
-            onSubmit={async (values, { resetForm }) => {
-              setDialogOpen(true);
-              setTxStatus('waiting-approve');
-
-              try {
-                let txHash: Hash;
-
-                if (isNativeToken(tokenIn) && tokenOut === tokenMap.weth) {
-                  txHash = await writeContractAsync({
-                    address: (tokenMap.weth as ERC20Token).address,
-                    abi: (tokenMap.weth as ERC20Token).abi,
-                    functionName: 'deposit',
-                    args: [],
-                    value: parseEther(amount), // Amount of WETH to deposit
-                  });
-                  setTxStatus('pending');
-                } else {
-                  // const { capabilities, id } = await sendCallsAsync({
-                  //   account: address as Address,
-                  //   calls: [
-                  //     {
-                  //       address: tokenIn.address as Address,
-                  //       abi: tokenIn.abi as Abi,
-                  //       functionName: 'approve',
-                  //       args: [swapRouterAddress, parseEther(values.value.toString())],
-                  //     },
-                  //     {
-                  //       address: swapRouterAddress as Address,
-                  //       abi: UNISWAP_V3_ROUTER_ABI,
-                  //       functionName: 'exactInputSingle',
-                  //       args: [
-                  //         {
-                  //           tokenIn: tokenIn.address as Address,
-                  //           tokenOut: tokenOut.address as Address,
-                  //           fee: poolFee.fee,
-                  //           recipient: address as Address,
-                  //           amountIn: parseUnits(amount, tokenIn.decimals),
-                  //           amountOutMinimum, // Minimum amount of output tokens to receive
-                  //           sqrtPriceLimitX96: BigInt(0), // No price limit
-                  //         },
-                  //       ],
-                  //     },
-                  //   ],
-                  // });
-                  // console.log(capabilities, id);
-                  // txHash = id as Address;
-
-                  // Approve
-                  await writeContractAsync({
-                    address: (tokenIn as ERC20Token).address,
-                    abi: (tokenIn as ERC20Token).abi,
-                    functionName: 'approve',
-                    args: [swapRouterAddress, parseEther(values.value.toString())],
-                  });
-
-                  setTxStatus('pending');
-
-                  // Swap
-                  txHash = await writeContractAsync({
-                    address: swapRouterAddress as Address,
-                    abi: UNISWAP_V3_ROUTER_ABI,
-                    functionName: 'exactInputSingle',
-                    args: [
-                      {
-                        tokenIn: (tokenIn as ERC20Token).address,
-                        tokenOut: (tokenOut as ERC20Token).address,
-                        fee: poolFee.fee,
-                        recipient: address!,
-                        amountIn: parseUnits(amount, tokenIn.decimals),
-                        amountOutMinimum, // Minimum amount of output tokens to receive
-                        sqrtPriceLimitX96: 0n, // No price limit
-                      },
-                    ],
-                  });
-                }
-
-                await client?.waitForTransactionReceipt({ hash: txHash });
-
-                setTxStatus('confirmed');
-                resetForm();
-              } catch (error) {
-                setDialogOpen(false);
-
-                if ((error as Error)?.message?.includes('User rejected the request')) {
-                  return;
-                }
-                console.error('Error sending transaction:', error);
-                setTxStatus('error');
-              }
-            }}
+            onSubmit={onFormSubmit}
             validationSchema={validationSchema}
           >
             {({ setFieldValue, values, setFieldError, isValid: isFormValid }) => {
@@ -425,7 +419,9 @@ export function TokenExchange() {
                     </Button>
                   </div>
 
-                  <Label className="text-sm font-medium text-white">You Receive</Label>
+                  <Label htmlFor="tokenOut" className="text-sm font-medium text-white">
+                    You Receive
+                  </Label>
 
                   <ContentCard variant="light" className="pt-4">
                     <div className="flex items-center gap-1">
@@ -483,10 +479,10 @@ export function TokenExchange() {
                               key={option.fee}
                               variant="outline"
                               onClick={() => setPoolFee(option)}
-                              className={`flex h-auto flex-col items-center gap-1 p-3 transition-all duration-200 ${
+                              className={`flex h-auto cursor-pointer flex-col items-center gap-1 p-3 transition-all duration-200 hover:bg-gray-700 ${
                                 poolFee.fee === option.fee
                                   ? `border-2 ${option.color.replace('text-', 'border-')} bg-gray-700`
-                                  : 'border-gray-600 bg-gray-800 hover:bg-gray-700'
+                                  : 'border-gray-600 bg-gray-800'
                               }`}
                             >
                               <span className={`font-bold ${poolFee === option ? option.color : 'text-white'}`}>
