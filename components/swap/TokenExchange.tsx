@@ -11,7 +11,7 @@ import { Label } from '@/components/ui/label';
 import { ERC20Token, isErc20, isNativeToken, tokenMap, TokenMapKey, tokens } from '@/const/tokens';
 import { UNISWAP_V3_QUOTER_ABI } from '@/const/uniswap/uniswap-v3-quoter-abi';
 import { UNISWAP_V3_ROUTER_ABI } from '@/const/uniswap/uniswap-v3-router-abi';
-import { usePortfolio } from '@/context/PortfolioBalanceProvider';
+import { usePortfolioBalance } from '@/context/PortfolioBalanceProvider';
 import { cn } from '@/lib/cn';
 import { CHAIN_TO_ADDRESSES_MAP } from '@uniswap/sdk-core';
 import { Field, Form, Formik, FormikHelpers } from 'formik';
@@ -20,7 +20,7 @@ import Link from 'next/link';
 import { ChangeEvent, useState } from 'react';
 import { Address, formatUnits, Hash, parseEther, parseUnits } from 'viem';
 import { sepolia } from 'viem/chains';
-import { useAccount, useBalance, usePublicClient, useSimulateContract, useWriteContract } from 'wagmi';
+import { useAccount, usePublicClient, useSimulateContract, useWriteContract } from 'wagmi';
 import { useSendCalls } from 'wagmi/experimental';
 import * as Yup from 'yup';
 
@@ -81,8 +81,7 @@ export function TokenExchange() {
   const [amount, setAmount] = useState(initialValues.value);
   const [poolFee, setPoolFee] = useState<FeeOption>(poolFeeMap[3000]);
   const { address } = useAccount();
-  const { balances } = usePortfolio();
-  const { data: ethBalance } = useBalance({ address });
+  const { balances } = usePortfolioBalance();
   const { sendCallsAsync } = useSendCalls();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [txStatus, setTxStatus] = useState<TransactionStatus>('idle');
@@ -94,7 +93,7 @@ export function TokenExchange() {
 
   const { writeContractAsync, isPending: isWriteContractPending } = useWriteContract();
 
-  const tokenInBalance = (tokenIn === tokenMap.eth ? ethBalance?.value : balances.get(tokenIn.symbol)?.rawValue) ?? 0n;
+  const tokenInBalance = balances.get(tokenIn.symbol)?.rawValue ?? 0n;
 
   const validationSchema = Yup.object().shape({
     tokenIn: Yup.string()

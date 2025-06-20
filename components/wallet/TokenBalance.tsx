@@ -2,7 +2,7 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Token } from '@/const/tokens';
-import { usePortfolio } from '@/context/PortfolioBalanceProvider';
+import { usePortfolioBalance } from '@/context/PortfolioBalanceProvider';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -11,14 +11,14 @@ export interface WalletBalanceItemProps {
 }
 
 export const TokenBalance = ({ token }: WalletBalanceItemProps) => {
-  const { balances, error } = usePortfolio();
+  const { balances, error } = usePortfolioBalance();
   const tokenBalance = balances.get(token.symbol);
 
   return (
-    <Card className="border-gray-800 bg-gray-900 hover:border-gray-700 transition-all duration-200 group">
+    <Card className="group border-gray-800 bg-gray-900 transition-all duration-200 hover:border-gray-700">
       <CardContent className="p-6">
         <div className="grid grid-cols-3 items-center justify-between">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
+          <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:gap-4">
             <Image src={token.logo} width={40} height={40} alt={token.label} />
             {!error ? (
               <div>
@@ -39,7 +39,7 @@ export const TokenBalance = ({ token }: WalletBalanceItemProps) => {
               <p className="text-sm text-gray-500">{token.changeValue}</p>
             </div> */}
           </div>
-          <div className="flex flex-col sm:flex-row gap-4 justify-end text-right md:opacity-0 group-hover:opacity-100 transition-opacity duration-200 ml-4">
+          <div className="ml-4 flex flex-col justify-end gap-4 text-right transition-opacity duration-200 group-hover:opacity-100 sm:flex-row md:opacity-0">
             {token?.faucetUrl && (
               <Button asChild size="sm" variant="secondary">
                 <Link href={token.faucetUrl} target="_blank" rel="noopener noreferrer">

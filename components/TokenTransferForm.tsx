@@ -7,7 +7,7 @@ import { useToast } from '@/components/ui/hooks/use-toast';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ERC20Token, tokenMap, TokenMapKey, tokens } from '@/const/tokens';
-import { usePortfolio } from '@/context/PortfolioBalanceProvider';
+import { usePortfolioBalance } from '@/context/PortfolioBalanceProvider';
 import { Field, Form, Formik, FormikHelpers } from 'formik';
 import { useEffect, useState } from 'react';
 import { Address, encodeFunctionData, formatEther, formatUnits, isAddress, parseEther, parseUnits } from 'viem';
@@ -19,7 +19,7 @@ const initialValues = { unit: tokenMap.eth.symbol as TokenMapKey, to: '', value:
 export function TokenTransferForm() {
   const [selectedToken, setSelectedToken] = useState<TokenMapKey>(initialValues.unit);
   const { address, chain } = useAccount();
-  const { balances } = usePortfolio();
+  const { balances } = usePortfolioBalance();
   const { data: ethBalance } = useBalance({ address });
   const { sendTransactionAsync, isPending: isTransactionPending } = useSendTransaction();
   const { toast } = useToast();

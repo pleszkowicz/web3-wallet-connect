@@ -2,7 +2,7 @@
 import { ContentCard } from '@/components/ContentCard';
 import { ContentLayout } from '@/components/ContentLayout';
 import { Loader } from '@/components/ui/loader';
-import { usePortfolio } from '@/context/PortfolioBalanceProvider';
+import { usePortfolioBalance } from '@/context/PortfolioBalanceProvider';
 import { ImagePlusIcon, LucideIcon, RefreshCw, SendIcon } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -12,7 +12,7 @@ import { useConnect } from 'wagmi';
 export function WalletDashboard({ children }: PropsWithChildren) {
   const { connectors } = useConnect();
   const [ready, setReady] = useState<{ [key: string]: boolean }>({});
-  const { totalUsd, isLoading } = usePortfolio();
+  const { totalUsd, isLoading } = usePortfolioBalance();
 
   useEffect(() => {
     connectors.forEach(async (connector) => {
