@@ -29,7 +29,7 @@ const quoterAddress = CHAIN_TO_ADDRESSES_MAP[sepolia.id].quoterAddress;
 
 type FeeTier = 500 | 3000 | 10000;
 
-type FeeOption = {
+export type FeeOption = {
   fee: FeeTier;
   label: string;
   description: string;
@@ -37,7 +37,7 @@ type FeeOption = {
   color: string;
 };
 
-const poolFeeOptions: FeeOption[] = [
+export const poolFeeOptions: FeeOption[] = [
   {
     fee: 500,
     label: '0.05%',
@@ -61,7 +61,7 @@ const poolFeeOptions: FeeOption[] = [
   },
 ];
 
-const poolFeeMap: Record<FeeTier, FeeOption> = poolFeeOptions.reduce(
+export const poolFeeMap: Record<FeeTier, FeeOption> = poolFeeOptions.reduce(
   (acc, feeItem) => {
     acc[feeItem.fee] = feeItem;
     return acc;
