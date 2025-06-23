@@ -9,7 +9,7 @@ Leveraging [wagmi](https://wagmi.sh/react/getting-started), this project showcas
 The dApp allows users to:
 
 - **Connect wallets** and view balances.
-- **Swap tokens using Uniswap v3**: Seamlessly swap supported tokens directly in the dApp via Uniswap v3 integration, utilizing both the **Uniswap Quoter** (for real-time price quotes) and **Swap Router** (for executing swaps) contracts.
+- **Swap tokens using Uniswap v3**: Seamlessly swap supported tokens directly in the dApp via Uniswap v3 integration, utilizing both the **Uniswap Quoter** (for real-time price quotes) and **Swap Router** (for executing swaps) contracts. Swapper is orchestrated via state machine (XState).
 - **Manage NFTs lifecycle**:
   - Mint NFTs.
   - List NFTs for sale, edit prices, execute sales.
@@ -36,7 +36,7 @@ In order to get free ETH tokens on Sepolia testnet, you can use:
 
 ## 🛠 Tech Stack
 
-- **Frontend:** Next.js, Tailwind CSS, Shadcn UI
+- **Frontend:** Next.js, Tailwind CSS, Shadcn UI, [XState](https://stately.ai/docs/xstate)
 - **Blockchain:** wagmi, Alchemy provider
 - **Backend:** Prisma ORM, PostgreSQL (hosted on [Neon](https://neon.tech))
 - **Smart Contracts:** Solidity, Hardhat
