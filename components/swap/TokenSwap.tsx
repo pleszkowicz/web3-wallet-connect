@@ -204,8 +204,6 @@ export function TokenSwap() {
   });
 
   const [state, send] = useMachine(machineWithDeps);
-  console.log('state', state.context);
-  console.log('state', state);
 
   const { tokenIn, tokenOut, amount, fee, quote, error } = state.context;
 

@@ -1,6 +1,6 @@
 import { tokenMap, TokenMapKey } from "@/const/tokens";
 import { Hash } from "viem";
-import { assign, createMachine } from "xstate";
+import { AnyEventObject, assign, createMachine } from "xstate";
 
 export type FeeTier = 500 | 3000 | 10000;
 
@@ -131,13 +131,13 @@ export const swapMachine = createMachine(
         Number(context.amount) > 0,
     },
     actions: {
-      updateField: assign(({ context, event }: { context: SwapContext; event: SwapEvent }) => {
+      updateField: assign(({ context, event }: { context: SwapContext; event: AnyEventObject }) => {
         if (event.type === 'CHANGE') {
           return { ...context, [event.field]: event.value, dirty: true };
         }
         return context;
       }),
-      swapTokens: assign(({ context, event }: { context: SwapContext; event: SwapEvent }) => {
+      swapTokens: assign(({ context, event }: { context: SwapContext; event: AnyEventObject }) => {
         if (event.type === 'SWAP_TOKENS') {
           return { ...context, tokenIn: context.tokenOut, tokenOut: context.tokenIn, dirty: true, error: undefined };
         }
@@ -145,7 +145,7 @@ export const swapMachine = createMachine(
       }),
       setQuote: assign({
         dirty: () => false, // prevent unnecessary re-fetching
-        quote: ({ event }: { event: SwapEvent }) => {
+        quote: ({ event }: { event: AnyEventObject }) => {
           // actors have a specific event type for done events
           if (event.type === 'xstate.done.actor.fetchQuote') {
             return event.output;
@@ -154,7 +154,7 @@ export const swapMachine = createMachine(
         error: () => undefined,
       }),
       setError: assign({
-        error: ({ event }: { event: { error: { message?: string } } }) => {
+        error: ({ event }: { event: AnyEventObject }) => {
           return event.error.message;
         },
         dirty: () => false, // ← clear dirty on error too
