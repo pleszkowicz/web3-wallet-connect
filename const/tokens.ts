@@ -8,12 +8,14 @@ type NativeToken = {
   decimals: number;
   label: string;
   logo: string;
+  type: 'native';
   faucetUrl?: string;
 }
 
-export type ERC20Token = NativeToken & {
+export type ERC20Token = Omit<NativeToken, 'type'> & {
   abi: Abi;
   address: Address;
+  type: 'erc20';
 }
 
 export type Token = NativeToken | ERC20Token;
@@ -26,6 +28,7 @@ export const tokenMap: Record<Token['symbol'], Token> = {
     label: 'Sepolia ETH',
     decimals: 18,
     logo: '/images/tokens/eth.png',
+    type: 'native',
     faucetUrl: 'https://cloud.google.com/application/web3/faucet/ethereum/sepolia'
   },
   weth: {
@@ -35,6 +38,7 @@ export const tokenMap: Record<Token['symbol'], Token> = {
     decimals: 18,
     abi: WETH_ABI,
     logo: '/images/tokens/weth.png',
+    type: 'erc20',
   },
   link: {
     symbol: 'link',
@@ -43,6 +47,8 @@ export const tokenMap: Record<Token['symbol'], Token> = {
     decimals: 18,
     abi: LINK_TOKEN_ABI,
     logo: '/images/tokens/link.png',
+    type: 'erc20',
+    faucetUrl: 'https://faucets.chain.link/sepolia'
   },
   usdc: {
     symbol: 'usdc',
@@ -51,6 +57,7 @@ export const tokenMap: Record<Token['symbol'], Token> = {
     decimals: 6,
     abi: USDC_ABI,
     logo: '/images/tokens/usdc.png',
+    type: 'erc20',
   },
 };
 
@@ -60,4 +67,4 @@ export const erc20Tokens = tokens.filter((token) => token.symbol !== tokenMap.et
 
 export const isErc20 = (token: Token): token is ERC20Token => 'address' in token && 'abi' in token;
 
-export const isNativeToken = (token: Token): token is NativeToken => !('address' in token);
+export const isNativeToken = (tokenSymbol: TokenMapKey) => tokenMap[tokenSymbol].type === 'native';

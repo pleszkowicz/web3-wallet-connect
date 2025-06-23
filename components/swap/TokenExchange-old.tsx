@@ -130,12 +130,12 @@ export function TokenExchange() {
     },
   });
 
-  const slippageTolerance = 500n; // 5.0% (500 bps)
+  const SLIPPAGE_TOLERANCE = 500n; // 5.0% (500 bps)
   const SLIPPAGE_DENOMINATOR = 10000n;
 
   const expectedAmountOut = quoteExactInputSingle?.result?.[0] ?? 0n;
 
-  const amountOutMinimum = (expectedAmountOut * (SLIPPAGE_DENOMINATOR - slippageTolerance)) / SLIPPAGE_DENOMINATOR;
+  const amountOutMinimum = (expectedAmountOut * (SLIPPAGE_DENOMINATOR - SLIPPAGE_TOLERANCE)) / SLIPPAGE_DENOMINATOR;
 
   const isSubmitDisabled =
     tokenIn.symbol === tokenOut.symbol || !quoteExactInputSingle?.result?.[0] || isWriteContractPending;
@@ -209,7 +209,7 @@ export function TokenExchange() {
     try {
       let txHash: Hash;
 
-      if (isNativeToken(tokenIn) && tokenOut === tokenMap.weth) {
+      if (isNativeToken(tokenIn.symbol) && tokenOut === tokenMap.weth) {
         txHash = await writeContractAsync({
           address: (tokenMap.weth as ERC20Token).address,
           abi: (tokenMap.weth as ERC20Token).abi,
@@ -514,7 +514,7 @@ export function TokenExchange() {
                           <div className="flex items-center gap-1">
                             <span className="text-gray-400">Slippage Tolerance</span>
                           </div>
-                          <span className="text-white">{(Number(slippageTolerance) / 100).toFixed(2)}%</span>
+                          <span className="text-white">{(Number(SLIPPAGE_TOLERANCE) / 100).toFixed(2)}%</span>
                         </div>
                       </div>
                     </ContentCard>
@@ -580,7 +580,7 @@ const STATUSES = {
   },
 };
 
-const TransactionStatusDialog = ({ open, status, onClose, onNewSwap }: TransactionStatusDialogProps) => {
+export const TransactionStatusDialog = ({ open, status, onClose, onNewSwap }: TransactionStatusDialogProps) => {
   const current = STATUSES[status as keyof typeof STATUSES];
 
   return (

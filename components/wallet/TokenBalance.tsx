@@ -48,7 +48,7 @@ export const TokenBalance = ({ token }: WalletBalanceItemProps) => {
               </Button>
             )}
             <Button asChild size="sm" className="bg-orange-600 hover:bg-orange-700">
-              <Link href="/exchange">Trade</Link>
+              <Link href="/swap">Trade</Link>
             </Button>
           </div>
         </div>

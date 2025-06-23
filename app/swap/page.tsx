@@ -2,14 +2,14 @@ import { Loader } from '@/components/ui/loader';
 import { PortfolioBalanceProvider } from '@/context/PortfolioBalanceProvider';
 import dynamic from 'next/dynamic';
 
-const LazyTokenExchange = dynamic(() => import('@/components/swap/TokenExchange').then((mod) => mod.TokenExchange), {
+const LazyTokenSwap = dynamic(() => import('@/components/swap/TokenSwap').then((mod) => mod.TokenSwap), {
   loading: () => <Loader size="lg" />,
 });
 
-export default function ExchangePage() {
+export default function TokenSwapPage() {
   return (
     <PortfolioBalanceProvider>
-      <LazyTokenExchange />
+      <LazyTokenSwap />
     </PortfolioBalanceProvider>
   );
 }

@@ -48,18 +48,18 @@ export function WalletDashboard({ children }: PropsWithChildren) {
 
           <div className="grid grid-cols-3 justify-items-center gap-4">
             <ActionLink
+              bgColor="from-blue-500 to-cyan-500"
+              href="/swap"
+              text="Swap"
+              Icon={RefreshCw}
+              testId="swap-button"
+            />
+            <ActionLink
               bgColor="from-orange-500 to-pink-500"
               href="/nft/create"
               text="Mint NFT"
               Icon={ImagePlusIcon}
               testId="mint-nft-button"
-            />
-            <ActionLink
-              bgColor="from-blue-500 to-cyan-500"
-              href="/exchange"
-              text="Swap"
-              Icon={RefreshCw}
-              testId="swap-button"
             />
             <ActionLink
               bgColor="from-green-500 to-emerald-500"
