@@ -10,9 +10,9 @@ export interface SwapContext {
   amount: string;
   fee: FeeTier;
   quote?: bigint;
-  error?: string;
-  txHash?: Hash;
-  dirty: boolean; // prevents unnecessary re-fetching of quotes
+  fieldError?: Partial<Record<keyof Pick<SwapContext, 'tokenIn' | 'tokenOut' | 'amount' | 'fee'>, string>>;
+  submitError?: string;
+  dirty: boolean; // helper to prevent unnecessary re-fetching of quotes
 }
 
 export type SwapEvent =
@@ -21,8 +21,6 @@ export type SwapEvent =
   | { type: 'SWAP_TOKENS'; field: 'tokenIn' | 'tokenOut'; value: string }
   | { type: 'EXECUTE_SWAP'; }
   | { type: 'AWAIT_CONFIRMATION'; }
-  | { type: 'AWAIT_CONFIRMATION.DONE'; txHash: string }
-  | { type: 'AWAIT_CONFIRMATION.ERROR'; data: unknown }
   | { type: 'RESET' };
 
 const initialContext = {
@@ -31,9 +29,9 @@ const initialContext = {
   amount: '',
   fee: 3000,
   quote: undefined,
-  error: undefined,
+  fieldError: undefined,
+  submitError: undefined,
   dirty: false,
-  txHash: undefined,
 } as SwapContext
 
 export const swapMachine = createMachine(
@@ -44,8 +42,8 @@ export const swapMachine = createMachine(
     states: {
       idle: {
         on: {
-          CHANGE: { actions: ['clearQuote', 'updateField',] },
-          SWAP_TOKENS: { actions: ['clearQuote', 'swapTokens',] },
+          CHANGE: { actions: ['clearQuote', 'updateField', 'validateField'] },
+          SWAP_TOKENS: { actions: ['clearQuote', 'swapTokens', 'validateField'] },
           EXECUTE_SWAP: 'submitting',
           AWAIT_CONFIRMATION: 'awaitingBlockchainConfirmation',
           RESET: { target: 'idle', actions: 'resetContext' },
@@ -66,7 +64,7 @@ export const swapMachine = createMachine(
           },
           onError: {
             target: 'idle',
-            actions: 'setError',
+            actions: 'setSubmitError',
           },
         },
       },
@@ -78,10 +76,22 @@ export const swapMachine = createMachine(
           onDone: {
             target: 'awaitingBlockchainConfirmation',
           },
-          onError: {
+          onError: [{
+            // user rejected the request
+            guard: ({ event }) => {
+              if ((event?.error as Error)?.message?.includes('User rejected the request')) {
+                return true;
+              }
+              return false;
+            },
             target: 'idle',
-            actions: 'setError',
-          },
+            actions: [
+              'clearSubmitError'
+            ]
+          }, {
+            target: 'submittingError',
+            actions: 'setSubmitError',
+          }],
         },
       },
       awaitingBlockchainConfirmation: {
@@ -89,16 +99,28 @@ export const swapMachine = createMachine(
           id: 'await-blockchain-confirmation',
           src: 'awaitBlockchainConfirmation',
           input: ({ event }) => ({
-            txHash: event.output as Hash,
+            txHash: event.output! as Hash,
           }),
           onDone: {
             actions: 'resetContext',
             target: 'confirmed',
           },
-          onError: {
+          onError: [{
+            // user rejected the request
+            guard: ({ event }) => {
+              if ((event?.error as Error)?.message?.includes('User rejected the request')) {
+                return true;
+              }
+              return false;
+            },
             target: 'idle',
-            actions: 'setError',
-          },
+            actions: [
+              'clearSubmitError'
+            ]
+          }, {
+            target: 'submittingError',
+            actions: 'setSubmitError',
+          }],
         },
       },
       confirmed: {
@@ -108,17 +130,9 @@ export const swapMachine = createMachine(
       },
       submittingError: {
         on: {
-          'AWAIT_CONFIRMATION.ERROR': {
-            target: 'idle',
-            actions: 'setError',
-          },
-        },
-      },
-      error: {
-        on: {
-          RESET: { target: 'idle', actions: 'resetContext' }
-        },
-      },
+          RESET: { target: 'idle', actions: 'resetContext' },
+        }
+      }
     },
   },
   {
@@ -131,15 +145,16 @@ export const swapMachine = createMachine(
         Number(context.amount) > 0,
     },
     actions: {
-      updateField: assign(({ context, event }: { context: SwapContext; event: AnyEventObject }) => {
+      updateField: assign(({ context, event }: { context: SwapContext; event: AnyEventObject }): SwapContext => {
         if (event.type === 'CHANGE') {
           return { ...context, [event.field]: event.value, dirty: true };
         }
         return context;
       }),
-      swapTokens: assign(({ context, event }: { context: SwapContext; event: AnyEventObject }) => {
+
+      swapTokens: assign(({ context, event }: { context: SwapContext; event: AnyEventObject }): SwapContext => {
         if (event.type === 'SWAP_TOKENS') {
-          return { ...context, tokenIn: context.tokenOut, tokenOut: context.tokenIn, dirty: true, error: undefined };
+          return { ...context, tokenIn: context.tokenOut, tokenOut: context.tokenIn, dirty: true, submitError: undefined };
         }
         return context;
       }),
@@ -151,19 +166,22 @@ export const swapMachine = createMachine(
             return event.output;
           }
         },
-        error: () => undefined,
       }),
-      setError: assign({
-        error: ({ event }: { event: AnyEventObject }) => {
-          return event.error.message;
-        },
-        dirty: () => false, // ← clear dirty on error too
-      }),
-      clearQuote: assign(({ context }: { context: SwapContext }) => ({
+      clearQuote: assign(({ context }: { context: SwapContext }): SwapContext => ({
         ...context,
         quote: undefined,
-        error: undefined,
-        dirty: true,
+        submitError: undefined,
+        dirty: false,
+      })),
+      setSubmitError: assign({
+        submitError: ({ event }: { event: AnyEventObject }) => {
+          return event?.error?.message || 'An error occurred while processing your request.';
+        },
+        dirty: () => false,
+      }),
+      clearSubmitError: assign(({ context }: { context: SwapContext }): SwapContext => ({
+        ...context,
+        submitError: undefined,
       })),
       resetContext: assign(() => (initialContext)),
     },

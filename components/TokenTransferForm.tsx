@@ -2,7 +2,7 @@
 import { ContentCard } from '@/components/ContentCard';
 import { Button } from '@/components/ui/button';
 import { FormError } from '@/components/ui/form/FormError';
-import { TokenSelect } from '@/components/ui/form/TokenSelect';
+import { TokenSelectOld } from '@/components/ui/form/TokenSelect-old';
 import { useToast } from '@/components/ui/hooks/use-toast';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -185,7 +185,7 @@ export function TokenTransferForm() {
                     <FormError name="value" className="absolute -bottom-6" />
 
                     <div className="flex items-center">
-                      <TokenSelect
+                      <TokenSelectOld
                         className="overflow-hidden rounded-full border-none bg-white p-6 pr-4 pl-3 text-gray-950 focus:ring-0"
                         name="unit"
                         tokens={tokens}

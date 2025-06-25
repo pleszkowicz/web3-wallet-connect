@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { FormError } from '@/components/ui/form/FormError';
-import { TokenSelect } from '@/components/ui/form/TokenSelect';
+import { TokenSelectOld } from '@/components/ui/form/TokenSelect-old';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ERC20Token, isErc20, isNativeToken, tokenMap, TokenMapKey, tokens } from '@/const/tokens';
@@ -394,7 +394,7 @@ export function TokenExchange() {
                       <FormError name="value" className="absolute -bottom-6" />
 
                       <div className="flex items-center">
-                        <TokenSelect
+                        <TokenSelectOld
                           name="tokenIn"
                           tokens={tokens}
                           onChange={(tokenSymbol: TokenMapKey) => {
@@ -435,7 +435,7 @@ export function TokenExchange() {
                       </div>
 
                       <div className="flex items-center">
-                        <TokenSelect
+                        <TokenSelectOld
                           name="tokenOut"
                           tokens={tokens}
                           onChange={(tokenSymbol: TokenMapKey) => {

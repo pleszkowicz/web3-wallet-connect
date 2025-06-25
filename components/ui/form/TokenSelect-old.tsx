@@ -1,7 +1,9 @@
+import { FormError } from '@/components/ui/form/FormError';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Token, TokenMapKey } from '@/const/tokens';
 import { cn } from '@/lib/cn';
+import { useFormikContext } from 'formik';
 import Image from 'next/image';
 
 type CryptoSelectProps = {
@@ -10,16 +12,19 @@ type CryptoSelectProps = {
   name: string;
   onChange: (value: TokenMapKey) => void;
   tokens: Token[];
-  value: TokenMapKey;
 };
 
-export const TokenSelect2 = ({ label, name, onChange, tokens, className, value }: CryptoSelectProps) => {
+export const TokenSelectOld = ({ label, name, onChange, tokens, className }: CryptoSelectProps) => {
+  const { setFieldValue, values } = useFormikContext<Record<string, string>>();
+  const selectedValue = values[name] as TokenMapKey;
+
   return (
     <>
       {label && <Label htmlFor={name}>{label}</Label>}
       <Select
-        value={value}
+        value={selectedValue}
         onValueChange={(value) => {
+          setFieldValue(name, value);
           onChange(value as TokenMapKey);
         }}
       >
@@ -52,7 +57,7 @@ export const TokenSelect2 = ({ label, name, onChange, tokens, className, value }
           })}
         </SelectContent>
       </Select>
-      {/* <FormError name={name} /> */}
+      <FormError name={name} />
     </>
   );
 };

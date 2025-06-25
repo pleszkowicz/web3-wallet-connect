@@ -4,8 +4,15 @@ import { ContentLayout } from '@/components/ContentLayout';
 import { FeeTier, SwapContext, swapMachine } from '@/components/swap/machines/swap-machine';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { TokenSelect2 } from '@/components/ui/form/TokenSelect2';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { TokenSelect } from '@/components/ui/form/TokenSelect';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Loader } from '@/components/ui/loader';
@@ -16,21 +23,14 @@ import { usePortfolioBalance } from '@/context/PortfolioBalanceProvider';
 import { cn } from '@/lib/cn';
 import { CHAIN_TO_ADDRESSES_MAP } from '@uniswap/sdk-core';
 import { useMachine } from '@xstate/react';
-import { ArrowUpDown } from 'lucide-react';
+import { ArrowUpDown, Check } from 'lucide-react';
 import Link from 'next/link';
-import { ReactNode } from 'react';
 import { Address, formatUnits, Hash, parseEther, parseUnits } from 'viem';
 import { sepolia } from 'viem/chains';
-import type { UseWriteContractReturnType } from 'wagmi';
-import { useAccount, usePublicClient, UsePublicClientReturnType, useWriteContract } from 'wagmi';
-import { fromPromise } from 'xstate';
+import { useAccount, usePublicClient, useWriteContract } from 'wagmi';
+import { assign, fromPromise } from 'xstate';
 
 const { swapRouter02Address, quoterAddress } = CHAIN_TO_ADDRESSES_MAP[sepolia.id];
-
-export interface SwapSystem {
-  publicClient: UsePublicClientReturnType;
-  writeContractAsync: UseWriteContractReturnType['writeContractAsync'];
-}
 
 export type FeeOption = {
   fee: FeeTier;
@@ -82,25 +82,23 @@ export function TokenSwap() {
   const { writeContractAsync } = useWriteContract();
   const { address } = useAccount();
 
-  const fetchQuoteActor = fromPromise<bigint, { tokenIn: TokenMapKey; tokenOut: Address; amount: string; fee: number }>(
-    async ({ input }) => {
-      const res = await publicClient?.simulateContract({
-        address: quoterAddress as Address,
-        abi: UNISWAP_V3_QUOTER_ABI,
-        functionName: 'quoteExactInputSingle',
-        args: [
-          {
-            tokenIn: (tokenMap[input.tokenIn] as ERC20Token).address,
-            tokenOut: (tokenMap[input.tokenOut] as ERC20Token).address,
-            amountIn: parseUnits(input.amount, tokenMap[input.tokenIn].decimals),
-            fee: input.fee,
-            sqrtPriceLimitX96: BigInt(0),
-          },
-        ],
-      });
-      return res?.result[0] as bigint;
-    }
-  );
+  const fetchQuoteActor = fromPromise<bigint, SwapContext>(async ({ input }) => {
+    const res = await publicClient?.simulateContract({
+      address: quoterAddress as Address,
+      abi: UNISWAP_V3_QUOTER_ABI,
+      functionName: 'quoteExactInputSingle',
+      args: [
+        {
+          tokenIn: (tokenMap[input.tokenIn] as ERC20Token).address,
+          tokenOut: (tokenMap[input.tokenOut] as ERC20Token).address,
+          amountIn: parseUnits(input.amount, tokenMap[input.tokenIn].decimals),
+          fee: input.fee,
+          sqrtPriceLimitX96: BigInt(0),
+        },
+      ],
+    });
+    return res?.result[0] as bigint;
+  });
 
   const submitSwapActor = fromPromise<Hash, SwapContext>(async ({ input }) => {
     let txHash: Hash;
@@ -115,6 +113,8 @@ export function TokenSwap() {
           value: parseEther(input.amount), // Amount of WETH to deposit
         });
       } else {
+        // Test multicall
+
         // const { capabilities, id } = await sendCallsAsync({
         //   account: address as Address,
         //   calls: [
@@ -170,53 +170,78 @@ export function TokenSwap() {
             },
           ],
         });
-        // send({ type: 'AWAIT_CONFIRMATION', txHash });
       }
 
       return txHash;
     } catch (error) {
       console.error('Error submitting swap:', error);
-      send({ type: 'xstate.error.actor.submitSwap', data: (error as Error).message });
-      throw error;
+      throw error || new Error('Failed to submit swap transaction');
     }
 
     // send({ type: 'xstate.done.actor.submitSwap' });
   });
 
-  const awaitConfirmationActor = fromPromise<void, Pick<SwapContext, 'txHash'>>(async ({ input }) => {
+  const awaitBlockchainConfirmationActor = fromPromise<void, { txHash: Hash }>(async ({ input }) => {
     try {
       if (input.txHash) {
-        await publicClient?.waitForTransactionReceipt({ hash: input.txHash });
+        const receipt = await publicClient?.waitForTransactionReceipt({ hash: input.txHash });
+
+        if (receipt?.status === 'success') {
+          return;
+        }
+
+        if (receipt?.status === 'reverted') {
+          throw new Error('Transaction reverted');
+        }
+        throw new Error('Transaction failed');
       }
-      send({ type: 'AWAIT_CONFIRMATION.DONE' });
+      return;
     } catch (error) {
-      console.error('Error waiting for confirmation:', error);
-      send({ type: 'AWAIT_CONFIRMATION.ERROR', error: (error as Error).message });
+      console.error('Tx error:', error);
+      throw error || new Error('Failed to wait for transaction confirmation');
     }
   });
 
   const machineWithDeps = swapMachine.provide({
+    actions: {
+      validateField: assign(({ context }: { context: SwapContext }) => {
+        let errorMessage: string | undefined;
+        const { amount, tokenIn } = context;
+        const typedAmount = Number(amount);
+        const tokenInBalance = balances.get(tokenIn)?.formattedValue ?? 0n;
+
+        if (typedAmount <= 0) {
+          errorMessage = 'Amount must be greater than 0';
+        } else if (typedAmount > tokenInBalance) {
+          errorMessage = 'Insufficient balance';
+        }
+        if (errorMessage) {
+          return { ...context, fieldError: { amount: errorMessage } };
+        }
+        return { ...context, fieldError: undefined };
+      }),
+    },
     actors: {
       fetchQuote: fetchQuoteActor,
-      awaitBlockchainConfirmation: awaitConfirmationActor,
+      awaitBlockchainConfirmation: awaitBlockchainConfirmationActor,
       submitSwap: submitSwapActor,
     },
   });
 
   const [state, send] = useMachine(machineWithDeps);
 
-  const { tokenIn, tokenOut, amount, fee, quote, error } = state.context;
+  const { tokenIn, tokenOut, amount, fee, quote } = state.context;
 
-  const extecpedAmountOut = quote ? Number(formatUnits(quote, tokenMap[tokenOut].decimals)) : 0;
+  const expectedAmountOut = quote ? Number(formatUnits(quote, tokenMap[tokenOut].decimals)) : 0;
 
-  const amountOutMinimum = (quote ?? 0n * (SLIPPAGE_DENOMINATOR - SLIPPAGE_TOLERANCE)) / SLIPPAGE_DENOMINATOR;
+  const amountOutMinimum = ((quote ?? 0n) * (SLIPPAGE_DENOMINATOR - SLIPPAGE_TOLERANCE)) / SLIPPAGE_DENOMINATOR;
 
   let formattedExchangeRate = '—';
 
-  if (extecpedAmountOut <= 0) {
+  if (expectedAmountOut <= 0) {
     formattedExchangeRate = 'No liquidity';
   } else {
-    const rate = extecpedAmountOut / Number(amount);
+    const rate = expectedAmountOut / Number(amount);
 
     if (!isFinite(rate) || isNaN(rate) || rate <= 0) {
       formattedExchangeRate = 'No liquidity';
@@ -261,10 +286,14 @@ export function TokenSwap() {
                   </div>
                 </div>
 
-                {/* <FormError name="value" className="absolute -bottom-6" /> */}
+                <p className="absolute -bottom-6">
+                  {state.context.fieldError?.amount && (
+                    <span className="text-sm text-yellow-300">{state.context.fieldError.amount}</span>
+                  )}
+                </p>
 
                 <div className="flex items-center">
-                  <TokenSelect2
+                  <TokenSelect
                     name="tokenIn"
                     value={tokenIn}
                     tokens={tokens}
@@ -299,14 +328,14 @@ export function TokenSwap() {
                     <Loader iconOnly size="sm" />
                   ) : // <span className="animate-pulse text-xs">Fetching quote</span>
                   quote && amount ? (
-                    extecpedAmountOut
+                    expectedAmountOut
                   ) : (
                     '0'
                   )}
                 </div>
 
                 <div className="flex items-center">
-                  <TokenSelect2
+                  <TokenSelect
                     name="tokenOut"
                     value={tokenOut}
                     tokens={tokens}
@@ -406,82 +435,96 @@ export function TokenSwap() {
 
       <TransactionStatusDialog
         open={Object.keys(TRANSACTION_STATUSES).includes(state.value as string)}
+        errorMessage={state.context.submitError}
         status={state.value as TransactionStatus}
         onClose={() => {
           send({ type: 'RESET' });
-          // setDialogOpen(false);
-          // setTxStatus('idle');
         }}
         onNewSwap={() => {
           send({ type: 'RESET' });
-
-          // setDialogOpen(false);
-          // setTxStatus('idle');
         }}
       />
     </ContentLayout>
   );
 }
 
-const TRANSACTION_STATUSES: Record<string, { title: ReactNode; icon: ReactNode; message?: string }> = {
+const TRANSACTION_STATUSES = {
   submitting: {
     title: 'Awaiting wallet confirmation',
-    icon: <span className="mb-2 h-8 w-8 animate-spin rounded-full border-b-2 border-indigo-400" />,
+    icon: <Loader />,
     message: 'Please confirm the transaction in your wallet.',
   },
   awaitingBlockchainConfirmation: {
     title: 'Transaction Pending',
-    icon: <span className="mb-2 h-8 w-8 animate-spin rounded-full border-b-2 border-indigo-400" />,
+    icon: <Loader />,
     message: 'Waiting for confirmation on the blockchain...',
   },
   confirmed: {
-    title: <span className="flex items-center">Swap Confirmed</span>,
-    icon: undefined,
-    message: undefined,
+    title: 'Congratulations - Swap Confirmed',
+    // confetti like lucide react icon
+    icon: <Check className="text-3xl text-green-400" />,
+    message: (
+      <>
+        Your swap was successful! <br />
+        You can view it in your{' '}
+        <Link className="font-semibold text-blue-500" href="/dashboard/transactions">
+          transaction history
+        </Link>
+        .
+      </>
+    ),
   },
   submittingError: {
     title: 'Transaction Failed',
     icon: <span className="text-3xl text-red-400">✗</span>,
     message: 'Transaction failed. Please try again.',
   },
-};
+} as const;
 
 type TransactionStatus = keyof typeof TRANSACTION_STATUSES;
 
 type TransactionStatusDialogProps = {
   open: boolean;
+  errorMessage?: string;
   status: TransactionStatus;
   onClose: () => void;
   onNewSwap?: () => void;
 };
 
-export const TransactionStatusDialog = ({ open, status, onClose, onNewSwap }: TransactionStatusDialogProps) => {
+export const TransactionStatusDialog = ({
+  open,
+  errorMessage,
+  status,
+  onClose,
+  onNewSwap,
+}: TransactionStatusDialogProps) => {
   const current = TRANSACTION_STATUSES[status];
+  const message = status === 'submittingError' ? errorMessage : current?.message;
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent aria-describedby="dialog-content" className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>{current?.title || 'Swap'}</DialogTitle>
+          <DialogTitle className="flex justify-center">{current?.title || 'Swap'}</DialogTitle>
         </DialogHeader>
-        {current && (
-          <div className="flex flex-col items-center gap-2 py-4">
+        <DialogDescription className="flex flex-col items-center gap-2 py-4">
+          <>
             {current?.icon}
-            <p className="text-center text-gray-400">{current.message}</p>
-          </div>
-        )}
+            <span className="text-center text-gray-400">{message}</span>
+          </>
+        </DialogDescription>
         <DialogFooter>
           {status === 'confirmed' && (
             <>
               <Button asChild variant="outline">
-                <Link href="/dashboard/tokens">Go to Dashboard</Link>
+                <Link href="/dashboard/tokens">Go back to Dashboard</Link>
               </Button>
-              <Button variant="secondary" onClick={onNewSwap}>
+              <Button variant="default" onClick={onNewSwap}>
                 New Swap
               </Button>
             </>
           )}
-          {status === 'error' && (
+          {status === 'submittingError' && (
             <Button variant="outline" onClick={onClose}>
               Close
             </Button>

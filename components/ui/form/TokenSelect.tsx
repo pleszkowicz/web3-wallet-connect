@@ -1,9 +1,7 @@
-import { FormError } from '@/components/ui/form/FormError';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Token, TokenMapKey } from '@/const/tokens';
 import { cn } from '@/lib/cn';
-import { useFormikContext } from 'formik';
 import Image from 'next/image';
 
 type CryptoSelectProps = {
@@ -12,19 +10,16 @@ type CryptoSelectProps = {
   name: string;
   onChange: (value: TokenMapKey) => void;
   tokens: Token[];
+  value: TokenMapKey;
 };
 
-export const TokenSelect = ({ label, name, onChange, tokens, className }: CryptoSelectProps) => {
-  const { setFieldValue, values } = useFormikContext<Record<string, string>>();
-  const selectedValue = values[name] as TokenMapKey;
-
+export const TokenSelect = ({ label, name, onChange, tokens, className, value }: CryptoSelectProps) => {
   return (
     <>
       {label && <Label htmlFor={name}>{label}</Label>}
       <Select
-        value={selectedValue}
+        value={value}
         onValueChange={(value) => {
-          setFieldValue(name, value);
           onChange(value as TokenMapKey);
         }}
       >
@@ -32,7 +27,7 @@ export const TokenSelect = ({ label, name, onChange, tokens, className }: Crypto
           id={name}
           className={cn(
             className,
-            'rounded-full p-5 pl-3 pr-4 bg-gray-700 border-gray-600 text-white hover:bg-gray-600 focus:ring-0 overflow-hidden'
+            'overflow-hidden rounded-full border-gray-600 bg-gray-700 p-5 pr-4 pl-3 text-white hover:bg-gray-600 focus:ring-0'
           )}
         >
           <SelectValue placeholder="Select token" />
@@ -57,7 +52,7 @@ export const TokenSelect = ({ label, name, onChange, tokens, className }: Crypto
           })}
         </SelectContent>
       </Select>
-      <FormError name={name} />
+      {/* <FormError name={name} /> */}
     </>
   );
 };
