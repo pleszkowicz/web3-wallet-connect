@@ -1,7 +1,7 @@
 'use client';
 import { ContentCard } from '@/components/ContentCard';
 import { ContentLayout } from '@/components/ContentLayout';
-import { FeeTier, SwapContext, swapMachine } from '@/components/swap/machines/swap-machine';
+import { createSwapMachine, FeeTier, SwapContext } from '@/components/swap/machines/swap-machine';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -177,8 +177,6 @@ export function TokenSwap() {
       console.error('Error submitting swap:', error);
       throw error || new Error('Failed to submit swap transaction');
     }
-
-    // send({ type: 'xstate.done.actor.submitSwap' });
   });
 
   const awaitBlockchainConfirmationActor = fromPromise<void, { txHash: Hash }>(async ({ input }) => {
@@ -202,7 +200,7 @@ export function TokenSwap() {
     }
   });
 
-  const machineWithDeps = swapMachine.provide({
+  const machineWithDeps = createSwapMachine({
     actions: {
       validateField: assign(({ context }: { context: SwapContext }) => {
         let errorMessage: string | undefined;
@@ -423,7 +421,7 @@ export function TokenSwap() {
                 type="submit"
                 className="mt-4"
                 size="xl"
-                onClick={() => send({ type: 'EXECUTE_SWAP', recipient: address })}
+                onClick={() => send({ type: 'EXECUTE_SWAP' })}
                 disabled={state.matches('submitting') || quote === undefined}
               >
                 Swap
