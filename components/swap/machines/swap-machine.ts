@@ -213,7 +213,7 @@ type CreateSwapMachineTypes = {
     awaitBlockchainConfirmation: AwaitConfirmationLogic
   }
   actions: {
-    validateField: (args: { context: SwapContext; event: AnyEventObject }) => SwapContext;
+    validateField: (args: { context: SwapContext }) => SwapContext;
   }
 }
 
