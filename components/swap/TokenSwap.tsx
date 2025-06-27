@@ -201,6 +201,12 @@ export function TokenSwap() {
   });
 
   const machineWithDeps = createSwapMachine({
+    actors: {
+      fetchQuote: fetchQuoteActor,
+      awaitBlockchainConfirmation: awaitBlockchainConfirmationActor,
+      submitSwap: submitSwapActor,
+    },
+  }).provide({
     actions: {
       validateField: assign(({ context }: { context: SwapContext }) => {
         let errorMessage: string | undefined;
@@ -218,11 +224,6 @@ export function TokenSwap() {
         }
         return { ...context, fieldError: undefined };
       }),
-    },
-    actors: {
-      fetchQuote: fetchQuoteActor,
-      awaitBlockchainConfirmation: awaitBlockchainConfirmationActor,
-      submitSwap: submitSwapActor,
     },
   });
 

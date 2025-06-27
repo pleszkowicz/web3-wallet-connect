@@ -1,6 +1,6 @@
 import { tokenMap, TokenMapKey } from "@/const/tokens";
 import { Hash } from "viem";
-import { ActorLogic, UnknownActorLogic, AnyEventObject, assign, createMachine, PromiseActorLogic, setup, MachineTypes, fromPromise, AssignAction, EventObject, Actor, ProvidedActor } from "xstate";
+import { ActorLogic, UnknownActorLogic, AnyEventObject, assign, createMachine, PromiseActorLogic, setup, MachineTypes, fromPromise, AssignAction, EventObject, Actor, ProvidedActor, ActionFunction, NonReducibleUnknown } from "xstate";
 
 export type FeeTier = 500 | 3000 | 10000;
 
@@ -206,21 +206,16 @@ const swapMachine = setup({
   },
 );
 
-type ValidateFieldAction = ReturnType<typeof assign<SwapContext, SwapEvent>>;
-
 type CreateSwapMachineTypes = {
   actors: {
     fetchQuote: FetchQuoteLogic
     submitSwap: SubmitSwapLogic
     awaitBlockchainConfirmation: AwaitConfirmationLogic
   }
-  actions: {
-    validateField: ValidateFieldAction
-  }
 }
 
 // Enforce devs to provide necessary dependencies
-export function createSwapMachine({ actors, actions }: CreateSwapMachineTypes) {
-  return swapMachine.provide({ actors, actions })
+export function createSwapMachine({ actors }: CreateSwapMachineTypes) {
+  return swapMachine.provide({ actors })
 }
 
