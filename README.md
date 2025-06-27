@@ -1,6 +1,12 @@
 # Web3 Wallet Connect
 
-A [Next.js](https://nextjs.org) decentralized application (**dApp**) built to interact with **EVM-compatible blockchains**. Demonstrates advanced skills in **wallet integration**, **smart contracts**, and **blockchain interactions** using modern, efficient technologies.
+A [Next.js](https://nextjs.org) decentralized application (**dApp**) built to interact with **EVM-compatible blockchains**. Demonstrates advanced skills in:
+
+- **wallet integration**
+- **smart contracts**
+- **blockchain interactions**
+- **token swaps**
+- **NFT management**
 
 Leveraging [wagmi](https://wagmi.sh/react/getting-started), this project showcases expertise in frontend blockchain development and the Ethereum Virtual Machine (**EVM**) ecosystem integration.
 
