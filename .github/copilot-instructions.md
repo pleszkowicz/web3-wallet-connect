@@ -46,7 +46,6 @@ globs: **/*.tsx, **/*.ts, src/**/*.ts, src/**/*.tsx
 
 ## Forms and Validation
 
-- Use Zod for form validation
 - Implement proper server-side validation
 - Handle form errors appropriately
 - Show loading states during form submission
