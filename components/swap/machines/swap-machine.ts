@@ -1,6 +1,6 @@
 import { tokenMap, TokenMapKey } from "@/const/tokens";
 import { Hash } from "viem";
-import { ActorLogic, UnknownActorLogic, AnyEventObject, assign, createMachine, PromiseActorLogic, setup, MachineTypes, fromPromise, AssignAction, EventObject, Actor, ProvidedActor, ActionFunction, NonReducibleUnknown } from "xstate";
+import { AnyEventObject, assign, PromiseActorLogic, setup } from "xstate";
 
 export type FeeTier = 500 | 3000 | 10000;
 
@@ -38,7 +38,7 @@ type FetchQuoteLogic = PromiseActorLogic<bigint, SwapContext>
 type SubmitSwapLogic = PromiseActorLogic<Hash, SwapContext>
 type AwaitConfirmationLogic = PromiseActorLogic<void, { txHash: Hash }>
 
-const swapMachine = setup({
+export const swapMachine = setup({
   types: {
     context: {} as SwapContext,
     events: {} as SwapEvent,
@@ -59,7 +59,7 @@ const swapMachine = setup({
     }),
     setQuote: assign({
       dirty: false, // prevent unnecessary re-fetching
-      quote: ({ event }: { event: AnyEventObject }) => {
+      quote: ({ event }) => {
         // actors have a specific event type for done events
         if (event.type === 'xstate.done.actor.fetchQuote') {
           return event.output;
@@ -73,8 +73,10 @@ const swapMachine = setup({
       dirty: false,
     })),
     setSubmitError: assign({
-      submitError: ({ event }: { event: AnyEventObject }) => {
-        return event?.error?.message || 'An error occurred while processing your request.';
+      submitError: ({ event }) => {
+        if ('error' in event && event.error) {
+          return (event.error as Error)?.message || 'An error occurred while processing your request.';
+        }
       },
       dirty: false,
     }),
@@ -147,7 +149,7 @@ const swapMachine = setup({
           },
           onError: [{
             // user rejected the request
-            guard: ({ event }: { event: AnyEventObject }) => {
+            guard: ({ event }) => {
               if ((event?.error as Error)?.message?.includes('User rejected the request')) {
                 return true;
               }
