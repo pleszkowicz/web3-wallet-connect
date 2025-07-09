@@ -1,7 +1,7 @@
 'use client';
 import { ContentCard } from '@/components/ContentCard';
 import { ContentLayout } from '@/components/ContentLayout';
-import { createSwapMachine, FeeTier, SwapContext } from '@/components/swap/machines/swap-machine';
+import { createSwapMachine, FeeTier, QuotesMap, SwapContext } from '@/components/swap/machines/swap-machine';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -82,22 +82,52 @@ export function TokenSwap() {
   const { writeContractAsync } = useWriteContract();
   const { address } = useAccount();
 
-  const fetchQuoteActor = fromPromise<bigint, SwapContext>(async ({ input }) => {
-    const res = await publicClient?.simulateContract({
-      address: quoterAddress as Address,
-      abi: UNISWAP_V3_QUOTER_ABI,
-      functionName: 'quoteExactInputSingle',
-      args: [
-        {
-          tokenIn: (tokenMap[input.tokenIn] as ERC20Token).address,
-          tokenOut: (tokenMap[input.tokenOut] as ERC20Token).address,
-          amountIn: parseUnits(input.amount, tokenMap[input.tokenIn].decimals),
-          fee: input.fee,
-          sqrtPriceLimitX96: BigInt(0),
-        },
-      ],
+  const fetchQuotesActor = fromPromise<QuotesMap, SwapContext>(async ({ input, emit }) => {
+    const rawQuotes = await Promise.allSettled(
+      poolFeeOptions.map((feeTier) => {
+        try {
+          const simulateContractPromise = publicClient
+            ?.simulateContract({
+              address: quoterAddress as Address,
+              abi: UNISWAP_V3_QUOTER_ABI,
+              functionName: 'quoteExactInputSingle',
+              args: [
+                {
+                  tokenIn: (tokenMap[input.tokenIn] as ERC20Token).address,
+                  tokenOut: (tokenMap[input.tokenOut] as ERC20Token).address,
+                  amountIn: parseUnits(input.amount, tokenMap[input.tokenIn].decimals),
+                  fee: feeTier.fee,
+                  sqrtPriceLimitX96: BigInt(0),
+                },
+              ],
+            })
+            .then((result) => ({
+              fee: feeTier.fee,
+              amount: result?.result[0],
+            }));
+
+          return simulateContractPromise;
+        } catch (err) {
+          console.log(err);
+        }
+      })
+    );
+
+    const quotesMap: QuotesMap = {
+      500: 0n,
+      3000: 0n,
+      10000: 0n,
+    };
+
+    rawQuotes.forEach((rawQuote, index) => {
+      if (rawQuote.status === 'fulfilled') {
+        quotesMap[rawQuote?.value?.fee as FeeTier] = rawQuote?.value?.amount ?? 0n;
+      } else {
+        quotesMap[poolFeeOptions[index].fee] = 0n;
+      }
     });
-    return res?.result[0] as bigint;
+
+    return quotesMap as QuotesMap;
   });
 
   const submitSwapActor = fromPromise<Hash, SwapContext>(async ({ input }) => {
@@ -202,7 +232,7 @@ export function TokenSwap() {
 
   const machineWithDeps = createSwapMachine({
     actors: {
-      fetchQuote: fetchQuoteActor,
+      fetchQuotes: fetchQuotesActor,
       awaitBlockchainConfirmation: awaitBlockchainConfirmationActor,
       submitSwap: submitSwapActor,
     },
@@ -229,7 +259,8 @@ export function TokenSwap() {
 
   const [state, send] = useMachine(machineWithDeps);
 
-  const { tokenIn, tokenOut, amount, fee, quote } = state.context;
+  const { tokenIn, tokenOut, amount, fee, quotesMap } = state.context;
+  const quote = quotesMap?.[fee];
 
   const expectedAmountOut = quote ? Number(formatUnits(quote, tokenMap[tokenOut].decimals)) : 0;
 
@@ -271,6 +302,7 @@ export function TokenSwap() {
               <div className="relative flex flex-row items-center justify-between">
                 <div>
                   <Input
+                    autoFocus
                     onChange={(e) => send({ type: 'CHANGE', field: 'amount', value: e.target.value })}
                     id="value"
                     type="number"
@@ -365,7 +397,7 @@ export function TokenSwap() {
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-1">
-                      <span className="text-sm font-medium text-white">Pool Fee</span>
+                      <span className="text-sm font-medium text-white">Pool Fee (best rate auto-selected)</span>
                     </div>
                     <span className="text-sm text-gray-400">Select fee tier</span>
                   </div>
@@ -376,7 +408,7 @@ export function TokenSwap() {
                         type="button"
                         key={option.fee}
                         variant="outline"
-                        onClick={() => send({ type: 'CHANGE', field: 'fee', value: option.fee })}
+                        onClick={() => send({ type: 'UPDATE_FEE', field: 'fee', value: option.fee })}
                         className={`flex h-auto cursor-pointer flex-col items-center gap-1 p-3 transition-all duration-200 hover:bg-gray-700 ${
                           fee === option.fee
                             ? `border-2 ${option.color.replace('text-', 'border-')} bg-gray-700`
@@ -423,7 +455,7 @@ export function TokenSwap() {
                 className="mt-4"
                 size="xl"
                 onClick={() => send({ type: 'EXECUTE_SWAP' })}
-                disabled={state.matches('submitting') || quote === undefined}
+                disabled={state.matches('submitting') || quote === 0n || quote === undefined}
               >
                 Swap
               </Button>
@@ -460,7 +492,6 @@ const TRANSACTION_STATUSES = {
   },
   confirmed: {
     title: 'Congratulations - Swap Confirmed',
-    // confetti like lucide react icon
     icon: <Check className="text-3xl text-green-400" />,
     message: (
       <>

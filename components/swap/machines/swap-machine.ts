@@ -1,40 +1,46 @@
+import { poolFeeMap } from "@/components/swap/TokenSwap";
 import { tokenMap, TokenMapKey } from "@/const/tokens";
 import { Hash } from "viem";
 import { AnyEventObject, assign, PromiseActorLogic, setup } from "xstate";
 
 export type FeeTier = 500 | 3000 | 10000;
 
+export type QuotesMap = Record<FeeTier, bigint>;
+
 export interface SwapContext {
   tokenIn: TokenMapKey;
   tokenOut: TokenMapKey;
   amount: string;
   fee: FeeTier;
-  quote?: bigint;
+  quotesMap?: QuotesMap;
   fieldError?: Partial<Record<keyof Pick<SwapContext, 'tokenIn' | 'tokenOut' | 'amount' | 'fee'>, string>>;
   submitError?: string;
   dirty: boolean; // helper to prevent unnecessary re-fetching of quotes
 }
 
 export type SwapEvent =
-  | { type: 'CHANGE'; field: keyof Pick<SwapContext, 'tokenIn' | 'tokenOut' | 'amount' | 'fee'>; value: string | number }
-  | { type: 'xstate.done.actor.fetchQuote'; output: bigint }
+  | { type: 'CHANGE'; field: keyof Pick<SwapContext, 'tokenIn' | 'tokenOut' | 'amount'>; value: string | number }
+  | { type: 'UPDATE_FEE'; field: keyof SwapContext; value: FeeTier }
+  | { type: 'xstate.done.actor.fetchQuotes'; output: QuotesMap }
   | { type: 'SWAP_TOKENS' }
   | { type: 'EXECUTE_SWAP'; }
   | { type: 'AWAIT_CONFIRMATION'; }
   | { type: 'RESET' };
 
+const DEFAULT_FEE_TIER: FeeTier = 3000
+
 const initialContext = {
   tokenIn: tokenMap.link.symbol,
   tokenOut: tokenMap.usdc.symbol,
   amount: '',
-  fee: 3000,
-  quote: undefined,
+  fee: DEFAULT_FEE_TIER,
+  quotesMap: undefined,
   fieldError: undefined,
   submitError: undefined,
   dirty: false,
 } as SwapContext
 
-type FetchQuoteLogic = PromiseActorLogic<bigint, SwapContext>
+type FetchQuotesLogic = PromiseActorLogic<QuotesMap, SwapContext>
 type SubmitSwapLogic = PromiseActorLogic<Hash, SwapContext>
 type AwaitConfirmationLogic = PromiseActorLogic<void, { txHash: Hash }>
 
@@ -57,18 +63,40 @@ export const swapMachine = setup({
       }
       return context;
     }),
-    setQuote: assign({
+    updateFee: assign({
+      fee: ({ event }) => {
+        if (event.type === 'UPDATE_FEE') {
+          return event.value
+        }
+        return DEFAULT_FEE_TIER;
+      }
+    }),
+    setQuotesAndFee: assign({
       dirty: false, // prevent unnecessary re-fetching
-      quote: ({ event }) => {
+      fee: ({ event }) => {
+        if (event.type === 'xstate.done.actor.fetchQuotes') {
+          const quotesMap = event.output as QuotesMap;
+
+          const bestFee: FeeTier | undefined = Object.entries(quotesMap).reduce((bestFee, [fee, currentAmount]) => {
+            const bestAmount = quotesMap[bestFee];
+            const feeNum = Number(fee) as FeeTier;
+            return currentAmount > bestAmount ? feeNum : bestFee;
+          }, DEFAULT_FEE_TIER as FeeTier);
+
+          return bestFee ?? DEFAULT_FEE_TIER;
+        }
+        return DEFAULT_FEE_TIER;
+      },
+      quotesMap: ({ event }) => {
         // actors have a specific event type for done events
-        if (event.type === 'xstate.done.actor.fetchQuote') {
+        if (event.type === 'xstate.done.actor.fetchQuotes') {
           return event.output;
         }
       },
     }),
     clearQuote: assign(({ context }: { context: SwapContext }): SwapContext => ({
       ...context,
-      quote: undefined,
+      quotesMap: undefined,
       submitError: undefined,
       dirty: false,
     })),
@@ -91,7 +119,7 @@ export const swapMachine = setup({
   },
 
   actors: {
-    fetchQuote: (() => { throw new Error('Provide actor logic') }) as unknown as FetchQuoteLogic,
+    fetchQuotes: (() => { throw new Error('Provide actor logic') }) as unknown as FetchQuotesLogic,
     submitSwap: (() => { throw new Error('Provide actor logic') }) as unknown as SubmitSwapLogic,
     awaitBlockchainConfirmation: (() => { throw new Error('Provide actor logic') }) as unknown as AwaitConfirmationLogic,
   },
@@ -114,6 +142,7 @@ export const swapMachine = setup({
       idle: {
         on: {
           CHANGE: { actions: ['clearQuote', 'updateField', 'validateField'] },
+          UPDATE_FEE: { actions: 'updateFee' },
           SWAP_TOKENS: { actions: ['clearQuote', 'swapTokens', 'validateField'] },
           EXECUTE_SWAP: 'submitting',
           AWAIT_CONFIRMATION: 'awaitingBlockchainConfirmation',
@@ -126,12 +155,12 @@ export const swapMachine = setup({
       },
       loadingQuote: {
         invoke: [{
-          id: 'fetchQuote',
-          src: 'fetchQuote',
+          id: 'fetchQuotes',
+          src: 'fetchQuotes',
           input: ({ context }: { context: SwapContext }) => context,
           onDone: {
             target: 'idle',
-            actions: 'setQuote',
+            actions: 'setQuotesAndFee',
           },
           onError: {
             target: 'idle',
@@ -210,7 +239,7 @@ export const swapMachine = setup({
 
 type CreateSwapMachineTypes = {
   actors: {
-    fetchQuote: FetchQuoteLogic
+    fetchQuotes: FetchQuotesLogic
     submitSwap: SubmitSwapLogic
     awaitBlockchainConfirmation: AwaitConfirmationLogic
   }

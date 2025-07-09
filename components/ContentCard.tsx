@@ -33,7 +33,7 @@ export const ContentCard = ({
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-lg font-semibold text-white">{title}</h2>
-              <p className="text-sm text-gray-400 mt-1">{description}</p>
+              <p className="mt-1 text-sm text-gray-400">{description}</p>
             </div>
             {badge}
           </div>
