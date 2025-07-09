@@ -1,0 +1,47 @@
+specVersion: 1.3.0
+indexerHints:
+  prune: auto
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: NftMarketplace
+    network: sepolia
+    source:
+      address: "0x1d02E4B9F6B62475fcc4cD74b55aF8eeD96F1f66"
+      abi: NftMarketplace
+      startBlock: 8300000
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.9
+      language: wasm/assemblyscript
+      entities:
+        - Approval
+        - ApprovalForAll
+        - BatchMetadataUpdate
+        - MetadataUpdate
+        - NftCreated
+        - NftListingChanged
+        - NftSold
+        - Transfer
+      abis:
+        - name: NftMarketplace
+          file: ./abis/NftMarketplace.json
+      eventHandlers:
+        - event: Approval(indexed address,indexed address,indexed uint256)
+          handler: handleApproval
+        - event: ApprovalForAll(indexed address,indexed address,bool)
+          handler: handleApprovalForAll
+        - event: BatchMetadataUpdate(uint256,uint256)
+          handler: handleBatchMetadataUpdate
+        - event: MetadataUpdate(uint256)
+          handler: handleMetadataUpdate
+        - event: NftCreated(uint256,address,uint256,string)
+          handler: handleNftCreated
+        - event: NftListingChanged(uint256,uint256)
+          handler: handleNftListingChanged
+        - event: NftSold(uint256,address,address,uint256)
+          handler: handleNftSold
+        - event: Transfer(indexed address,indexed address,indexed uint256)
+          handler: handleTransfer
+      file: ./src/nft-marketplace.ts
