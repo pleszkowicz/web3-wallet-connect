@@ -8,7 +8,7 @@ const compat = new FlatCompat({
 const eslintConfig = [
   ...compat.config({
     extends: ['next/core-web-vitals', 'next/typescript', 'eslint-config-next', 'prettier'],
-    ignorePatterns: ['.next/**', 'lib/generated/prisma/**'],
+    ignorePatterns: ['.next/**', 'lib/generated/prisma/**', '/subgraph/**'],
     settings: {
       next: {
         rootDir: '/',
