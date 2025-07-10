@@ -1,17 +1,19 @@
 'use client';
 import { ContentLayout } from '@/components/ContentLayout';
+import { NftListItem } from '@/components/nft/NftListItem';
 import { Button } from '@/components/ui/button';
 import { DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { NFT_MARKET_CONTRACT_ABI } from '@/const/nft-marketplace/nft-marketplace-abi';
+import { NFT_MARKETPLACE_ADDRESS } from '@/const/nft-marketplace/nft-marketplace-address';
 import { useMounted } from '@/hooks/useMounted';
-import { cn } from '@/lib/cn';
 import { Dialog } from '@radix-ui/react-dialog';
 import { OpenInNewWindowIcon } from '@radix-ui/react-icons';
 import { Code, Loader2, Rocket, Wallet2 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect, useMemo, useState } from 'react';
-import { Connector, useAccount, useConnect } from 'wagmi';
+import { useEffect, useState } from 'react';
+import { Connector, useAccount, useConnect, useReadContract } from 'wagmi';
 
 export function ConnectWallet() {
   const { connectors, connectAsync, isPending: isConnectionPending, isSuccess: isConnectionSuccess } = useConnect();
@@ -19,12 +21,16 @@ export function ConnectWallet() {
   const { push } = useRouter();
   const [open, setIsOpen] = useState(false);
 
-  // prevent re-render during wallet connect action
-  const nftPlaceholders = useMemo(() => {
-    return [300, 700, 500].map((nftPlaceholderDelay) => (
-      <NftPlaceholder delay={nftPlaceholderDelay} key={nftPlaceholderDelay} />
-    ));
-  }, []);
+  // Fetch NFTs for display (show up to 3)
+  const {
+    data: nfts,
+    isLoading: isNftsLoading,
+    error: nftsError,
+  } = useReadContract({
+    address: NFT_MARKETPLACE_ADDRESS,
+    abi: NFT_MARKET_CONTRACT_ABI,
+    functionName: 'getAllNfts',
+  });
 
   const mounted = useMounted();
 
@@ -51,8 +57,23 @@ export function ConnectWallet() {
       </div>
       <div className="mb-16">
         <h2 className="mb-8 text-center text-2xl font-bold text-white md:text-3xl">Explore & Trade NFTs</h2>
-
-        <div className="grid grid-cols-3 gap-6">{nftPlaceholders}</div>
+        <div className="grid grid-cols-3 gap-6">
+          {isNftsLoading ? (
+            <Loader2 className="mx-auto animate-spin" />
+          ) : nftsError ? (
+            <p className="col-span-3 text-red-500">
+              Unable to show NFTs, please check your connection or try again later.
+            </p>
+          ) : nfts && nfts.length > 0 ? (
+            nfts.slice(0, 3).map((nft) => (
+              <div key={nft.tokenId} className="flex flex-col justify-between text-center">
+                <NftListItem tokenId={nft.tokenId} price={nft.price} owner={nft.owner} hideLink />
+              </div>
+            ))
+          ) : (
+            <p className="col-span-3 mt-4 text-gray-400">No NFTs created.</p>
+          )}
+        </div>
       </div>
       <div className="mb-16 text-center">
         <h2 className="mb-8 text-2xl font-bold text-white md:text-3xl">Let's dive</h2>
@@ -200,80 +221,3 @@ function WalletOption({
     </Button>
   );
 }
-
-const delayMap: Record<number, string> = {
-  0: 'delay-0',
-  100: 'delay-100',
-  200: 'delay-200',
-  300: 'delay-300',
-  500: 'delay-500',
-  700: 'delay-700',
-  1000: 'delay-1000',
-};
-
-const getRandomTokenData = () => {
-  const names = ['Sky Ape', 'Pixel Cat', 'Cyber Punk', 'Mystic Fox'];
-  const descriptions = ['Cool NFT', 'Limited Edition', 'Rare drop', 'Exclusive art'];
-  const prices = [0.016, 0.05, 0.1, 0.25, 0.5];
-  const gradients = [
-    ['from-purple-900', 'via-pink-700', 'to-amber-500'],
-    ['from-blue-900', 'via-indigo-700', 'to-sky-500'],
-    ['from-green-900', 'via-emerald-700', 'to-lime-500'],
-    ['from-orange-800', 'via-yellow-600', 'to-red-400'],
-    ['from-red-900', 'via-orange-700', 'to-yellow-500'],
-  ];
-
-  return {
-    gradient: gradients[Math.floor(Math.random() * prices.length)],
-    name: names[Math.floor(Math.random() * names.length)],
-    description: descriptions[Math.floor(Math.random() * descriptions.length)],
-    price: prices[Math.floor(Math.random() * prices.length)],
-  };
-};
-
-const generateRandomCircles = (count = 5) =>
-  Array.from({ length: count }).map((_, i) => {
-    const cx = Math.floor(Math.random() * 100);
-    const cy = Math.floor(Math.random() * 100);
-    const r = Math.floor(Math.random() * 10) + 3;
-    const opacity = (Math.random() * 0.1 + 0.05).toFixed(2);
-    const blur = Math.random() > 0.5 ? 'blur-xs' : '';
-    const delay = `${Math.floor(Math.random() * 3)}s`;
-    return (
-      <circle
-        key={i}
-        cx={cx}
-        cy={cy}
-        r={r}
-        fill={`hsl(${Math.floor(Math.random() * 360)}, 70%, 80%)`}
-        style={{ animationDelay: delay }}
-        className={`animate-float opacity-[${opacity}] ${blur}`}
-      />
-    );
-  });
-
-const NftPlaceholder = ({ delay }: { delay: number }) => {
-  const { gradient, name, description, price } = getRandomTokenData();
-  const delayClass = delayMap[delay] ?? 'delay-0';
-
-  return (
-    <div
-      className={cn(
-        gradient,
-        delayClass,
-        'animate-fade-in relative aspect-square overflow-hidden rounded-xl bg-linear-to-br opacity-0'
-      )}
-    >
-      <div className="absolute inset-0 opacity-20">
-        <svg className="h-full w-full" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-          {generateRandomCircles(delay / 100)}
-        </svg>
-      </div>
-      <div className="absolute top-[30%] right-0 bottom-0 left-0 flex flex-col justify-end bg-linear-to-t from-black to-transparent p-2">
-        <h3 className="font-bold text-white">{name}</h3>
-        <p className="text-sm text-gray-300">{description}</p>
-        <p className="mt-1 font-bold text-green-400">{price} ETH</p>
-      </div>
-    </div>
-  );
-};

@@ -17,7 +17,7 @@ const geistMono = localFont({
 
 export const metadata: Metadata = {
   title: 'Web3 Dashboard - Piotr Leszkowicz',
-  description: 'Pure ',
+  description: 'Web3 Dashboard',
 };
 
 export default function RootLayout({

@@ -181,13 +181,14 @@ const NftItem = ({ tokenId, owner, price }: NftItemProps) => {
           isSaleApproved={isSaleApproved}
           tokenDetailsError={tokenDetailsError}
           isPreview
+          hideLink
         />
 
         <ContentCard title="NFT Details" className="space-y-3">
           <div className="flex justify-between">
             <span className="text-gray-400">Contract Address</span>
-            <div className="flex items-center gap-2 wrap">
-              <span className="text-white font-mono text-sm">{shrotenAddress(NFT_MARKETPLACE_ADDRESS)}</span>
+            <div className="wrap flex items-center gap-2">
+              <span className="font-mono text-sm text-white">{shrotenAddress(NFT_MARKETPLACE_ADDRESS)}</span>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
@@ -334,7 +335,7 @@ const NftPrice = ({ tokenId, price, isOwned }: NftPriceProps) => {
                       <FormError name="price" />
                     </div>
                   </div>
-                  <p className="text-gray-400 text-sm"> Once saved, you’ll confirm the transaction in your wallet.</p>
+                  <p className="text-sm text-gray-400"> Once saved, you’ll confirm the transaction in your wallet.</p>
                   <DialogFooter>
                     <Button variant="outline" onClick={() => setIsEditing(false)}>
                       Cancel

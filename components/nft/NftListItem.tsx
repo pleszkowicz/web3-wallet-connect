@@ -13,7 +13,12 @@ import { Fragment, ReactNode, useEffect, useState } from 'react';
 import { formatEther } from 'viem';
 import { useAccount, useReadContract } from 'wagmi';
 
-export const NftListItem = ({ tokenId, price, owner }: Nft) => {
+interface NftListItemProps extends Nft {
+  isPreview?: boolean;
+  hideLink?: boolean;
+}
+
+export const NftListItem = ({ tokenId, price, owner, isPreview, hideLink }: NftListItemProps) => {
   const { data: tokenURI, isLoading } = useReadContract({
     address: NFT_MARKETPLACE_ADDRESS,
     abi: NFT_MARKET_CONTRACT_ABI,
@@ -58,6 +63,8 @@ export const NftListItem = ({ tokenId, price, owner }: Nft) => {
 
   return (
     <NftListItemUI
+      isPreview={isPreview}
+      hideLink={hideLink}
       tokenId={tokenId}
       tokenDetailsError={tokenDetailsError}
       isLoading={isLoading || isLoadingTokenDetails}
@@ -78,6 +85,7 @@ type NftListItemUIProps = {
   isSaleApproved: boolean;
   price?: bigint;
   isPreview?: boolean;
+  hideLink?: boolean;
 };
 
 export const NftListItemUI = ({
@@ -88,53 +96,53 @@ export const NftListItemUI = ({
   isOwned,
   isSaleApproved,
   price,
+  hideLink = false,
   isPreview = false,
 }: NftListItemUIProps) => {
-  const Wrapper = isPreview ? Fragment : Link;
   return (
-    <div className="flex flex-col w-full animate-fade-in opacity-0 overflow-hidden transition-all duration-200 shadow-lg">
-      <ConditionalLink href={isPreview ? undefined : `/dashboard/nfts/view/${tokenId}`}>
+    <div className="animate-fade-in flex w-full flex-col overflow-hidden opacity-0 shadow-lg transition-all duration-200">
+      <ConditionalLink href={hideLink ? undefined : `/dashboard/nfts/view/${tokenId}`}>
         <div
-          className={`relative aspect-square rounded-xl border-2 ${isPreview && 'border-dashed'} border-gray-700 bg-gray-800/50 overflow-hidden`}
+          className={`relative aspect-square rounded-xl border ${isPreview && 'border-dashed'} overflow-hidden border-gray-700 bg-gray-800/50`}
         >
           {tokenDetailsError ? (
-            <span className="text-red-500 text-sm text-center">Failed to load metadata</span>
+            <span className="text-center text-sm text-red-500">Failed to load metadata</span>
           ) : isLoading ? (
             <div className="flex h-full items-center justify-center">
               <div className="text-center">
-                {isPreview && <ImageIcon className="mx-auto h-8 w-8 text-gray-600 mb-2" />}
+                {isPreview && <ImageIcon className="mx-auto mb-2 h-8 w-8 text-gray-600" />}
                 <p className="text-sm text-gray-500">{isPreview ? 'Image preview' : <Loader />}</p>
               </div>
             </div>
           ) : !tokenDetails ? null : (
             <>
-              <div className="relative w-full h-full">
+              <div className="relative h-full w-full">
                 <Image
                   loading="lazy"
                   priority={false}
                   src={tokenDetails.image}
                   alt={tokenDetails.name || 'NFT Image'}
-                  className="pointer w-full aspect-square object-cover transform transition-transform duration-1000 hover:scale-[1.02]"
+                  className="pointer aspect-square w-full transform object-cover transition-transform duration-1000 hover:scale-[1.02]"
                   width={192}
                   height={192}
                 />
               </div>
-              <div className="absolute top-2 right-2 flex flex-row gap-1 z-10 cursor-default">
+              <div className="absolute top-2 right-2 z-10 flex cursor-default flex-row gap-1">
                 {isOwned && <NftStatusHelper variant="owner" />}
                 {isSaleApproved && <NftStatusHelper variant="for-sale" />}
               </div>
 
-              <div className="absolute bottom-0 left-0 top-[50%] p-2 w-full flex flex-row items-end gap-1 z-10 text-white text-left bg-linear-to-b from-transparent to-black bg-opacity-100">
+              <div className="bg-opacity-100 absolute top-[50%] bottom-0 left-0 z-10 flex w-full flex-row items-end gap-1 bg-linear-to-b from-transparent to-black p-2 text-left text-white">
                 <div className="w-full">
-                  <h3 className="text-sm font-semibold truncate overflow-hidden whitespace-nowrap">
+                  <h3 className="truncate overflow-hidden text-sm font-semibold whitespace-nowrap">
                     <b>{tokenDetails.name}</b>
                   </h3>
 
-                  <p className="text-sm text-white truncate overflow-hidden whitespace-nowrap">
+                  <p className="truncate overflow-hidden text-sm whitespace-nowrap text-white">
                     {tokenDetails.description}
                   </p>
 
-                  <p className="mt-1 text-lg text-green-300 font-semibold display-inline">
+                  <p className="display-inline mt-1 text-lg font-semibold text-green-300">
                     <b>{price && formatEther(price)} ETH</b>
                   </p>
                 </div>
