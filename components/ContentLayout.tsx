@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Separator } from '@/components/ui/separator';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { ConnectWallet } from '@/components/wallet/ConnectWallet';
 import { DisconnectWallet } from '@/components/wallet/DisconnectWallet';
 import { NetworkSwitch } from '@/components/wallet/NetworkSwitch';
 import { useIsMobile } from '@/hooks/useMobile';
@@ -54,47 +55,47 @@ export const ContentLayout = ({ title, description, goBackUrl, children }: CardL
               </div>
             </div>
 
-            {isConnected && (
-              <div className="flex flex-row gap-2">
-                {!isMobile && <WalletAddress />}
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      size="icon"
-                      className="text-gray-400 hover:bg-gray-800 hover:text-white"
-                      variant="ghost"
-                      data-testid="wallet-menu-button"
+            <div className="flex flex-row gap-2">
+              {isConnected ? (
+                <>
+                  !isMobile && <WalletAddress />
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        size="icon"
+                        className="text-gray-400 hover:bg-gray-800 hover:text-white"
+                        variant="ghost"
+                        data-testid="wallet-menu-button"
+                      >
+                        <User width={20} />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                      align="end"
+                      side="bottom"
+                      className="border border-gray-700 bg-gray-800 shadow-lg"
                     >
-                      <User width={20} />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent
-                    align="end"
-                    side="bottom"
-                    className="border border-gray-700 bg-gray-800 shadow-lg"
-                  >
-                    <div>
-                      <h3 className="my-4 text-center text-lg text-gray-200">Account</h3>
+                      <div>
+                        <h3 className="my-4 text-center text-lg text-gray-200">Account</h3>
 
-                      {isMobile && (
-                        <>
-                          <div className="flex flex-col items-center gap-4 p-4 pb-2">
-                            <WalletAddress />
-                          </div>
-                        </>
-                      )}
-                    </div>
+                        {isMobile && (
+                          <>
+                            <div className="flex flex-col items-center gap-4 p-4 pb-2">
+                              <WalletAddress />
+                            </div>
+                          </>
+                        )}
+                      </div>
 
-                    {/* <Separator className="bg-gray-700/50" /> */}
+                      {/* <Separator className="bg-gray-700/50" /> */}
 
-                    <div className="flex flex-col items-center justify-center gap-1 p-4 pt-2 pb-4">
-                      <p className="text-xs text-gray-400">Network:</p>
-                      <NetworkSwitch />
-                    </div>
+                      <div className="flex flex-col items-center justify-center gap-1 p-4 pt-2 pb-4">
+                        <p className="text-xs text-gray-400">Network:</p>
+                        <NetworkSwitch />
+                      </div>
 
-                    <Separator className="bg-gray-700/50" />
+                      <Separator className="bg-gray-700/50" />
 
-                    {isConnected && (
                       <div>
                         {/* <Separator className="bg-gray-700" /> */}
 
@@ -114,11 +115,13 @@ export const ContentLayout = ({ title, description, goBackUrl, children }: CardL
 
                         <DisconnectWallet className="flex w-full cursor-pointer gap-2 rounded-none text-gray-400 hover:bg-gray-700 hover:text-white" />
                       </div>
-                    )}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-            )}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </>
+              ) : (
+                <ConnectWallet buttonSize="lg" variant="secondary" />
+              )}
+            </div>
           </div>
         </div>
       </header>

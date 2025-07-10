@@ -2,15 +2,12 @@
 import { withMounted } from '@/lib/hoc/withMounted';
 import dynamic from 'next/dynamic';
 
-const LazyWalletConnect = dynamic(
-  () => import('@/components/wallet/ConnectWallet').then((module) => module.ConnectWallet),
-  {
-    ssr: false,
-  }
-);
+const LazyHomePage = dynamic(() => import('@/components/home-page/HomePage').then((module) => module.HomePage), {
+  ssr: false,
+});
 
 function HomePage() {
-  return <LazyWalletConnect />;
+  return <LazyHomePage />;
 }
 
 const HomePageWithMounted = withMounted(HomePage);
