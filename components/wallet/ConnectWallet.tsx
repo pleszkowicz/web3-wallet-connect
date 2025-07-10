@@ -11,9 +11,10 @@ import { Connector, useAccount, useConnect } from 'wagmi';
 interface WalletOptionProps {
   buttonSize: 'lg' | 'xl';
   variant?: 'default' | 'secondary';
+  testId?: string;
 }
 
-export function ConnectWallet({ buttonSize = 'lg', variant = 'default' }: WalletOptionProps) {
+export function ConnectWallet({ buttonSize = 'lg', variant = 'default', testId }: WalletOptionProps) {
   const { connectors, connectAsync, isPending: isConnectionPending, isSuccess: isConnectionSuccess } = useConnect();
   const { isConnected } = useAccount();
   const { push } = useRouter();
@@ -33,7 +34,7 @@ export function ConnectWallet({ buttonSize = 'lg', variant = 'default' }: Wallet
     <Dialog open={open} onOpenChange={setIsOpen}>
       <DialogTrigger asChild onAbort={() => setIsOpen(false)}>
         <Button
-          data-testid="connect-wallet-button"
+          data-testid={testId}
           variant={variant}
           size={buttonSize}
           className="cursor-pointer"

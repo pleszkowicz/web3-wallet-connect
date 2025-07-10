@@ -119,7 +119,7 @@ export const ContentLayout = ({ title, description, goBackUrl, children }: CardL
                   </DropdownMenu>
                 </>
               ) : (
-                <ConnectWallet buttonSize="lg" variant="secondary" />
+                <ConnectWallet buttonSize="lg" variant="secondary" testId="connect-wallet-button-header" />
               )}
             </div>
           </div>

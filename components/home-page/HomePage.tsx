@@ -75,7 +75,7 @@ export function HomePage() {
         {/* <h2 className="mb-8 text-2xl font-bold text-white md:text-3xl">Launch Your Dashboard</h2> */}
 
         {!isConnected ? (
-          <ConnectWallet buttonSize="xl" />
+          <ConnectWallet buttonSize="xl" testId="connect-wallet-button" />
         ) : (
           <Button asChild variant="default" size="xl" data-testid="launch-dashboard-button">
             <Link href="/dashboard/tokens">
